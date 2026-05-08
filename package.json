@@ -19,12 +19,13 @@
     "@commitlint/config-conventional": "^20.5.3",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "eslint": "^10.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.2",
     "prettier": "^3.2.5",
     "turbo": "^2.9.9"
   },
-  "packageManager": "pnpm@8.15.5",
+  "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=18"
   },
