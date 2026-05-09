@@ -46,7 +46,6 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 
 - Node.js
 - pnpm
-- Docker (optional)
 
 ### Installation
 
@@ -66,15 +65,35 @@ cp .env.example .env
 
 ### Database Setup
 
-Create a PostgreSQL database
+This project requires a local PostgreSQL database.
+
+#### Install PostgreSQL
+
+**Linux / WSL**:
 
 ```sh
-createdb iskommerce
-# or
-docker compose up postgres -d
+sudo apt install postgresql postgresql-contrib
+sudo service postgresql start
 ```
 
-Run migrations
+Create database:
+
+```sh
+sudo -u postgres createdb iskommerce
+```
+
+**Windows**:
+
+- Install PostgreSQL from [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
+- During setup, ensure `psql` and tools are added to PATH
+
+Create database:
+
+```sh
+createdb -U postgres iskommerce
+```
+
+#### Run migrations
 
 ```sh
 pnpm db:migrate

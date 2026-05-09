@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: myapp
+      POSTGRES_DB: iskommerce
     ports:
       - '5432:5432'
     volumes:
@@ -19,7 +19,7 @@ services:
     env_file:
       - apps/api/.env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/iskommerce
       NODE_ENV: production
     depends_on:
       - postgres

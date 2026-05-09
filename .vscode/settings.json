@@ -38,7 +38,7 @@
       "port": 5432,
       "driver": "PostgreSQL",
       "name": "Iskommerce",
-      "database": "myapp",
+      "database": "iskommerce",
       "username": "postgres",
       "password": "postgres"
     }
