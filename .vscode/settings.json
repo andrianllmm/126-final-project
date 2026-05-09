@@ -29,5 +29,18 @@
     "**/dist": true,
     "**/.next": true,
     "**/.turbo": true
-  }
+  },
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "Iskommerce",
+      "database": "myapp",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ]
 }
