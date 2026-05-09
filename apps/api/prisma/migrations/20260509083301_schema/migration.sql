@@ -1,17 +1,17 @@
 -- CreateEnum
-CREATE TYPE "ListingCondition" AS ENUM ('new', 'like_new', 'good', 'fair', 'for_parts');
+CREATE TYPE "ListingCondition" AS ENUM ('NEW', 'LIKE_NEW', 'GOOD', 'FAIR', 'FOR_PARTS');
 
 -- CreateEnum
-CREATE TYPE "ListingStatus" AS ENUM ('draft', 'available', 'reserved', 'sold', 'archived');
+CREATE TYPE "ListingStatus" AS ENUM ('DRAFT', 'AVAILABLE', 'RESERVED', 'SOLD', 'qD');
 
 -- CreateEnum
-CREATE TYPE "TransactionStatus" AS ENUM ('pending', 'accepted', 'rejected', 'completed', 'cancelled');
+CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED');
 
 -- CreateEnum
-CREATE TYPE "ReviewRole" AS ENUM ('buyer_to_seller', 'seller_to_buyer');
+CREATE TYPE "ReviewRole" AS ENUM ('BUYER_TO_SELLER', 'SELLER_TO_BUYER');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('message', 'transaction', 'system', 'rating');
+CREATE TYPE "NotificationType" AS ENUM ('MESSAGE', 'TRANSACTION', 'SYSTEM', 'RATING');
 
 -- CreateTable
 CREATE TABLE "ListingCategory" (
@@ -31,7 +31,7 @@ CREATE TABLE "Listing" (
     "price" DECIMAL(10,2) NOT NULL,
     "categoryId" TEXT NOT NULL,
     "condition" "ListingCondition" NOT NULL,
-    "status" "ListingStatus" NOT NULL DEFAULT 'draft',
+    "status" "ListingStatus" NOT NULL DEFAULT 'DRAFT',
     "meetupLocation" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE "Transaction" (
     "buyerId" TEXT NOT NULL,
     "sellerId" TEXT NOT NULL,
     "agreedPrice" DECIMAL(10,2) NOT NULL,
-    "status" "TransactionStatus" NOT NULL DEFAULT 'pending',
+    "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completedAt" TIMESTAMP(3),
 

@@ -93,39 +93,39 @@ model Verification {
 // =====================
 
 enum ListingCondition {
-  new
-  like_new
-  good
-  fair
-  for_parts
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  FOR_PARTS
 }
 
 enum ListingStatus {
-  draft
-  available
-  reserved
-  sold
-  archived
+  DRAFT
+  AVAILABLE
+  RESERVED
+  SOLD
+  qD
 }
 
 enum TransactionStatus {
-  pending
-  accepted
-  rejected
-  completed
-  cancelled
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
 }
 
 enum ReviewRole {
-  buyer_to_seller
-  seller_to_buyer
+  BUYER_TO_SELLER
+  SELLER_TO_BUYER
 }
 
 enum NotificationType {
-  message
-  transaction
-  system
-  rating
+  MESSAGE
+  TRANSACTION
+  SYSTEM
+  RATING
 }
 
 // =====================
@@ -154,7 +154,7 @@ model Listing {
   category   ListingCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
   condition ListingCondition
-  status    ListingStatus    @default(draft)
+  status    ListingStatus    @default(DRAFT)
 
   meetupLocation String?
 
@@ -253,7 +253,7 @@ model Transaction {
   seller   User   @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
 
   agreedPrice Decimal           @db.Decimal(10, 2)
-  status      TransactionStatus @default(pending)
+  status      TransactionStatus @default(PENDING)
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
