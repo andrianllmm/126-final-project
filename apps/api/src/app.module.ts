@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './auth/auth.js';
+
+import { PrismaService } from './prisma/prisma.service.js';
 
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
 import { UsersModule } from './users/users.module.js';
-import { PrismaService } from './prisma/prisma.service.js';
 import { UsersService } from './users/users.service.js';
 
 @Module({

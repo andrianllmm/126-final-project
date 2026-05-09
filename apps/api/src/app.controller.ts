@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service.js';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { AppService } from './app.service.js';
 
 @Controller()
 export class AppController {
@@ -8,7 +8,7 @@ export class AppController {
 
   @Get()
   @AllowAnonymous()
-  getHello(): string {
-    return this.appService.getHello();
+  getIndex() {
+    return this.appService.getIndex();
   }
 }
