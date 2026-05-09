@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalEnv": ["DATABASE_URL"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "WEB_URL",
+    "NEXT_PUBLIC_API_URL"
+  ],
   "globalDependencies": ["**/.env.*local"],
   "tasks": {
     "dev": {
