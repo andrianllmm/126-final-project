@@ -11,6 +11,7 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
     steps:
       - name: Checkout
@@ -31,12 +32,12 @@ jobs:
       - name: Prisma generate
         run: pnpm db:generate
 
-      - name: Validate DATABASE_URL
+      - name: Validate env
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL missing"
-            exit 1
-          fi
+          set -euo pipefail
+
+          [ -n "${DATABASE_URL:-}" ] || exit 1
+          [ -n "${DIRECT_URL:-}" ] || exit 1
 
       - name: Run migrations
         run: pnpm db:deploy
