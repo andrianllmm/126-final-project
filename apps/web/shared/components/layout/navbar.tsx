@@ -14,7 +14,8 @@ import {
   navigationMenuTriggerStyle,
 } from '@/shared/components/ui/navigation-menu';
 
-import { AuthButton } from '@/auth/components/auth-button';
+import { NavUser } from './nav-user';
+
 import { Logo } from '@/shared/components/brand/logo';
 import { Wordmark } from '@/shared/components/brand/wordmark';
 
@@ -102,8 +103,8 @@ export function Navbar({ className }: { className?: string }) {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Auth */}
-        <AuthButton />
+        {/* User */}
+        <NavUser />
       </div>
     </header>
   );
