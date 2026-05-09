@@ -5,18 +5,17 @@ import { resolve } from 'path';
 
 config({ path: resolve(__dirname, '.env') });
 
-const databaseUrl = process.env.DATABASE_URL;
+const directUrl = process.env.DIRECT_URL;
 
-if (!databaseUrl) {
-  throw new Error('DATABASE_URL is not set');
+if (!directUrl) {
+  throw new Error('DIRECT_URL is not set');
 }
-
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
   },
   datasource: {
-    url: databaseUrl,
+    url: directUrl,
   },
 });
