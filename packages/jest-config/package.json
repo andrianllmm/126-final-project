@@ -2,7 +2,9 @@
   "name": "@repo/jest-config",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -35,8 +37,5 @@
     "jest": "^30.2.0",
     "next": "16.2.0",
     "typescript": "^5.8.2"
-  },
-  "scripts": {
-    "build": "tsc"
   }
 }
