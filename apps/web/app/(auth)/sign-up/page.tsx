@@ -1,4 +1,10 @@
+import { Metadata } from 'next';
 import { SignupForm } from '@/auth/components/sign-up-form';
+
+export const metadata: Metadata = {
+  title: 'Sign Up | Iskommerce',
+  description: 'Create your Iskommerce account',
+};
 
 export default function Page() {
   return (
