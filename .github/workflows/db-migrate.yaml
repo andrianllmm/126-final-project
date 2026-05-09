@@ -3,6 +3,7 @@ name: DB Migration
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   migrate:
@@ -30,5 +31,13 @@ jobs:
       - name: Prisma generate
         run: pnpm db:generate
 
+      - name: Validate DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL missing"
+            exit 1
+          fi
+
       - name: Run migrations
         run: pnpm db:deploy
+        timeout-minutes: 3
