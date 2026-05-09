@@ -33,7 +33,8 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 - Next.js (Frontend)
 - NestJS (Backend)
 - PostgreSQL + Prisma (Database)
-- Tailwind CSS + shadcn/ui
+- Better Auth (Auth)
+- Tailwind CSS + shadcn/ui (UI)
 - TypeScript
 - Turborepo (Monorepo)
 
@@ -94,8 +95,7 @@ apps/
   web/        # Next.js frontend
   api/        # NestJS backend
 
-packages/
-  shared/     # shared utilities and configs
+packages/     # shared utilities and configs
 ```
 
 ---
