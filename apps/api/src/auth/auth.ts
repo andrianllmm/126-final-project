@@ -3,9 +3,6 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-console.log('process.env.DATABASE_URL', process.env.DATABASE_URL);
-console.log('process.env.BETTER_AUTH_URL', process.env.BETTER_AUTH_URL);
-
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL as string,
 });
