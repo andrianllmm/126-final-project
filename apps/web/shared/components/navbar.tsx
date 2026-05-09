@@ -12,6 +12,9 @@ import {
 
 import { AuthButton } from '@/auth/components/auth-button';
 
+import { Logo } from '@/shared/components/brand/logo';
+import { Wordmark } from '@/shared/components/brand/wordmark';
+
 /**
  * Types (explicit + minimal)
  */
@@ -35,8 +38,9 @@ export function Navbar() {
     <header className="w-full border-b">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         {/* Brand */}
-        <Link href="/" className="font-semibold">
-          Iskommerce
+        <Link href="/" className="flex items-center">
+          <Logo className="text-primary w-8 h-8 md:hidden" />
+          <Wordmark className="text-primary hidden md:block h-8 w-auto" />
         </Link>
 
         {/* Nav */}
