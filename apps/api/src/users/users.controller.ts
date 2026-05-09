@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UsersService } from './users.service.js';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 
 @Controller('users')
