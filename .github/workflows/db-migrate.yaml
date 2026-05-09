@@ -29,15 +29,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prisma generate
-        run: pnpm db:generate
-
       - name: Validate env
         run: |
           set -euo pipefail
 
           [ -n "${DATABASE_URL:-}" ] || exit 1
           [ -n "${DIRECT_URL:-}" ] || exit 1
+
+      - name: Prisma generate
+        run: pnpm db:generate
 
       - name: Run migrations
         run: pnpm db:deploy
