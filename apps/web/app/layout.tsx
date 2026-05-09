@@ -6,8 +6,8 @@ import { cn } from '@/shared/lib/utils';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'Title',
-  description: 'Description',
+  title: 'Iskommerce',
+  description: 'Buy and sell within UPV',
 };
 
 export default function RootLayout({
