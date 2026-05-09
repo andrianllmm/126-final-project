@@ -1,14 +1,16 @@
 {
-  "extends": "@repo/typescript-config/nestjs.json",
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "allowJs": true,
-    "baseUrl": "src",
-    "esModuleInterop": true,
-    "incremental": false,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "declaration": true,
     "outDir": "dist",
-    "types": ["node"],
-    "strictNullChecks": true
+    "rootDir": "src",
+
+    "strict": true,
+    "esModuleInterop": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "include": ["src"]
 }
