@@ -16,6 +16,8 @@ services:
       dockerfile: apps/api/Dockerfile
     ports:
       - '3000:3000'
+    env_file:
+      - apps/api/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
       NODE_ENV: production
@@ -28,6 +30,8 @@ services:
       dockerfile: apps/web/Dockerfile
     ports:
       - '3001:3000'
+    env_file:
+      - apps/web/.env
     environment:
       NODE_ENV: production
     depends_on:
