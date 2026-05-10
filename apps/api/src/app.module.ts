@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
-import { auth } from './auth/auth.js';
+import { auth } from './core/auth/auth.js';
 
 import { PrismaService } from './prisma/prisma.service.js';
 
