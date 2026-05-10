@@ -4,18 +4,17 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './core/auth/auth.js';
 
-import { PrismaService } from './prisma/prisma.service.js';
-
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
 import { UsersModule } from './modules/users/users.module.js';
-import { UsersService } from './modules/users/users.service.js';
+import { DatabaseModule } from './database/database.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    DatabaseModule,
     AuthModule.forRoot({
       auth,
       bodyParser: {
@@ -27,6 +26,6 @@ import { UsersService } from './modules/users/users.service.js';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UsersService],
+  providers: [AppService],
 })
 export class AppModule {}
