@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Learn more about Iskommerce',
 };
 
-export default function About() {
+export default function Page() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 space-y-8">
       <section className="space-y-2">
