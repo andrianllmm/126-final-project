@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { AboutPage } from '@/content/about/about-page';
+import { AboutPage } from '@/features/content/about/about-page';
 
 export const metadata: Metadata = {
   title: 'About Iskommerce',
