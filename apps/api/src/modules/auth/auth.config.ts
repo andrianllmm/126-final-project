@@ -2,8 +2,9 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { env } from '../../config/env.js';
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl = env.databaseUrl;
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL is not set');
@@ -15,10 +16,10 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = env.nodeEnv === 'production';
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  baseURL: env.betterAuthUrl,
   basePath: '/api/auth',
 
   database: prismaAdapter(prisma, {
@@ -29,7 +30,7 @@ export const auth = betterAuth({
     enabled: true,
   },
 
-  trustedOrigins: [process.env.WEB_URL || 'http://localhost:3001'],
+  trustedOrigins: [env.webUrl],
 
   advanced: {
     cookies: {
