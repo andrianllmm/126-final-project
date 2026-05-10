@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { authClient } from '@/features/auth/lib/auth-client';
+import { authClient } from '@/shared/lib/auth-client';
 
 import { Button } from '@/shared/components/ui/button';
 import {

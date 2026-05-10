@@ -5,7 +5,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-import { authClient } from '@/features/auth/lib/auth-client';
+import { authClient } from '@/shared/lib/auth-client';
 
 import { getInitials } from '@/shared/lib/get-initials';
 
