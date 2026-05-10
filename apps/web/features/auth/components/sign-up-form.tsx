@@ -23,7 +23,7 @@ import {
 import { Input } from '@/shared/components/ui/input';
 import Link from 'next/link';
 
-import { signUpSchema, SignUpInput } from '@repo/api';
+import { signUpSchema, SignUpInput } from '../validation/sign-up.schema';
 
 export function SignupForm({
   className,
