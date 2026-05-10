@@ -8,8 +8,8 @@ import { PrismaService } from './prisma/prisma.service.js';
 
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
-import { UsersModule } from './users/users.module.js';
-import { UsersService } from './users/users.service.js';
+import { UsersModule } from './modules/users/users.module.js';
+import { UsersService } from './modules/users/users.service.js';
 
 @Module({
   imports: [
