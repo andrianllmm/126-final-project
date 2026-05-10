@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
-import { auth } from './core/auth/auth.js';
+import { auth } from './modules/auth/auth.config.js';
 
 import { DatabaseModule } from './database/database.module.js';
 
