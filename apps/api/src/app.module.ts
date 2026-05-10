@@ -4,10 +4,18 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './core/auth/auth.js';
 
+import { DatabaseModule } from './database/database.module.js';
+
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
+
 import { UsersModule } from './modules/users/users.module.js';
-import { DatabaseModule } from './database/database.module.js';
+import { ListingsModule } from './modules/listings/listings.module.js';
+import { SearchModule } from './modules/search/search.module.js';
+import { MessagingModule } from './modules/messaging/messaging.module.js';
+import { TransactionsModule } from './modules/transactions/transactions.module.js';
+import { ReviewsModule } from './modules/reviews/reviews.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -24,6 +32,12 @@ import { DatabaseModule } from './database/database.module.js';
       },
     }),
     UsersModule,
+    ListingsModule,
+    SearchModule,
+    MessagingModule,
+    TransactionsModule,
+    ReviewsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
