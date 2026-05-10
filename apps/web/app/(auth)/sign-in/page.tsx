@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { SignInForm } from '@/auth/components/sign-in-form';
+import { SignInForm } from '@/features/auth/components/sign-in-form';
 
 export const metadata: Metadata = {
   title: 'Sign In | Iskommerce',

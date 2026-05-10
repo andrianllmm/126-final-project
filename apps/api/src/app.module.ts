@@ -2,20 +2,27 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
-import { auth } from './auth/auth.js';
+import { auth } from './modules/auth/auth.config.js';
 
-import { PrismaService } from './prisma/prisma.service.js';
+import { DatabaseModule } from './database/database.module.js';
 
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
-import { UsersModule } from './users/users.module.js';
-import { UsersService } from './users/users.service.js';
+
+import { UsersModule } from './modules/users/users.module.js';
+import { ListingsModule } from './modules/listings/listings.module.js';
+import { SearchModule } from './modules/search/search.module.js';
+import { MessagingModule } from './modules/messaging/messaging.module.js';
+import { TransactionsModule } from './modules/transactions/transactions.module.js';
+import { ReviewsModule } from './modules/reviews/reviews.module.js';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    DatabaseModule,
     AuthModule.forRoot({
       auth,
       bodyParser: {
@@ -25,8 +32,14 @@ import { UsersService } from './users/users.service.js';
       },
     }),
     UsersModule,
+    ListingsModule,
+    SearchModule,
+    MessagingModule,
+    TransactionsModule,
+    ReviewsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UsersService],
+  providers: [AppService],
 })
 export class AppModule {}
