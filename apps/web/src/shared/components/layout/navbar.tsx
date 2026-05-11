@@ -15,6 +15,7 @@ import {
 } from '@/shared/components/ui/navigation-menu';
 
 import { NavUser } from './nav-user';
+import { ThemeToggle } from '../theme-toggle';
 
 import { Logo } from '@/shared/components/brand/logo';
 import { Wordmark } from '@/shared/components/brand/wordmark';
@@ -104,7 +105,10 @@ export function Navbar({ className }: { className?: string }) {
         </NavigationMenu>
 
         {/* User */}
-        <NavUser />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <NavUser />
+        </div>
       </div>
     </header>
   );
