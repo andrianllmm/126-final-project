@@ -10,6 +10,34 @@ import { CreateListingDto } from './dto/create-listing.dto.js';
 export class ListingsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll(params: { sellerId?: string } = {}) {
+    const where: any = {};
+
+    if (params.sellerId) {
+      where.sellerId = params.sellerId;
+    } else {
+      where.status = 'AVAILABLE';
+    }
+
+    return this.prisma.listing.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        category: true,
+        images: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
   async create(sellerId: string, createListingDto: CreateListingDto) {
     const title = createListingDto.title?.trim();
     const description = createListingDto.description?.trim();
