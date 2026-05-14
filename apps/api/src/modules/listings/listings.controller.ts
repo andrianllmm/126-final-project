@@ -14,6 +14,7 @@ import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
+import { UpdateListingStatusDto } from './dto/update-listing-status.dto.js';
 
 @Controller('listings')
 export class ListingsController {
@@ -53,6 +54,27 @@ export class ListingsController {
     }
 
     return this.listingsService.update(listingId, userId, updateListingDto);
+  }
+
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') listingId: string,
+    @Req() req: Request,
+    @Body() updateStatusDto: UpdateListingStatusDto,
+  ) {
+    const userId = this.getAuthenticatedUserId(req);
+
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Authentication required to update listing status',
+      );
+    }
+
+    return this.listingsService.updateStatus(
+      listingId,
+      userId,
+      updateStatusDto.status,
+    );
   }
 
   private getAuthenticatedUserId(req: Request): string | undefined {

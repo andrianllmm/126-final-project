@@ -136,6 +136,67 @@ export class ListingsService {
     });
   }
 
+  async updateStatus(listingId: string, userId: string, newStatus: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    if (listing.sellerId !== userId) {
+      throw new ForbiddenException(
+        'You may only update the status of your own listing',
+      );
+    }
+
+    // Validate status transition
+    const validStatuses = [
+      'DRAFT',
+      'AVAILABLE',
+      'RESERVED',
+      'SOLD',
+      'ARCHIVED',
+    ];
+    if (!validStatuses.includes(newStatus)) {
+      throw new BadRequestException(
+        `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+      );
+    }
+
+    // Validate status transitions
+    const currentStatus = listing.status;
+    const invalidTransitions = {
+      SOLD: ['DRAFT', 'AVAILABLE', 'RESERVED'], // Can't go back from SOLD
+      ARCHIVED: ['DRAFT', 'AVAILABLE', 'RESERVED', 'SOLD'], // Can't go back from ARCHIVED
+    };
+
+    if (invalidTransitions[newStatus]?.includes(currentStatus)) {
+      throw new BadRequestException(
+        `Cannot change status from ${currentStatus} to ${newStatus}`,
+      );
+    }
+
+    const data: any = { status: newStatus };
+
+    // Set soldAt when status becomes SOLD
+    if (newStatus === 'SOLD' && currentStatus !== 'SOLD') {
+      data.soldAt = new Date();
+    }
+
+    return this.prisma.listing.update({
+      where: { id: listingId },
+      data,
+      include: {
+        category: true,
+        images: {
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
+    });
+  }
+
   async create(sellerId: string, createListingDto: CreateListingDto) {
     const title = createListingDto.title?.trim();
     const description = createListingDto.description?.trim();
