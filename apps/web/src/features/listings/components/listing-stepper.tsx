@@ -13,6 +13,8 @@ import {
 } from '@/shared/components/ui/stepper';
 import { CheckIcon, LoaderCircleIcon } from 'lucide-react';
 import { ListingForm } from '@/features/listings/components/listing-form';
+import { SellerTipsCard } from '@/features/listings/components/seller-tips-card';
+import { NeedHelpCard } from '@/features/listings/components/need-help-card';
 
 const steps = [{ title: 'Details' }, { title: 'Pricing' }, { title: 'Review' }];
 
@@ -50,7 +52,10 @@ export function Pattern() {
             <div className="md:col-span-2">
               <ListingForm />
             </div>
-            <div className="space-y-6"></div>
+            <div className="space-y-6">
+              <SellerTipsCard />
+              <NeedHelpCard />
+            </div>
           </div>
         </StepperContent>
 
