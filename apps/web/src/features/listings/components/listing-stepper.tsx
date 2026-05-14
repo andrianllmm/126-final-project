@@ -48,11 +48,11 @@ export function Pattern() {
       <StepperPanel>
         {/* Step 1 — Details */}
         <StepperContent value={1}>
-          <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <div className="-mt-4 md:col-span-2">
               <ListingForm />
             </div>
-            <div className="space-y-6">
+            <div className="mt-4 space-y-3">
               <SellerTipsCard />
               <NeedHelpCard />
             </div>
@@ -61,12 +61,12 @@ export function Pattern() {
 
         {/* Step 2 — Pricing */}
         <StepperContent value={2}>
-          <div className="max-w-7xl mx-auto px-4 md:px-6" />
+          <div className="max-w-5xl mx-auto px-4 md:px-6" />
         </StepperContent>
 
         {/* Step 3 — Review */}
         <StepperContent value={3}>
-          <div className="max-w-7xl mx-auto px-4 md:px-6" />
+          <div className="max-w-5xl mx-auto px-4 md:px-6" />
         </StepperContent>
       </StepperPanel>
     </Stepper>

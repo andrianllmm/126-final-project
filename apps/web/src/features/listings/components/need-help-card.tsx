@@ -3,16 +3,15 @@ import { Card } from '@/shared/components/ui/card';
 export function NeedHelpCard() {
   return (
     <Card className="border border-border">
-      <div className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-lg">❓</span>
-          <h3 className="text-lg font-semibold text-foreground">Need Help?</h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
+      <div className="p-4">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground mb-2">
+          Need Help?
+        </h3>
+        <p className="text-xs text-muted-foreground mb-3">
           Check out our safety guidelines for in-person campus meetups.
         </p>
-        <button className="text-sm font-medium text-foreground hover:underline">
-          View Safety Tips →
+        <button className="text-xs font-semibold text-foreground underline underline-offset-2 hover:opacity-70 transition-opacity">
+          View Safety Tips ↗
         </button>
       </div>
     </Card>
