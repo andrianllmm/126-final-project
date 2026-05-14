@@ -30,7 +30,7 @@ export const navItems: NavSection[] = [
     items: [
       {
         label: 'Create Listing',
-        href: '/listing/new',
+        href: '/listings/new',
         description: 'Post an item for sale',
       },
       {
