@@ -30,6 +30,9 @@
     "db:deploy": {
       "cache": false
     },
+    "db:seed": {
+      "cache": false
+    },
     "test": {},
     "test:e2e": {},
     "lint": {}

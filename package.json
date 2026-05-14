@@ -9,6 +9,7 @@
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate",
     "db:deploy": "turbo run db:deploy",
+    "db:seed": "turbo run db:seed",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
