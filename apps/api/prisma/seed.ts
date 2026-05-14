@@ -17,11 +17,22 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
+// Helper to simulate upload records
+async function createUpload(url: string, key: string) {
+  return prisma.upload.create({
+    data: {
+      key,
+      url,
+      mimeType: 'image/jpeg',
+      size: 123456,
+    },
+  });
+}
+
 async function main() {
-  // Dates
   const now = new Date();
 
-  // Clean slate for repeatable seeds
+  // CLEAN
   await prisma.message.deleteMany();
   await prisma.review.deleteMany();
   await prisma.transaction.deleteMany();
@@ -29,6 +40,7 @@ async function main() {
   await prisma.savedListing.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.listingImage.deleteMany();
+  await prisma.upload.deleteMany();
   await prisma.listing.deleteMany();
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
@@ -37,7 +49,6 @@ async function main() {
   await prisma.listingCategory.deleteMany();
 
   // USERS
-  // SELLER
   await auth.api.signUpEmail({
     body: {
       email: 'seller@demo.com',
@@ -53,7 +64,6 @@ async function main() {
     },
   });
 
-  // BUYER
   await auth.api.signUpEmail({
     body: {
       email: 'buyer@demo.com',
@@ -64,9 +74,7 @@ async function main() {
   });
 
   const buyer = await prisma.user.findUniqueOrThrow({
-    where: {
-      email: 'buyer@demo.com',
-    },
+    where: { email: 'buyer@demo.com' },
   });
 
   // CATEGORIES
@@ -113,18 +121,30 @@ async function main() {
     },
   });
 
+  // UPLOADS
+
+  const keyboardUpload = await createUpload(
+    'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
+    `seed-keyboard-${Date.now()}`,
+  );
+
+  const textbookUpload = await createUpload(
+    'https://upload.wikimedia.org/wikipedia/commons/c/c7/Americanstudbookvolume2open.jpg',
+    `seed-textbook-${Date.now()}`,
+  );
+
+  // LISTING IMAGES
+
   await prisma.listingImage.createMany({
     data: [
       {
         listingId: keyboard.id,
-        imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
+        uploadId: keyboardUpload.id,
         sortOrder: 0,
       },
       {
         listingId: textbook.id,
-        imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/c/c7/Americanstudbookvolume2open.jpg',
+        uploadId: textbookUpload.id,
         sortOrder: 0,
       },
     ],
