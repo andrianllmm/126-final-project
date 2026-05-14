@@ -197,6 +197,37 @@ export class ListingsService {
     });
   }
 
+  async delete(listingId: string, userId: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    if (listing.sellerId !== userId) {
+      throw new ForbiddenException('You may only delete your own listing');
+    }
+
+    // Prevent deletion of listings that are SOLD or RESERVED
+    if (listing.status === 'SOLD') {
+      throw new BadRequestException(
+        'Cannot delete a listing that has been sold',
+      );
+    }
+
+    if (listing.status === 'RESERVED') {
+      throw new BadRequestException(
+        'Cannot delete a listing that is currently reserved. Cancel the reservation first.',
+      );
+    }
+
+    return this.prisma.listing.delete({
+      where: { id: listingId },
+    });
+  }
+
   async create(sellerId: string, createListingDto: CreateListingDto) {
     const title = createListingDto.title?.trim();
     const description = createListingDto.description?.trim();

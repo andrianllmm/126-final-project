@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -75,6 +76,19 @@ export class ListingsController {
       userId,
       updateStatusDto.status,
     );
+  }
+
+  @Delete(':id')
+  delete(@Param('id') listingId: string, @Req() req: Request) {
+    const userId = this.getAuthenticatedUserId(req);
+
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Authentication required to delete a listing',
+      );
+    }
+
+    return this.listingsService.delete(listingId, userId);
   }
 
   private getAuthenticatedUserId(req: Request): string | undefined {
