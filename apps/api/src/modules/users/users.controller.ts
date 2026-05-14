@@ -6,12 +6,6 @@ import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @AllowAnonymous()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get(':id')
   @AllowAnonymous()
   findOne(@Param('id') id: string) {
