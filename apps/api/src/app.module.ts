@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+
+import { join } from 'path';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './modules/auth/auth.config.js';
@@ -19,6 +22,8 @@ import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 
+import { env } from './config/env.js';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,6 +39,13 @@ import { HealthModule } from './modules/health/health.module.js';
       },
     }),
     UsersModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), env.uploadDir),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,
+      },
+    }),
     UploadsModule,
     ListingsModule,
     SearchModule,
