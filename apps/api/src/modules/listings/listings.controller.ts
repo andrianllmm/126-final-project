@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -11,6 +13,7 @@ import type { Request } from 'express';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
+import { UpdateListingDto } from './dto/update-listing.dto.js';
 
 @Controller('listings')
 export class ListingsController {
@@ -27,10 +30,29 @@ export class ListingsController {
     const userId = this.getAuthenticatedUserId(req);
 
     if (!userId) {
-      throw new UnauthorizedException('Authentication required to create a listing');
+      throw new UnauthorizedException(
+        'Authentication required to create a listing',
+      );
     }
 
     return this.listingsService.create(userId, createListingDto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') listingId: string,
+    @Req() req: Request,
+    @Body() updateListingDto: UpdateListingDto,
+  ) {
+    const userId = this.getAuthenticatedUserId(req);
+
+    if (!userId) {
+      throw new UnauthorizedException(
+        'Authentication required to update a listing',
+      );
+    }
+
+    return this.listingsService.update(listingId, userId, updateListingDto);
   }
 
   private getAuthenticatedUserId(req: Request): string | undefined {
