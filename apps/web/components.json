@@ -22,6 +22,7 @@
     "hooks": "@/shared/hooks"
   },
   "registries": {
-    "@reui": "https://reui.io/r/{style}/{name}.json"
+    "@reui": "https://reui.io/r/{style}/{name}.json",
+    "@commercn": "https://commercn.com/r/{name}.json"
   }
 }
