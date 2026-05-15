@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -14,12 +14,15 @@ import {
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 
+import { UserAvatar } from '../user-avatar';
+
 import {
   userProfileUpdateSchema,
   type UserProfile,
   type UserProfileUpdateInput,
 } from '@repo/api';
 
+import { deleteUserAvatar, uploadUserAvatar } from '../../api/users-api';
 import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 
 type ProfileSettingsFormProps = {
@@ -27,9 +30,13 @@ type ProfileSettingsFormProps = {
   profile: UserProfile;
 };
 
+type AvatarState =
+  | { mode: 'existing'; url: string | null }
+  | { mode: 'file'; file: File; previewUrl: string }
+  | { mode: 'removed' };
+
 function normalizeNullableString(value: unknown) {
   if (typeof value !== 'string') return null;
-
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
 }
@@ -38,7 +45,15 @@ export function ProfileSettingsForm({
   userId,
   profile,
 }: ProfileSettingsFormProps) {
+  const mutation = useUpdateUserProfile({ userId });
+
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
+
+  const [avatarState, setAvatarState] = useState<AvatarState>({
+    mode: 'existing',
+    url: profile.avatarUpload?.url ?? null,
+  });
 
   const {
     register,
@@ -49,26 +64,78 @@ export function ProfileSettingsForm({
     resolver: zodResolver(userProfileUpdateSchema),
     defaultValues: {
       name: profile.name ?? '',
-      image: profile.image ?? '',
     },
   });
+
+  const existingAvatarUploadId = profile.avatarUpload?.id ?? null;
 
   useEffect(() => {
     reset({
       name: profile.name ?? '',
-      image: profile.image ?? '',
     });
+
+    setAvatarState({
+      mode: 'existing',
+      url: profile.avatarUpload?.url ?? null,
+    });
+
+    setFileInputKey((v) => v + 1);
+    setSaveMessage(null);
   }, [profile, reset]);
 
-  const mutation = useUpdateUserProfile({ userId });
+  const avatarSrc = useMemo(() => {
+    if (avatarState.mode === 'file') return avatarState.previewUrl;
+    if (avatarState.mode === 'removed') return null;
+    return avatarState.url;
+  }, [avatarState]);
+
+  const hasChanges =
+    isDirty || avatarState.mode === 'file' || avatarState.mode === 'removed';
 
   const onSubmit = handleSubmit(async (values) => {
     setSaveMessage(null);
 
-    await mutation.mutateAsync({
-      name: normalizeNullableString(values.name),
-      image: normalizeNullableString(values.image),
-    });
+    try {
+      let avatarUploadId: string | null = existingAvatarUploadId;
+
+      // Upload new avatar
+      if (avatarState.mode === 'file') {
+        if (existingAvatarUploadId) {
+          await deleteUserAvatar(existingAvatarUploadId);
+        }
+
+        const upload = await uploadUserAvatar(avatarState.file);
+        avatarUploadId = upload.id;
+      }
+
+      // Remove avatar explicitly
+      if (avatarState.mode === 'removed') {
+        if (existingAvatarUploadId) {
+          await deleteUserAvatar(existingAvatarUploadId);
+        }
+        avatarUploadId = null;
+      }
+
+      await mutation.mutateAsync({
+        name: normalizeNullableString(values.name),
+        avatarUploadId,
+      });
+
+      reset({
+        name: normalizeNullableString(values.name) ?? '',
+      });
+
+      setAvatarState({
+        mode: 'existing',
+        url: avatarUploadId ? avatarSrc : null,
+      });
+
+      setFileInputKey((v) => v + 1);
+      setSaveMessage('Profile updated.');
+    } catch (err) {
+      console.error(err);
+      setSaveMessage('Failed to update profile.');
+    }
   });
 
   return (
@@ -98,6 +165,7 @@ export function ProfileSettingsForm({
                 setValueAs: normalizeNullableString,
               })}
             />
+
             {errors.name ? (
               <FieldDescription className="text-destructive">
                 {errors.name.message}
@@ -110,40 +178,70 @@ export function ProfileSettingsForm({
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="image">Avatar image URL</FieldLabel>
-            <Input
-              id="image"
-              type="url"
-              placeholder="https://example.com/avatar.png"
-              {...register('image', {
-                setValueAs: normalizeNullableString,
-              })}
-            />
-            {errors.image ? (
-              <FieldDescription className="text-destructive">
-                {errors.image.message}
-              </FieldDescription>
-            ) : (
-              <FieldDescription>
-                Leave blank to use your initials.
-              </FieldDescription>
-            )}
+            <FieldLabel>Avatar</FieldLabel>
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <UserAvatar
+                name={profile.name}
+                email={profile.email}
+                src={avatarSrc}
+                sizeClassName="size-16"
+                fallbackClassName="text-lg font-semibold"
+              />
+
+              <div className="flex w-full gap-2 items-center">
+                <Input
+                  key={fileInputKey}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    const previewUrl = URL.createObjectURL(file);
+
+                    setAvatarState({
+                      mode: 'file',
+                      file,
+                      previewUrl,
+                    });
+                  }}
+                  className="w-full"
+                />
+
+                {avatarState.mode !== 'removed' && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    disabled={mutation.isPending}
+                    onClick={() => {
+                      setAvatarState({ mode: 'removed' });
+                      setFileInputKey((v) => v + 1);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
           </Field>
 
           <Field>
-            {saveMessage ? (
-              <FieldDescription>{saveMessage}</FieldDescription>
-            ) : null}
+            {saveMessage && <FieldDescription>{saveMessage}</FieldDescription>}
 
-            {mutation.isError ? (
+            {mutation.isError && (
               <FieldDescription className="text-destructive">
-                {(mutation.error as Error).message ||
+                {(mutation.error as Error)?.message ||
                   'Unable to update profile.'}
               </FieldDescription>
-            ) : null}
+            )}
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button type="submit" disabled={mutation.isPending || !isDirty}>
+              <Button
+                type="submit"
+                disabled={mutation.isPending || !hasChanges}
+              >
                 {mutation.isPending ? 'Saving...' : 'Save changes'}
               </Button>
             </div>
