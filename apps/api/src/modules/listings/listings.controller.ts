@@ -27,6 +27,7 @@ export class ListingsController {
     return this.listingsService.findAll({ sellerId });
   }
 
+ 
   @Post()
   create(@Req() req: Request, @Body() createListingDto: CreateListingDto) {
     const userId = this.getAuthenticatedUserId(req);
@@ -38,6 +39,13 @@ export class ListingsController {
     }
 
     return this.listingsService.create(userId, createListingDto);
+  }
+
+  @Get(':id')
+  @AllowAnonymous()
+  findOne(@Param('id') listingId: string, @Req() req: Request) {
+    const userId = this.getAuthenticatedUserId(req);
+    return this.listingsService.findOne(listingId, userId);
   }
 
   @Patch(':id')

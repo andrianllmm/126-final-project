@@ -197,6 +197,35 @@ export class ListingsService {
     });
   }
 
+  async findOne(listingId: string, userId?: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+      include: {
+        category: true,
+        images: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    if (listing.status !== 'AVAILABLE' && listing.sellerId !== userId) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    return listing;
+  }
+
   async delete(listingId: string, userId: string) {
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },
