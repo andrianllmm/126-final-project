@@ -9,6 +9,11 @@ export const userProfileSchema = z.object({
   updatedAt: z.string(),
 });
 
+export const userProfileUpdateSchema = userProfileSchema.pick({
+  name: true,
+  image: true,
+});
+
 export const userProfileStatsSchema = z.object({
   averageRating: z.number(),
   reviewCount: z.number(),
@@ -18,4 +23,5 @@ export const userProfileStatsSchema = z.object({
 });
 
 export type UserProfile = z.infer<typeof userProfileSchema>;
+export type UserProfileUpdateInput = z.infer<typeof userProfileUpdateSchema>;
 export type UserProfileStats = z.infer<typeof userProfileStatsSchema>;
