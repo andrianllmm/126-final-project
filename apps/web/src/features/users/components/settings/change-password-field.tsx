@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { authClient } from '@/shared/lib/auth-client';
 
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
 } from '@/shared/components/ui/field';
+
 import {
   Dialog,
   DialogClose,
@@ -22,44 +26,38 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
 
+import {
+  changePasswordSchema,
+  type ChangePasswordInput,
+} from '../../validation/change-password.schema';
+
 export function ChangePasswordField() {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<ChangePasswordInput>({
+    resolver: zodResolver(changePasswordSchema),
+  });
 
-  const handleChangePassword = async () => {
-    setError(null);
-    setIsLoading(true);
+  async function onSubmit(values: ChangePasswordInput) {
+    const { error } = await authClient.changePassword({
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    });
 
-    try {
-      await authClient.changePassword(
-        {
-          currentPassword,
-          newPassword,
-        },
-        {
-          onSuccess: () => {
-            setCurrentPassword('');
-            setNewPassword('');
-            setError(null);
-          },
-          onError: ({ error }) => {
-            setError(
-              error.message || 'Invalid current password or request failed.',
-            );
-          },
-        },
-      );
+    if (error) {
+      setError('root', {
+        message: error.message || 'Invalid current password or request failed.',
+      });
 
-      setCurrentPassword('');
-      setNewPassword('');
-    } catch (err) {
-      setError((err as Error)?.message || 'Failed to change password.');
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  };
+
+    reset();
+  }
 
   return (
     <Field>
@@ -84,49 +82,86 @@ export function ChangePasswordField() {
               </DialogDescription>
             </DialogHeader>
 
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="current-password">
-                  Current password
-                </FieldLabel>
-                <Input
-                  id="current-password"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                />
-              </Field>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="current-password">
+                    Current password
+                  </FieldLabel>
 
-              <Field>
-                <FieldLabel htmlFor="new-password">New password</FieldLabel>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </Field>
+                  <Input
+                    id="current-password"
+                    type="password"
+                    autoComplete="current-password"
+                    {...register('currentPassword')}
+                  />
 
-              {error ? (
-                <FieldDescription className="text-destructive">
-                  {error}
-                </FieldDescription>
-              ) : null}
-            </FieldGroup>
+                  {errors.currentPassword && (
+                    <FieldDescription className="text-destructive">
+                      {errors.currentPassword.message}
+                    </FieldDescription>
+                  )}
+                </Field>
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
+                <Field>
+                  <FieldLabel htmlFor="new-password">New password</FieldLabel>
 
-              <Button
-                type="button"
-                disabled={isLoading || !currentPassword || !newPassword}
-                onClick={handleChangePassword}
-              >
-                {isLoading ? 'Updating...' : 'Update password'}
-              </Button>
-            </DialogFooter>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    autoComplete="new-password"
+                    {...register('newPassword')}
+                  />
+
+                  {errors.newPassword && (
+                    <FieldDescription className="text-destructive">
+                      {errors.newPassword.message}
+                    </FieldDescription>
+                  )}
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="confirm-password">
+                    Confirm new password
+                  </FieldLabel>
+
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    autoComplete="new-password"
+                    {...register('confirmPassword')}
+                  />
+
+                  {errors.confirmPassword && (
+                    <FieldDescription className="text-destructive">
+                      {errors.confirmPassword.message}
+                    </FieldDescription>
+                  )}
+                </Field>
+
+                {errors.root && (
+                  <FieldDescription className="text-destructive text-center">
+                    {errors.root.message}
+                  </FieldDescription>
+                )}
+              </FieldGroup>
+
+              <DialogFooter className="mt-6">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Updating...' : 'Update password'}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
