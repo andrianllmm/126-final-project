@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -18,6 +19,7 @@ import {
   type UserProfile,
   type UserProfileUpdateInput,
 } from '@repo/api';
+
 import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 
 type ProfileSettingsFormProps = {
@@ -71,6 +73,19 @@ export function ProfileSettingsForm({
 
   return (
     <div>
+      <div className="flex items-center justify-between mb-8">
+        <p className="text-sm text-muted-foreground">
+          Manage your public profile information.
+        </p>
+
+        <Link
+          href={`/profile/${userId}`}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          View profile
+        </Link>
+      </div>
+
       <form onSubmit={onSubmit} noValidate>
         <FieldGroup>
           <Field>

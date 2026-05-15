@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
+
 import { ShareDialog } from '@/shared/components/share-dialog';
 import { useUserProfile } from '../hooks/use-user-profile';
+import { authClient } from '@/shared/lib/auth-client';
 
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -10,6 +13,10 @@ import { UserAvatar } from './user-avatar';
 
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
+  const session = authClient.useSession();
+
+  const currentUserId = session.data?.user?.id;
+  const isOwner = currentUserId === userId;
 
   if (isLoading) return <ProfileHeaderLoading />;
   if (error) return <ProfileHeaderError message={error.message} />;
@@ -46,6 +53,12 @@ export function ProfileHeader({ userId }: { userId: string }) {
         </div>
 
         <div className="flex gap-3">
+          {isOwner && (
+            <Button variant="outline" size="lg" className="min-w-28" asChild>
+              <Link href="/settings?tab=profile">Edit profile</Link>
+            </Button>
+          )}
+
           <ShareDialog url={`/users/${userId}`}>
             <Button size="lg" className="min-w-28">
               Share
