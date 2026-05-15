@@ -20,20 +20,18 @@ import {
   type UserProfileUpdateInput,
 } from '@repo/api';
 
-import { deleteUserAvatar, uploadUserAvatar } from '../../api/users-api';
 import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 import { AvatarUpload } from '@/shared/components/upload/avatar-upload';
+import { normalizeNullableString } from '@/shared/lib/normalize-nullable-string';
 
 type ProfileSettingsFormProps = {
   userId: string;
   profile: UserProfile;
 };
 
-function normalizeNullableString(value: unknown) {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
+const profileSettingsSchema = userProfileUpdateSchema;
+
+type ProfileSettingsValues = UserProfileUpdateInput;
 
 export function ProfileSettingsForm({
   userId,
@@ -53,8 +51,8 @@ export function ProfileSettingsForm({
     handleSubmit,
     reset,
     formState: { errors, isDirty },
-  } = useForm<UserProfileUpdateInput>({
-    resolver: zodResolver(userProfileUpdateSchema),
+  } = useForm<ProfileSettingsValues>({
+    resolver: zodResolver(profileSettingsSchema),
     defaultValues: {
       name: profile.name ?? '',
     },
@@ -76,32 +74,22 @@ export function ProfileSettingsForm({
     setSaveMessage(null);
 
     try {
-      let avatarUploadId = existingAvatar?.id ?? null;
+      const formData = new FormData();
+
+      formData.append('name', values.name ?? '');
 
       if (avatarFile) {
-        const upload = await uploadUserAvatar(avatarFile);
-
-        if (avatarUploadId) {
-          await deleteUserAvatar(avatarUploadId);
-        }
-
-        avatarUploadId = upload.id;
+        formData.append('avatar', avatarFile);
       }
 
       if (avatarRemoved) {
-        if (avatarUploadId) {
-          await deleteUserAvatar(avatarUploadId);
-        }
-        avatarUploadId = null;
+        formData.append('avatar', '');
       }
 
-      await mutation.mutateAsync({
-        name: normalizeNullableString(values.name),
-        avatarUploadId,
-      });
+      await mutation.mutateAsync(formData);
 
       reset({
-        name: normalizeNullableString(values.name) ?? '',
+        name: normalizeNullableString(values.name || '') ?? '',
       });
 
       setAvatarFile(null);

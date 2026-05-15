@@ -5,6 +5,8 @@ import {
   UserProfileStats,
   UserProfileUpdateInput,
 } from '@repo/api';
+import { UploadsService } from '../uploads/uploads.service.js';
+import { UploadFile } from '../uploads/uploads.types.js';
 
 const profileSelect = {
   id: true,
@@ -37,7 +39,10 @@ function toUserProfile(user: {
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadsService: UploadsService,
+  ) {}
 
   async findProfileById(id: string): Promise<UserProfile | null> {
     const user = await this.prisma.user.findUnique({
@@ -55,15 +60,39 @@ export class UsersService {
   async updateProfileById(
     id: string,
     input: UserProfileUpdateInput,
+    avatarFile?: UploadFile,
+    removeAvatar = false,
   ): Promise<UserProfile> {
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        avatarUploadId: true,
+      },
+    });
+
+    let nextAvatarUploadId = currentUser?.avatarUploadId ?? null;
+
+    if (avatarFile) {
+      const uploadedAvatar = await this.uploadsService.upload(avatarFile, id);
+      nextAvatarUploadId = uploadedAvatar.id;
+    }
+
     const user = await this.prisma.user.update({
       where: { id },
       data: {
         name: input.name,
-        avatarUploadId: input.avatarUploadId,
+        avatarUploadId: avatarFile
+          ? nextAvatarUploadId
+          : removeAvatar
+            ? null
+            : nextAvatarUploadId,
       },
       select: profileSelect,
     });
+
+    if ((avatarFile || removeAvatar) && currentUser?.avatarUploadId) {
+      await this.uploadsService.delete(currentUser.avatarUploadId, id);
+    }
 
     return toUserProfile(user);
   }

@@ -3,8 +3,14 @@ import { PipeTransform, BadRequestException } from '@nestjs/common';
 export class ImageFileValidationPipe implements PipeTransform {
   private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
+  constructor(private readonly options: { required?: boolean } = {}) {}
+
   transform(file: any) {
     if (!file) {
+      if (this.options.required === false) {
+        return undefined;
+      }
+
       throw new BadRequestException('File is required');
     }
 
