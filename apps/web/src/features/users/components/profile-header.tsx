@@ -1,3 +1,98 @@
+'use client';
+
+import { ShareDialog } from '@/shared/components/share-dialog';
+import { useUserProfile } from '../hooks/use-user-profile';
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/shared/components/ui/avatar';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+
+import { getInitials } from '@/shared/lib/get-initials';
+
 export function ProfileHeader({ userId }: { userId: string }) {
-  return <div>{userId}</div>;
+  const { data, isLoading, error } = useUserProfile(userId);
+
+  if (isLoading) return <ProfileHeaderLoading />;
+  if (error) return <ProfileHeaderError message={error.message} />;
+  if (!data) return <ProfileHeaderError message="Profile not found" />;
+
+  const createdAt = new Date(data.createdAt).toLocaleDateString(undefined, {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <div className="w-full px-6 py-10">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <Avatar className="size-32">
+            <AvatarImage
+              src={data.image ?? undefined}
+              alt={data.name ?? 'User'}
+            />
+
+            <AvatarFallback className="text-4xl font-semibold">
+              {getInitials(data.name, data.email)}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">
+              {data.name ?? 'Unnamed user'}
+            </h1>
+
+            <p className="text-muted-foreground">{data.email}</p>
+
+            <p className="text-sm text-muted-foreground">
+              Member since {createdAt}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <ShareDialog url={`/users/${userId}`}>
+            <Button size="lg" className="min-w-28">
+              Share
+            </Button>
+          </ShareDialog>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileHeaderLoading() {
+  return (
+    <div className="w-full border-b px-6 py-10">
+      <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <Skeleton className="size-32 rounded-full" />
+
+          <div className="space-y-3">
+            <Skeleton className="h-8 w-72" />
+            <Skeleton className="h-5 w-64" />
+            <Skeleton className="h-5 w-40" />
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Skeleton className="h-11 w-28 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileHeaderError({ message }: { message: string }) {
+  return (
+    <div className="border-b px-6 py-10">
+      <p className="text-lg font-semibold">Profile unavailable</p>
+
+      <p className="text-sm text-muted-foreground">{message}</p>
+    </div>
+  );
 }
