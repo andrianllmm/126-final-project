@@ -79,11 +79,12 @@ export function ProfileSettingsForm({
       let avatarUploadId = existingAvatar?.id ?? null;
 
       if (avatarFile) {
+        const upload = await uploadUserAvatar(avatarFile);
+
         if (avatarUploadId) {
           await deleteUserAvatar(avatarUploadId);
         }
 
-        const upload = await uploadUserAvatar(avatarFile);
         avatarUploadId = upload.id;
       }
 
