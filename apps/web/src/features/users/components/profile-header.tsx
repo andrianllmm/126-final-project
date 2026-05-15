@@ -3,15 +3,10 @@
 import { ShareDialog } from '@/shared/components/share-dialog';
 import { useUserProfile } from '../hooks/use-user-profile';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 
-import { getInitials } from '@/shared/lib/get-initials';
+import { UserAvatar } from './user-avatar';
 
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
@@ -29,16 +24,13 @@ export function ProfileHeader({ userId }: { userId: string }) {
     <div className="w-full px-6 py-10">
       <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <Avatar className="size-32">
-            <AvatarImage
-              src={data.image ?? undefined}
-              alt={data.name ?? 'User'}
-            />
-
-            <AvatarFallback className="text-4xl font-semibold">
-              {getInitials(data.name, data.email)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            name={data.name}
+            email={data.email}
+            image={data.image}
+            sizeClassName="size-32"
+            fallbackClassName="text-4xl font-semibold"
+          />
 
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">

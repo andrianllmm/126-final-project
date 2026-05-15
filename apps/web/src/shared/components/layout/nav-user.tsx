@@ -7,8 +7,6 @@ import Link from 'next/link';
 
 import { authClient } from '@/shared/lib/auth-client';
 
-import { getInitials } from '@/shared/lib/get-initials';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,14 +15,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/components/ui/avatar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Button } from '@/shared/components/ui/button';
 import { LogOutIcon } from 'lucide-react';
+import { UserAvatar } from '@/features/users/components/user-avatar';
 
 export function NavUser() {
   const router = useRouter();
@@ -59,10 +53,7 @@ export function NavUser() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center rounded-full focus:outline-none">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={image ?? undefined} alt={name ?? 'User'} />
-            <AvatarFallback>{getInitials(name, email)}</AvatarFallback>
-          </Avatar>
+          <UserAvatar name={name} email={email} image={image} />
         </button>
       </DropdownMenuTrigger>
 
