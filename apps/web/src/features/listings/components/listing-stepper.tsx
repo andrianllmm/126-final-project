@@ -17,6 +17,7 @@ import { SellerTipsCard } from '@/features/listings/components/seller-tips-card'
 import { NeedHelpCard } from '@/features/listings/components/need-help-card';
 import { PhotoUploadForm } from './listing-form/photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
+import { ProductSummaryCardExample } from './product-summary-card';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
@@ -75,7 +76,14 @@ export function Pattern() {
 
         {/* Step 3 — Review */}
         <StepperContent value={3}>
-          <div className="max-w-5xl mx-auto px-4 md:px-6" />
+          <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <div className="mt-4 md:col-span-2">
+              <ProductSummaryCardExample />
+            </div>
+            <div className="mt-4 space-y-3">
+              <PhotoGuidelines />
+            </div>
+          </div>
         </StepperContent>
       </StepperPanel>
     </Stepper>
