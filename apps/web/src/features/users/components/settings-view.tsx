@@ -9,6 +9,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui/tabs';
+import { AccountSettingsForm } from './account-settings-form';
 
 type SettingsViewProps = {
   userId: string;
@@ -53,7 +54,7 @@ export function SettingsView({ userId }: SettingsViewProps) {
         </TabsContent>
 
         <TabsContent value="account">
-          Account-related settings go here (email, password, deletion, etc).
+          <AccountSettingsForm userId={userId} />
         </TabsContent>
       </Tabs>
     </div>

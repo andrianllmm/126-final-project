@@ -32,6 +32,12 @@ export const auth = betterAuth({
 
   trustedOrigins: [env.webUrl],
 
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
+
   advanced: {
     cookies: {
       session_token: {
