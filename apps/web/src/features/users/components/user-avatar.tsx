@@ -8,7 +8,7 @@ import { getInitials } from '@/shared/lib/get-initials';
 type UserAvatarProps = {
   name?: string | null;
   email: string;
-  image?: string | null;
+  src?: string | null;
   sizeClassName?: string;
   fallbackClassName?: string;
 };
@@ -16,13 +16,13 @@ type UserAvatarProps = {
 export function UserAvatar({
   name,
   email,
-  image,
+  src,
   sizeClassName = 'size-8',
   fallbackClassName = '',
 }: UserAvatarProps) {
   return (
     <Avatar className={sizeClassName}>
-      <AvatarImage src={image ?? undefined} alt={name ?? 'User'} />
+      <AvatarImage src={src ?? undefined} alt={name ?? 'User'} />
       <AvatarFallback className={fallbackClassName}>
         {getInitials(name, email)}
       </AvatarFallback>

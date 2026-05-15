@@ -34,7 +34,7 @@ export function ProfileHeader({ userId }: { userId: string }) {
           <UserAvatar
             name={data.name}
             email={data.email}
-            image={data.image}
+            src={data.avatarUpload?.url ?? null}
             sizeClassName="size-32"
             fallbackClassName="text-4xl font-semibold"
           />
