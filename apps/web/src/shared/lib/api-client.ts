@@ -71,6 +71,7 @@ async function request<TResponse, TBody = unknown>(
 
   const res = await fetch(url, {
     ...options,
+    credentials: options.credentials ?? 'include',
     method,
     headers: {
       'Content-Type': 'application/json',
