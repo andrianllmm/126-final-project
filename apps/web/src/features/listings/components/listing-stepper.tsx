@@ -15,6 +15,7 @@ import { CheckIcon, LoaderCircleIcon } from 'lucide-react';
 import { ListingForm } from '@/features/listings/components/listing-form';
 import { SellerTipsCard } from '@/features/listings/components/seller-tips-card';
 import { NeedHelpCard } from '@/features/listings/components/need-help-card';
+import { PhotoUploadForm } from './listing-form/photo-upload-form';
 
 const steps = [{ title: 'Details' }, { title: 'Pricing' }, { title: 'Review' }];
 
@@ -61,7 +62,15 @@ export function Pattern() {
 
         {/* Step 2 — Pricing */}
         <StepperContent value={2}>
-          <div className="max-w-5xl mx-auto px-4 md:px-6" />
+          <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <div className="mt-4 md:col-span-2">
+              <PhotoUploadForm />
+            </div>
+            <div className="mt-4 space-y-3">
+              <SellerTipsCard />
+              <NeedHelpCard />
+            </div>
+          </div>
         </StepperContent>
 
         {/* Step 3 — Review */}
