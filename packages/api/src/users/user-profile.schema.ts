@@ -1,17 +1,22 @@
 import { z } from 'zod';
 
+const avatarUploadSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+});
+
 export const userProfileSchema = z.object({
   id: z.string(),
   name: z.string().nullable(),
   email: z.string(),
-  image: z.string().nullable(),
+  avatarUpload: avatarUploadSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
-export const userProfileUpdateSchema = userProfileSchema.pick({
-  name: true,
-  image: true,
+export const userProfileUpdateSchema = z.object({
+  name: z.string().trim().min(1).nullable().optional(),
+  avatarUploadId: z.string().nullable().optional(),
 });
 
 export const userProfileStatsSchema = z.object({
