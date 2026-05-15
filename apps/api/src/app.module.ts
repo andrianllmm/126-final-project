@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+
+import { join } from 'path';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './modules/auth/auth.config.js';
@@ -10,6 +13,7 @@ import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
 
 import { UsersModule } from './modules/users/users.module.js';
+import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { ListingsModule } from './modules/listings/listings.module.js';
 import { SearchModule } from './modules/search/search.module.js';
 import { MessagingModule } from './modules/messaging/messaging.module.js';
@@ -17,6 +21,8 @@ import { TransactionsModule } from './modules/transactions/transactions.module.j
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+
+import { env } from './config/env.js';
 
 @Module({
   imports: [
@@ -33,6 +39,14 @@ import { HealthModule } from './modules/health/health.module.js';
       },
     }),
     UsersModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), env.uploadDir),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,
+      },
+    }),
+    UploadsModule,
     ListingsModule,
     SearchModule,
     MessagingModule,
