@@ -22,7 +22,6 @@ import {
 
 import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 import { AvatarUpload } from '@/shared/components/upload/avatar-upload';
-import { normalizeNullableString } from '@/shared/lib/normalize-nullable-string';
 
 type ProfileSettingsFormProps = {
   userId: string;
@@ -89,7 +88,7 @@ export function ProfileSettingsForm({
       await mutation.mutateAsync(formData);
 
       reset({
-        name: normalizeNullableString(values.name || '') ?? '',
+        name: values.name ?? '',
       });
 
       setAvatarFile(null);
@@ -126,9 +125,7 @@ export function ProfileSettingsForm({
               id="name"
               type="text"
               placeholder="Juan Dela Cruz"
-              {...register('name', {
-                setValueAs: normalizeNullableString,
-              })}
+              {...register('name')}
             />
 
             {errors.name ? (
