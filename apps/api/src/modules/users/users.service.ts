@@ -6,6 +6,35 @@ import {
   UserProfileUpdateInput,
 } from '@repo/api';
 
+const profileSelect = {
+  id: true,
+  name: true,
+  email: true,
+  avatarUpload: {
+    select: {
+      id: true,
+      url: true,
+    },
+  },
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+function toUserProfile(user: {
+  id: string;
+  name: string | null;
+  email: string;
+  avatarUpload: { id: string; url: string } | null;
+  createdAt: Date;
+  updatedAt: Date;
+}): UserProfile {
+  return {
+    ...user,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
+  };
+}
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -13,25 +42,14 @@ export class UsersService {
   async findProfileById(id: string): Promise<UserProfile | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: profileSelect,
     });
 
     if (!user) {
       return null;
     }
 
-    return {
-      ...user,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    };
+    return toUserProfile(user);
   }
 
   async updateProfileById(
@@ -42,23 +60,12 @@ export class UsersService {
       where: { id },
       data: {
         name: input.name,
-        image: input.image,
+        avatarUploadId: input.avatarUploadId,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: profileSelect,
     });
 
-    return {
-      ...user,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    };
+    return toUserProfile(user);
   }
 
   async getProfileStats(userId: string): Promise<UserProfileStats> {
