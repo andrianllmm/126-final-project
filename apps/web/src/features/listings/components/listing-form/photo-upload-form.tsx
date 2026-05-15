@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card } from '@/shared/components/ui/card';
 import { Plus } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 
 interface UploadedPhoto {
   id: string;
@@ -74,10 +75,10 @@ export function PhotoUploadForm() {
         </button>
       </Card>
     ) : (
-      <Card className="border-2 border-dashed border-gray-200 hover:border-gray-400 transition-colors w-full h-full">
+      <Card className="border-2 border-dashed border-gray-200 dark:border-gray-600/50 hover:border-gray-400 dark:hover:border-gray-500 transition-colors w-full h-full dark:bg-gray-700/30">
         <label className="flex flex-col items-center justify-center h-full cursor-pointer group">
-          <Plus className="w-5 h-5 text-gray-400 mb-1 group-hover:text-gray-600 transition-colors" />
-          <p className="text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
+          <Plus className="w-5 h-5 text-gray-400 dark:text-gray-500 mb-1 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+          <p className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
             Add Photo
           </p>
           <input
@@ -93,18 +94,16 @@ export function PhotoUploadForm() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Upload Photos
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Add up to {maxPhotos}&nbsp;photos. The first photo will be your
           listing&apos;s cover.
         </p>
       </div>
 
-      {/* Top row: main photo (tall, 2/3 width) + one shorter slot (1/3 width, top-aligned) */}
       <div className="flex gap-4 items-start">
-        {/* Main photo — takes 2/3 width, fixed tall height */}
         <div className="flex-[2] h-[300px]">
           {photos[0] ? (
             <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
@@ -134,11 +133,11 @@ export function PhotoUploadForm() {
               </button>
             </Card>
           ) : (
-            <Card className="border-2 border-dashed border-gray-300 hover:border-rose-500 transition-colors w-full h-full">
+            <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600/50 hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full dark:bg-gray-700/30">
               <label className="flex flex-col items-center justify-center h-full cursor-pointer group">
-                <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-50 transition-colors">
+                <div className="w-14 h-14 bg-gray-100 dark:bg-gray-600/40 rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
                   <svg
-                    className="w-7 h-7 text-gray-400 group-hover:text-rose-400 transition-colors"
+                    className="w-7 h-7 text-gray-400 dark:text-gray-400 group-hover:text-rose-400 transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -157,8 +156,12 @@ export function PhotoUploadForm() {
                     />
                   </svg>
                 </div>
-                <p className="font-semibold text-gray-700">Add Main Photo</p>
-                <p className="text-sm text-gray-400 mt-1">Required</p>
+                <p className="font-semibold text-gray-700 dark:text-gray-300">
+                  Add Main Photo
+                </p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                  Required
+                </p>
                 <input
                   type="file"
                   accept="image/*"
@@ -170,13 +173,11 @@ export function PhotoUploadForm() {
           )}
         </div>
 
-        {/* Top-right slot — 1/3 width, shorter height, top-aligned */}
         <div className="flex-1 h-[200px]">
           <SmallSlot index={1} />
         </div>
       </div>
 
-      {/* Bottom row: 3 equal slots */}
       <div className="grid grid-cols-3 gap-4">
         {[2, 3, 4].map((index) => (
           <div key={index} className="h-[200px]">
@@ -185,8 +186,16 @@ export function PhotoUploadForm() {
         ))}
       </div>
 
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gray-500 dark:text-gray-400">
         {photos.length} of {maxPhotos} photos added
+      </div>
+      <div className="flex justify-between pt-6 border-t border-border">
+        <Button type="button" variant="outline" className="px-6">
+          ← Back
+        </Button>
+        <Button type="button" className="px-6" variant="default">
+          Next →
+        </Button>
       </div>
     </div>
   );
