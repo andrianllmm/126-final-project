@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
 import { ProfileSettingsForm } from '@/features/users/components/settings/profile-settings-form';
 import { Spinner } from '@/shared/components/ui/spinner';
@@ -17,6 +19,21 @@ type SettingsViewProps = {
 
 export function SettingsView({ userId }: SettingsViewProps) {
   const profileQuery = useUserProfile(userId);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const tab = searchParams.get('tab') ?? 'profile';
+
+  const setTab = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', value);
+
+    router.replace(`${pathname}?${params.toString()}`, {
+      scroll: false,
+    });
+  };
 
   if (profileQuery.isLoading) {
     return (
@@ -43,7 +60,7 @@ export function SettingsView({ userId }: SettingsViewProps) {
     <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8 space-y-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
-      <Tabs defaultValue="profile" className="w-full space-y-4">
+      <Tabs value={tab} onValueChange={setTab} className="w-full space-y-4">
         <TabsList variant="line">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
