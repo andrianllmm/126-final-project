@@ -68,16 +68,27 @@ async function request<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
   const baseUrl = options.baseUrl ?? process.env.NEXT_PUBLIC_API_URL ?? '';
   const url = `${baseUrl}${endpoint}${buildQuery(options.params)}`;
+  const isFormDataBody =
+    typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+  const requestBody: BodyInit | undefined =
+    options.body === undefined
+      ? undefined
+      : isFormDataBody
+        ? (options.body as FormData)
+        : JSON.stringify(options.body);
 
   const res = await fetch(url, {
     ...options,
     credentials: options.credentials ?? 'include',
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    headers: isFormDataBody
+      ? options.headers
+      : {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+    body: requestBody,
   });
 
   const contentType = res.headers.get('content-type');
