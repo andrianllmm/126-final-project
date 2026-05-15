@@ -12,6 +12,35 @@ import { UpdateListingDto } from './dto/update-listing.dto.js';
 export class ListingsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async validateUploadIds(uploadIds: string[], sellerId: string) {
+    if (uploadIds.length === 0) {
+      return;
+    }
+
+    const uniqueUploadIds = Array.from(new Set(uploadIds));
+    if (uniqueUploadIds.length !== uploadIds.length) {
+      throw new BadRequestException('Duplicate upload IDs are not allowed');
+    }
+
+    const uploads = await this.prisma.upload.findMany({
+      where: { id: { in: uploadIds } },
+    });
+
+    if (uploads.length !== uploadIds.length) {
+      throw new NotFoundException('One or more uploads were not found');
+    }
+
+    const unauthorizedUpload = uploads.find(
+      (upload) => upload.uploaderId !== sellerId,
+    );
+
+    if (unauthorizedUpload) {
+      throw new ForbiddenException(
+        'You may only attach uploads that belong to your account',
+      );
+    }
+  }
+
   async findAll(params: { sellerId?: string } = {}) {
     const where: any = {};
 
@@ -28,6 +57,7 @@ export class ListingsService {
         category: true,
         images: {
           orderBy: { sortOrder: 'asc' },
+          include: { upload: true },
         },
         seller: {
           select: {
@@ -109,15 +139,17 @@ export class ListingsService {
       data.meetupLocation = meetupLocation || null;
     }
 
-    if (updateListingDto.imageUrls !== undefined) {
+    if (updateListingDto.uploadIds !== undefined) {
       await this.prisma.listingImage.deleteMany({
         where: { listingId },
       });
 
-      if (updateListingDto.imageUrls.length > 0) {
+      await this.validateUploadIds(updateListingDto.uploadIds, userId);
+
+      if (updateListingDto.uploadIds.length > 0) {
         data.images = {
-          create: updateListingDto.imageUrls.map((imageUrl, index) => ({
-            imageUrl: imageUrl.trim(),
+          create: updateListingDto.uploadIds.map((uploadId, index) => ({
+            uploadId,
             sortOrder: index,
           })),
         };
@@ -131,6 +163,7 @@ export class ListingsService {
         category: true,
         images: {
           orderBy: { sortOrder: 'asc' },
+          include: { upload: true },
         },
       },
     });
@@ -192,6 +225,7 @@ export class ListingsService {
         category: true,
         images: {
           orderBy: { sortOrder: 'asc' },
+          include: { upload: true },
         },
       },
     });
@@ -204,6 +238,7 @@ export class ListingsService {
         category: true,
         images: {
           orderBy: { sortOrder: 'asc' },
+          include: { upload: true },
         },
         seller: {
           select: {
@@ -261,7 +296,7 @@ export class ListingsService {
     const title = createListingDto.title?.trim();
     const description = createListingDto.description?.trim();
     const meetupLocation = createListingDto.meetupLocation?.trim();
-    const imageUrls = createListingDto.imageUrls ?? [];
+    const uploadIds = createListingDto.uploadIds ?? [];
 
     if (!title) {
       throw new BadRequestException('Listing title is required');
@@ -309,10 +344,12 @@ export class ListingsService {
       meetupLocation: meetupLocation || null,
     };
 
-    if (imageUrls.length > 0) {
+    if (uploadIds.length > 0) {
+      await this.validateUploadIds(uploadIds, sellerId);
+
       data.images = {
-        create: imageUrls.map((imageUrl, index) => ({
-          imageUrl: imageUrl.trim(),
+        create: uploadIds.map((uploadId, index) => ({
+          uploadId,
           sortOrder: index,
         })),
       };
@@ -321,8 +358,11 @@ export class ListingsService {
     return this.prisma.listing.create({
       data,
       include: {
-        images: true,
         category: true,
+        images: {
+          orderBy: { sortOrder: 'asc' },
+          include: { upload: true },
+        },
       },
     });
   }

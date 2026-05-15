@@ -5,6 +5,6 @@ export class CreateListingDto {
   categoryId!: string;
   condition!: 'NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR' | 'FOR_PARTS';
   meetupLocation?: string;
-  imageUrls?: string[];
+  uploadIds?: string[];
   status?: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'ARCHIVED';
 }
