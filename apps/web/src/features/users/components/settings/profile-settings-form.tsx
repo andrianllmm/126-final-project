@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -14,8 +14,6 @@ import {
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 
-import { UserAvatar } from '../user-avatar';
-
 import {
   userProfileUpdateSchema,
   type UserProfile,
@@ -24,16 +22,12 @@ import {
 
 import { deleteUserAvatar, uploadUserAvatar } from '../../api/users-api';
 import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
+import { AvatarUpload } from '@/shared/components/upload/avatar-upload';
 
 type ProfileSettingsFormProps = {
   userId: string;
   profile: UserProfile;
 };
-
-type AvatarState =
-  | { mode: 'existing'; url: string | null }
-  | { mode: 'file'; file: File; previewUrl: string }
-  | { mode: 'removed' };
 
 function normalizeNullableString(value: unknown) {
   if (typeof value !== 'string') return null;
@@ -47,13 +41,12 @@ export function ProfileSettingsForm({
 }: ProfileSettingsFormProps) {
   const mutation = useUpdateUserProfile({ userId });
 
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const [fileInputKey, setFileInputKey] = useState(0);
+  const existingAvatar = profile.avatarUpload ?? null;
 
-  const [avatarState, setAvatarState] = useState<AvatarState>({
-    mode: 'existing',
-    url: profile.avatarUpload?.url ?? null,
-  });
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
 
   const {
     register,
@@ -67,51 +60,36 @@ export function ProfileSettingsForm({
     },
   });
 
-  const existingAvatarUploadId = profile.avatarUpload?.id ?? null;
-
   useEffect(() => {
     reset({
       name: profile.name ?? '',
     });
 
-    setAvatarState({
-      mode: 'existing',
-      url: profile.avatarUpload?.url ?? null,
-    });
-
-    setFileInputKey((v) => v + 1);
+    setAvatarFile(null);
+    setAvatarRemoved(false);
     setSaveMessage(null);
   }, [profile, reset]);
 
-  const avatarSrc = useMemo(() => {
-    if (avatarState.mode === 'file') return avatarState.previewUrl;
-    if (avatarState.mode === 'removed') return null;
-    return avatarState.url;
-  }, [avatarState]);
-
-  const hasChanges =
-    isDirty || avatarState.mode === 'file' || avatarState.mode === 'removed';
+  const hasChanges = isDirty || Boolean(avatarFile) || avatarRemoved;
 
   const onSubmit = handleSubmit(async (values) => {
     setSaveMessage(null);
 
     try {
-      let avatarUploadId: string | null = existingAvatarUploadId;
+      let avatarUploadId = existingAvatar?.id ?? null;
 
-      // Upload new avatar
-      if (avatarState.mode === 'file') {
-        if (existingAvatarUploadId) {
-          await deleteUserAvatar(existingAvatarUploadId);
+      if (avatarFile) {
+        if (avatarUploadId) {
+          await deleteUserAvatar(avatarUploadId);
         }
 
-        const upload = await uploadUserAvatar(avatarState.file);
+        const upload = await uploadUserAvatar(avatarFile);
         avatarUploadId = upload.id;
       }
 
-      // Remove avatar explicitly
-      if (avatarState.mode === 'removed') {
-        if (existingAvatarUploadId) {
-          await deleteUserAvatar(existingAvatarUploadId);
+      if (avatarRemoved) {
+        if (avatarUploadId) {
+          await deleteUserAvatar(avatarUploadId);
         }
         avatarUploadId = null;
       }
@@ -125,12 +103,9 @@ export function ProfileSettingsForm({
         name: normalizeNullableString(values.name) ?? '',
       });
 
-      setAvatarState({
-        mode: 'existing',
-        url: avatarUploadId ? avatarSrc : null,
-      });
+      setAvatarFile(null);
+      setAvatarRemoved(false);
 
-      setFileInputKey((v) => v + 1);
       setSaveMessage('Profile updated.');
     } catch (err) {
       console.error(err);
@@ -157,6 +132,7 @@ export function ProfileSettingsForm({
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="name">Display name</FieldLabel>
+
             <Input
               id="name"
               type="text"
@@ -180,51 +156,22 @@ export function ProfileSettingsForm({
           <Field>
             <FieldLabel>Avatar</FieldLabel>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <UserAvatar
-                name={profile.name}
-                email={profile.email}
-                src={avatarSrc}
-                sizeClassName="size-16"
-                fallbackClassName="text-lg font-semibold"
-              />
+            <AvatarUpload
+              value={avatarFile ? [avatarFile] : []}
+              defaultSrc={avatarRemoved ? null : (existingAvatar?.url ?? null)}
+              onValueChange={(files) => {
+                const file = files[0];
 
-              <div className="flex w-full gap-2 items-center">
-                <Input
-                  key={fileInputKey}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
+                if (!file) {
+                  setAvatarFile(null);
+                  setAvatarRemoved(true);
+                  return;
+                }
 
-                    const previewUrl = URL.createObjectURL(file);
-
-                    setAvatarState({
-                      mode: 'file',
-                      file,
-                      previewUrl,
-                    });
-                  }}
-                  className="w-full"
-                />
-
-                {avatarState.mode !== 'removed' && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    disabled={mutation.isPending}
-                    onClick={() => {
-                      setAvatarState({ mode: 'removed' });
-                      setFileInputKey((v) => v + 1);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-            </div>
+                setAvatarFile(file);
+                setAvatarRemoved(false);
+              }}
+            />
           </Field>
 
           <Field>
