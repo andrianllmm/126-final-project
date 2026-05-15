@@ -18,7 +18,7 @@ import {
   type UserProfile,
   type UserProfileUpdateInput,
 } from '@repo/api';
-import { useUpdateUserProfile } from '../hooks/use-update-user-profile';
+import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 
 type ProfileSettingsFormProps = {
   userId: string;

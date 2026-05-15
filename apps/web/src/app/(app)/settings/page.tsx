@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { authClient } from '@/shared/lib/auth-client';
-import { SettingsView } from '@/features/users/components/settings-view';
+import { SettingsView } from '@/features/users/components/settings/settings-view';
 
 export default function Page() {
   const router = useRouter();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
-import { ProfileSettingsForm } from '@/features/users/components/profile-settings-form';
+import { ProfileSettingsForm } from '@/features/users/components/settings/profile-settings-form';
 import { Spinner } from '@/shared/components/ui/spinner';
 import {
   Tabs,
