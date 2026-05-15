@@ -36,9 +36,14 @@ export function DeleteAccountField() {
     setIsDeleting(true);
 
     try {
-      await authClient.deleteUser({
+      const result = await authClient.deleteUser({
         password,
       });
+
+      if (result.error) {
+        setError(result.error.message || 'Failed to delete account.');
+        return;
+      }
 
       router.replace('/sign-in');
     } catch (err) {
