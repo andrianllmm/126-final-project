@@ -3,7 +3,10 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
+
+import { AccountSettingsForm } from './account-settings-form';
 import { ProfileSettingsForm } from '@/features/users/components/settings/profile-settings-form';
+
 import { Spinner } from '@/shared/components/ui/spinner';
 import {
   Tabs,
@@ -11,7 +14,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui/tabs';
-import { AccountSettingsForm } from './account-settings-form';
 
 type SettingsViewProps = {
   userId: string;
@@ -24,7 +26,7 @@ export function SettingsView({ userId }: SettingsViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const tab = searchParams.get('tab') ?? 'profile';
+  const tab = searchParams.get('tab') ?? 'account';
 
   const setTab = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -62,16 +64,16 @@ export function SettingsView({ userId }: SettingsViewProps) {
 
       <Tabs value={tab} onValueChange={setTab} className="w-full space-y-4">
         <TabsList variant="line">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="profile">
-          <ProfileSettingsForm userId={userId} profile={profileQuery.data} />
-        </TabsContent>
 
         <TabsContent value="account">
           <AccountSettingsForm userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="profile">
+          <ProfileSettingsForm userId={userId} profile={profileQuery.data} />
         </TabsContent>
       </Tabs>
     </div>
