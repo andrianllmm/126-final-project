@@ -15,12 +15,7 @@ export const userProfileSchema = z.object({
 });
 
 export const userProfileUpdateSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .transform((value) => (value.length > 0 ? value : null))
-    .nullable()
-    .optional(),
+  name: z.string().trim().min(2, 'Name is required').optional(),
 });
 
 export const userProfileStatsSchema = z.object({
