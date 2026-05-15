@@ -26,8 +26,8 @@ export function ListingForm() {
   const [description, setDescription] = useState('');
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg p-8 border border-transparent dark:border-zinc-800">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-zinc-100">
+    <div className="bg-background text-foreground rounded-lg border border-border p-8">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">
         Create New Listing
       </h1>
 
@@ -107,11 +107,10 @@ export function ListingForm() {
             onChange={(e) => setDescription(e.target.value)}
             className="
               w-full px-4 py-3 h-48 resize-none rounded
-              border border-gray-300 dark:border-zinc-700
-              bg-white dark:bg-zinc-800
-              text-gray-900 dark:text-zinc-100
-              placeholder:text-gray-400 dark:placeholder:text-zinc-500
-              focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-zinc-500
+              bg-background text-foreground
+              border border-border
+              placeholder:text-muted-foreground
+              focus:outline-none focus:ring-2 focus:ring-ring
               transition-colors
             "
             rows={6}
@@ -119,14 +118,11 @@ export function ListingForm() {
         </FieldSet>
 
         {/* Navigation */}
-        <div className="flex justify-between pt-6 border-t border-gray-200 dark:border-zinc-700">
+        <div className="flex justify-between pt-6 border-t border-border">
           <Button type="button" variant="outline" className="px-6">
             ← Back
           </Button>
-          <Button
-            type="button"
-            className="px-6 bg-gray-800 hover:bg-gray-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 text-white"
-          >
+          <Button type="button" className="px-6" variant="default">
             Next →
           </Button>
         </div>

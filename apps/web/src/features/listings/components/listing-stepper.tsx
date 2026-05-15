@@ -49,7 +49,7 @@ export function Pattern() {
         {/* Step 1 — Details */}
         <StepperContent value={1}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div className="-mt-4 md:col-span-2">
+            <div className="mt-4 md:col-span-2">
               <ListingForm />
             </div>
             <div className="mt-4 space-y-3">
