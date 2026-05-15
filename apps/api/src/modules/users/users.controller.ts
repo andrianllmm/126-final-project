@@ -1,6 +1,19 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { UsersService } from './users.service.js';
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import {
+  AllowAnonymous,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
+import { userProfileUpdateSchema } from '@repo/api';
 
 @Controller('users')
 export class UsersController {
@@ -16,6 +29,17 @@ export class UsersController {
     }
 
     return profile;
+  }
+
+  @Patch('me/profile')
+  updateMyProfile(@Session() session: UserSession, @Body() body: unknown) {
+    const result = userProfileUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      throw new BadRequestException('Invalid profile data');
+    }
+
+    return this.usersService.updateProfileById(session.user.id, result.data);
   }
 
   @Get(':id/stats')
