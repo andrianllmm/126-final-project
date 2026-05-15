@@ -54,13 +54,6 @@ async function main() {
       email: 'seller@demo.com',
       password: 'password123',
       name: 'Seller One',
-      image: 'https://i.pravatar.cc/150?img=12',
-    },
-  });
-
-  const seller = await prisma.user.findUniqueOrThrow({
-    where: {
-      email: 'seller@demo.com',
     },
   });
 
@@ -69,12 +62,39 @@ async function main() {
       email: 'buyer@demo.com',
       password: 'password123',
       name: 'Buyer One',
-      image: 'https://i.pravatar.cc/150?img=32',
     },
+  });
+
+  const seller = await prisma.user.findUniqueOrThrow({
+    where: { email: 'seller@demo.com' },
   });
 
   const buyer = await prisma.user.findUniqueOrThrow({
     where: { email: 'buyer@demo.com' },
+  });
+
+  const sellerAvatar = await createUpload(
+    'https://i.pravatar.cc/150?img=12',
+    `seed-avatar-seller-${Date.now()}`,
+  );
+
+  const buyerAvatar = await createUpload(
+    'https://i.pravatar.cc/150?img=32',
+    `seed-avatar-buyer-${Date.now()}`,
+  );
+
+  await prisma.user.update({
+    where: { id: seller.id },
+    data: {
+      avatarUploadId: sellerAvatar.id,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: buyer.id },
+    data: {
+      avatarUploadId: buyerAvatar.id,
+    },
   });
 
   // CATEGORIES

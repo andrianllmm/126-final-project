@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { authClient } from '@/shared/lib/auth-client';
-
-import { getInitials } from '@/shared/lib/get-initials';
+import { useUserProfile } from '@/features/users/hooks/use-user-profile';
 
 import {
   DropdownMenu,
@@ -17,20 +16,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/components/ui/avatar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Button } from '@/shared/components/ui/button';
 import { LogOutIcon } from 'lucide-react';
+import { UserAvatar } from '@/features/users/components/user-avatar';
 
 export function NavUser() {
   const router = useRouter();
 
   const session = authClient.useSession();
   const user = session.data?.user;
+  const profileQuery = useUserProfile(user?.id ?? '');
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -53,25 +49,25 @@ export function NavUser() {
 
   const name = user.name ?? null;
   const email = user.email ?? null;
-  const image = user.image ?? null;
+  const profile = profileQuery.data;
+  const displayName = profile?.name ?? name;
+  const displayEmail = profile?.email ?? email;
+  const avatarUrl = profile?.avatarUpload?.url ?? null;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center rounded-full focus:outline-none">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={image ?? undefined} alt={name ?? 'User'} />
-            <AvatarFallback>{getInitials(name, email)}</AvatarFallback>
-          </Avatar>
+          <UserAvatar name={displayName} email={displayEmail} src={avatarUrl} />
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="flex flex-col">
           <span className="text-sm font-medium leading-none">
-            {name ?? 'User'}
+            {displayName ?? 'User'}
           </span>
-          <span className="text-xs text-muted-foreground">{email}</span>
+          <span className="text-xs text-muted-foreground">{displayEmail}</span>
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />

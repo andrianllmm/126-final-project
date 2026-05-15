@@ -1,30 +1,176 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
-import { Prisma, User } from '../../generated/prisma/client.js';
+import {
+  UserProfile,
+  UserProfileStats,
+  UserProfileUpdateInput,
+} from '@repo/api';
+import { UploadsService } from '../uploads/uploads.service.js';
+import { UploadFile } from '../uploads/uploads.types.js';
+
+const profileSelect = {
+  id: true,
+  name: true,
+  email: true,
+  avatarUpload: {
+    select: {
+      id: true,
+      url: true,
+    },
+  },
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+function toUserProfile(user: {
+  id: string;
+  name: string | null;
+  email: string;
+  avatarUpload: { id: string; url: string } | null;
+  createdAt: Date;
+  updatedAt: Date;
+}): UserProfile {
+  return {
+    ...user,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
+  };
+}
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadsService: UploadsService,
+  ) {}
 
-  async findAll(params?: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    return this.prisma.user.findMany({
-      skip: params?.skip,
-      take: params?.take,
-      cursor: params?.cursor,
-      where: params?.where,
-      orderBy: params?.orderBy,
+  async findProfileById(id: string): Promise<UserProfile | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: profileSelect,
     });
+
+    if (!user) {
+      return null;
+    }
+
+    return toUserProfile(user);
   }
 
-  async findOne(id: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
+  async updateProfileById(
+    id: string,
+    input: UserProfileUpdateInput,
+    avatarFile?: UploadFile,
+    removeAvatar = false,
+  ): Promise<UserProfile> {
+    const currentUser = await this.prisma.user.findUnique({
       where: { id },
+      select: {
+        avatarUploadId: true,
+      },
     });
+
+    let nextAvatarUploadId = currentUser?.avatarUploadId ?? null;
+
+    if (avatarFile) {
+      const uploadedAvatar = await this.uploadsService.upload(avatarFile, id);
+      nextAvatarUploadId = uploadedAvatar.id;
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: {
+        name: input.name,
+        avatarUploadId: avatarFile
+          ? nextAvatarUploadId
+          : removeAvatar
+            ? null
+            : nextAvatarUploadId,
+      },
+      select: profileSelect,
+    });
+
+    if ((avatarFile || removeAvatar) && currentUser?.avatarUploadId) {
+      await this.uploadsService.delete(currentUser.avatarUploadId, id);
+    }
+
+    return toUserProfile(user);
+  }
+
+  async getProfileStats(userId: string): Promise<UserProfileStats> {
+    const [
+      reviewAggregate,
+      salesCount,
+      listingCount,
+      totalConversations,
+      respondedConversations,
+    ] = await Promise.all([
+      this.prisma.review.aggregate({
+        where: {
+          revieweeId: userId,
+        },
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          rating: true,
+        },
+      }),
+
+      // Total completed sales by this user as seller
+      this.prisma.transaction.count({
+        where: {
+          sellerId: userId,
+          status: 'COMPLETED',
+        },
+      }),
+
+      // Active listings currently available for sale
+      this.prisma.listing.count({
+        where: {
+          sellerId: userId,
+          status: 'AVAILABLE',
+        },
+      }),
+
+      // Total conversations where user is the seller
+      this.prisma.conversation.count({
+        where: {
+          sellerId: userId,
+        },
+      }),
+
+      // Conversations where seller has sent at least one message
+      this.prisma.conversation.count({
+        where: {
+          sellerId: userId,
+          messages: {
+            some: {
+              senderId: userId,
+            },
+          },
+        },
+      }),
+    ]);
+
+    // Average rating from all received reviews
+    const averageRating = Number(reviewAggregate._avg.rating?.toFixed(1) ?? 0);
+
+    // Total number of reviews received
+    const reviewCount = reviewAggregate._count.rating;
+
+    // % of conversations where seller has responded at least once
+    const responseRate =
+      totalConversations === 0
+        ? 100
+        : Math.round((respondedConversations / totalConversations) * 100);
+
+    return {
+      averageRating,
+      reviewCount,
+      salesCount,
+      listingCount,
+      responseRate,
+    };
   }
 }
