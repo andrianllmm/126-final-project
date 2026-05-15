@@ -61,7 +61,7 @@ export function ProductSummaryCard({
           </div>
 
           {/* Meetup Location Box */}
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+          <div className="rounded-2xl border border-primary/40 bg-slate-50/50 p-5">
             <div className="flex items-start gap-3">
               <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#db0527]" />
               <div className="space-y-1">
