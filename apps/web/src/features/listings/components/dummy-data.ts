@@ -6,8 +6,8 @@ export const productSummaryDummyData = {
   price: '₱8,500.00',
   description:
     'Slightly used premium headphones. Excellent noise cancellation and 30-hour battery life. Includes original case and charging cable. Perfect for studying at the library or commuting. No visible scratches.',
-  meetupLocation: 'UPV Little Theater Lobby',
-  meetupTime: 'P-build, Mon, Wednesday 3:00 PM',
+  meetupLocation: 'UPV New Library',
+  meetupTime: 'Mon, Wednesday 3:00 PM',
 };
 
 export const mediaPreviewDummyData = {
