@@ -17,11 +17,22 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
+// Helper to simulate upload records
+async function createUpload(url: string, key: string) {
+  return prisma.upload.create({
+    data: {
+      key,
+      url,
+      mimeType: 'image/jpeg',
+      size: 123456,
+    },
+  });
+}
+
 async function main() {
-  // Dates
   const now = new Date();
 
-  // Clean slate for repeatable seeds
+  // CLEAN
   await prisma.message.deleteMany();
   await prisma.review.deleteMany();
   await prisma.transaction.deleteMany();
@@ -29,6 +40,7 @@ async function main() {
   await prisma.savedListing.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.listingImage.deleteMany();
+  await prisma.upload.deleteMany();
   await prisma.listing.deleteMany();
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
@@ -37,35 +49,51 @@ async function main() {
   await prisma.listingCategory.deleteMany();
 
   // USERS
-  // SELLER
   await auth.api.signUpEmail({
     body: {
       email: 'seller@demo.com',
       password: 'password123',
       name: 'Seller One',
-      image: 'https://i.pravatar.cc/150?img=12',
     },
   });
 
-  const seller = await prisma.user.findUniqueOrThrow({
-    where: {
-      email: 'seller@demo.com',
-    },
-  });
-
-  // BUYER
   await auth.api.signUpEmail({
     body: {
       email: 'buyer@demo.com',
       password: 'password123',
       name: 'Buyer One',
-      image: 'https://i.pravatar.cc/150?img=32',
     },
   });
 
+  const seller = await prisma.user.findUniqueOrThrow({
+    where: { email: 'seller@demo.com' },
+  });
+
   const buyer = await prisma.user.findUniqueOrThrow({
-    where: {
-      email: 'buyer@demo.com',
+    where: { email: 'buyer@demo.com' },
+  });
+
+  const sellerAvatar = await createUpload(
+    'https://i.pravatar.cc/150?img=12',
+    `seed-avatar-seller-${Date.now()}`,
+  );
+
+  const buyerAvatar = await createUpload(
+    'https://i.pravatar.cc/150?img=32',
+    `seed-avatar-buyer-${Date.now()}`,
+  );
+
+  await prisma.user.update({
+    where: { id: seller.id },
+    data: {
+      avatarUploadId: sellerAvatar.id,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: buyer.id },
+    data: {
+      avatarUploadId: buyerAvatar.id,
     },
   });
 
@@ -113,18 +141,30 @@ async function main() {
     },
   });
 
+  // UPLOADS
+
+  const keyboardUpload = await createUpload(
+    'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
+    `seed-keyboard-${Date.now()}`,
+  );
+
+  const textbookUpload = await createUpload(
+    'https://upload.wikimedia.org/wikipedia/commons/c/c7/Americanstudbookvolume2open.jpg',
+    `seed-textbook-${Date.now()}`,
+  );
+
+  // LISTING IMAGES
+
   await prisma.listingImage.createMany({
     data: [
       {
         listingId: keyboard.id,
-        imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
+        uploadId: keyboardUpload.id,
         sortOrder: 0,
       },
       {
         listingId: textbook.id,
-        imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/c/c7/Americanstudbookvolume2open.jpg',
+        uploadId: textbookUpload.id,
         sortOrder: 0,
       },
     ],
