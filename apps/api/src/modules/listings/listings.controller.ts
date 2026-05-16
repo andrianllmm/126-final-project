@@ -15,9 +15,11 @@ import {
 } from '@thallesp/nestjs-better-auth';
 
 import { ListingsService } from './listings.service.js';
-import { CreateListingDto } from './dto/create-listing.dto.js';
-import { UpdateListingDto } from './dto/update-listing.dto.js';
-import { UpdateListingStatusDto } from './dto/update-listing-status.dto.js';
+import {
+  CreateListingDto,
+  UpdateListingDto,
+  UpdateListingStatusDto,
+} from './listings.dto.js';
 
 @Controller('listings')
 export class ListingsController {
@@ -31,46 +33,35 @@ export class ListingsController {
 
   @Get(':id')
   @OptionalAuth()
-  findOne(@Param('id') listingId: string) {
-    return this.listingsService.findOne(listingId);
+  findOne(@Param('id') id: string) {
+    return this.listingsService.findOne(id);
   }
 
   @Post()
-  create(
-    @Session() session: UserSession,
-    @Body() createListingDto: CreateListingDto,
-  ) {
-    return this.listingsService.create(session.user.id, createListingDto);
+  create(@Session() session: UserSession, @Body() body: CreateListingDto) {
+    return this.listingsService.create(session.user.id, body);
   }
 
   @Patch(':id')
   update(
-    @Param('id') listingId: string,
+    @Param('id') id: string,
     @Session() session: UserSession,
-    @Body() updateListingDto: UpdateListingDto,
+    @Body() body: UpdateListingDto,
   ) {
-    return this.listingsService.update(
-      listingId,
-      session.user.id,
-      updateListingDto,
-    );
+    return this.listingsService.update(id, session.user.id, body);
   }
 
   @Patch(':id/status')
   updateStatus(
-    @Param('id') listingId: string,
+    @Param('id') id: string,
     @Session() session: UserSession,
-    @Body() updateStatusDto: UpdateListingStatusDto,
+    @Body() body: UpdateListingStatusDto,
   ) {
-    return this.listingsService.updateStatus(
-      listingId,
-      session.user.id,
-      updateStatusDto.status,
-    );
+    return this.listingsService.updateStatus(id, session.user.id, body.status);
   }
 
   @Delete(':id')
-  delete(@Param('id') listingId: string, @Session() session: UserSession) {
-    return this.listingsService.delete(listingId, session.user.id);
+  delete(@Param('id') id: string, @Session() session: UserSession) {
+    return this.listingsService.delete(id, session.user.id);
   }
 }

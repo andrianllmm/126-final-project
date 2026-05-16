@@ -1,4 +1,4 @@
-import { ListingStatus } from '../../generated/prisma/enums.js';
+import { ListingStatus } from '@repo/api';
 
 export const LISTING_STATUS_TRANSITIONS: Record<
   ListingStatus,
