@@ -18,6 +18,7 @@ import { NeedHelpCard } from '@/features/listings/components/need-help-card';
 import { PhotoUploadForm } from './listing-form/photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
 import { ProductSummaryCardExample } from './product-summary-card';
+import { ProductSummaryImg } from './product-summary-img';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
@@ -81,7 +82,7 @@ export function Pattern() {
               <ProductSummaryCardExample />
             </div>
             <div className="mt-4 space-y-3">
-              <PhotoGuidelines />
+              <ProductSummaryImg />
             </div>
           </div>
         </StepperContent>
