@@ -116,16 +116,6 @@ export function ListingForm() {
             rows={6}
           />
         </FieldSet>
-
-        {/* Navigation */}
-        <div className="flex justify-between pt-6 border-t border-border">
-          <Button type="button" variant="outline" className="px-6">
-            ← Back
-          </Button>
-          <Button type="button" className="px-6" variant="default">
-            Next →
-          </Button>
-        </div>
       </FieldGroup>
     </div>
   );

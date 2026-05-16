@@ -189,14 +189,6 @@ export function PhotoUploadForm() {
       <div className="text-sm text-gray-500 dark:text-gray-400">
         {photos.length} of {maxPhotos} photos added
       </div>
-      <div className="flex justify-between pt-6 border-t border-border">
-        <Button type="button" variant="outline" className="px-6">
-          ← Back
-        </Button>
-        <Button type="button" className="px-6" variant="default">
-          Next →
-        </Button>
-      </div>
     </div>
   );
 }

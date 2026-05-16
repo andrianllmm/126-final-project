@@ -21,13 +21,34 @@ import { PhotoGuidelines } from './image-guide-card';
 import { ProductSummaryCard } from './product-summary-card';
 import { ProductSummaryImg } from './product-summary-img';
 import { productSummaryDummyData } from './dummy-data';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
 export function Pattern() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep]);
+
+  const handleNext = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
+
+  const handleBack = () => {
+    if (currentStep === 1) {
+      router.back();
+    } else {
+      setCurrentStep((prev) => Math.max(prev - 1, 1));
+    }
+  };
+
   return (
     <Stepper
-      defaultValue={1}
+      value={currentStep}
       indicators={{
         completed: <CheckIcon className="size-3.5" />,
         loading: <LoaderCircleIcon className="size-3.5 animate-spin" />,
@@ -57,6 +78,24 @@ export function Pattern() {
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
               <ListingForm />
+              <div className="flex justify-between pt-6 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="px-6"
+                  onClick={handleBack}
+                >
+                  ← Back
+                </Button>
+                <Button
+                  type="button"
+                  className="px-6"
+                  variant="default"
+                  onClick={handleNext}
+                >
+                  Next →
+                </Button>
+              </div>
             </div>
             <div className="mt-4 space-y-3">
               <SellerTipsCard />
@@ -70,6 +109,24 @@ export function Pattern() {
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
               <PhotoUploadForm />
+              <div className="flex justify-between pt-6 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="px-6"
+                  onClick={handleBack}
+                >
+                  ← Back
+                </Button>
+                <Button
+                  type="button"
+                  className="px-6"
+                  variant="default"
+                  onClick={handleNext}
+                >
+                  Next →
+                </Button>
+              </div>
             </div>
             <div className="mt-4 space-y-3">
               <PhotoGuidelines />
@@ -98,6 +155,7 @@ export function Pattern() {
                 type="button"
                 variant="outline"
                 className="flex items-center gap-2 px-6"
+                onClick={handleBack}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
