@@ -5,8 +5,8 @@ export class ImageFileValidationPipe implements PipeTransform {
 
   constructor(private readonly options: { required?: boolean } = {}) {}
 
-  transform(file: any) {
-    if (!file) {
+  transform(value: any) {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
       if (this.options.required === false) {
         return undefined;
       }
@@ -14,16 +14,20 @@ export class ImageFileValidationPipe implements PipeTransform {
       throw new BadRequestException('File is required');
     }
 
-    if (!this.allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException('Only image files are allowed');
-    }
+    const files = Array.isArray(value) ? value : [value];
 
     const maxSize = 5 * 1024 * 1024;
 
-    if (file.size > maxSize) {
-      throw new BadRequestException('File too large (max 5MB)');
+    for (const file of files) {
+      if (!this.allowedMimeTypes.includes(file.mimetype)) {
+        throw new BadRequestException('Only image files are allowed');
+      }
+
+      if (file.size > maxSize) {
+        throw new BadRequestException('File too large (max 5MB)');
+      }
     }
 
-    return file;
+    return value;
   }
 }

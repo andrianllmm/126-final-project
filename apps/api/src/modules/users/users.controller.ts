@@ -1,22 +1,32 @@
 import {
-  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Patch,
+  Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UsersService } from './users.service.js';
+
 import {
   AllowAnonymous,
   Session,
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
-import { userProfileUpdateSchema } from '@repo/api';
+
+import { ZodResponse } from 'nestjs-zod';
+
+import {
+  UserProfileDto,
+  UpdateMyProfileDto,
+  UserProfileStatsDto,
+} from './users.dto.js';
+
+import { UsersService } from './users.service.js';
 import { ImageFileValidationPipe } from '../uploads/pipes/image-file-validation.pipe.js';
 import { toUploadFile } from '../uploads/adapters/to-upload-file.js';
 
@@ -26,6 +36,7 @@ export class UsersController {
 
   @Get(':id/profile')
   @AllowAnonymous()
+  @ZodResponse({ type: UserProfileDto })
   async getProfile(@Param('id') id: string) {
     const profile = await this.usersService.findProfileById(id);
 
@@ -37,36 +48,41 @@ export class UsersController {
   }
 
   @Patch('me/profile')
+  @ZodResponse({ type: UserProfileDto })
+  async updateMyProfile(
+    @Session() session: UserSession,
+    @Body() body: UpdateMyProfileDto,
+  ) {
+    return this.usersService.updateProfileById(session.user.id, body);
+  }
+
+  @Post('me/avatar')
   @UseInterceptors(
     FileInterceptor('avatar', {
-      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      limits: { fileSize: 5 * 1024 * 1024 },
     }),
   )
-  updateMyProfile(
+  @ZodResponse({ type: UserProfileDto })
+  async uploadMyAvatar(
     @Session() session: UserSession,
-    @Body() body: unknown,
-    @UploadedFile(new ImageFileValidationPipe({ required: false }))
-    avatarFile?: any,
+    @UploadedFile(new ImageFileValidationPipe({ required: true }))
+    avatarFile: any,
   ) {
-    const result = userProfileUpdateSchema.safeParse(body);
-
-    if (!result.success) {
-      throw new BadRequestException('Invalid profile data');
-    }
-
-    const rawBody = body as { avatar?: unknown } | null;
-    const shouldRemoveAvatar = rawBody?.avatar === '' && !avatarFile;
-
-    return this.usersService.updateProfileById(
+    return this.usersService.setAvatar(
       session.user.id,
-      result.data,
-      avatarFile ? toUploadFile(avatarFile) : undefined,
-      shouldRemoveAvatar,
+      toUploadFile(avatarFile),
     );
+  }
+
+  @Delete('me/avatar')
+  @ZodResponse({ type: UserProfileDto })
+  async removeMyAvatar(@Session() session: UserSession) {
+    return this.usersService.removeAvatar(session.user.id);
   }
 
   @Get(':id/stats')
   @AllowAnonymous()
+  @ZodResponse({ type: UserProfileStatsDto })
   getProfileStats(@Param('id') id: string) {
     return this.usersService.getProfileStats(id);
   }

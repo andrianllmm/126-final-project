@@ -26,10 +26,7 @@ import {
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
 
-import {
-  changePasswordSchema,
-  type ChangePasswordInput,
-} from '../../validation/change-password.schema';
+import { changePasswordSchema, type ChangePasswordInput } from '@repo/api';
 
 export function ChangePasswordField() {
   const {

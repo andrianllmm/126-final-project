@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -20,8 +21,13 @@ import {
   type UserProfileUpdateInput,
 } from '@repo/api';
 
-import { useUpdateUserProfile } from '../../hooks/use-update-user-profile';
 import { AvatarUpload } from '@/shared/components/upload/avatar-upload';
+
+import {
+  updateUserProfile,
+  uploadUserAvatar,
+  removeUserAvatar,
+} from '../../api/users-api';
 
 type ProfileSettingsFormProps = {
   userId: string;
@@ -36,14 +42,12 @@ export function ProfileSettingsForm({
   userId,
   profile,
 }: ProfileSettingsFormProps) {
-  const mutation = useUpdateUserProfile({ userId });
-
-  const existingAvatar = profile.avatarUpload ?? null;
+  const queryClient = useQueryClient();
 
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarRemoved, setAvatarRemoved] = useState(false);
+  const [avatarTouched, setAvatarTouched] = useState(false);
 
   const {
     register,
@@ -57,42 +61,49 @@ export function ProfileSettingsForm({
     },
   });
 
+  const existingAvatar = profile.avatarUpload ?? null;
+
   useEffect(() => {
     reset({
       name: profile.name ?? '',
     });
 
     setAvatarFile(null);
-    setAvatarRemoved(false);
+    setAvatarTouched(false);
     setSaveMessage(null);
   }, [profile, reset]);
 
-  const hasChanges = isDirty || Boolean(avatarFile) || avatarRemoved;
+  const hasExistingAvatar = Boolean(existingAvatar);
+  const shouldRemoveAvatar = avatarTouched && !avatarFile && hasExistingAvatar;
+
+  const hasChanges = isDirty || Boolean(avatarFile) || shouldRemoveAvatar;
 
   const onSubmit = handleSubmit(async (values) => {
     setSaveMessage(null);
 
     try {
-      const formData = new FormData();
+      // Update profile fields
+      await updateUserProfile({
+        name: values.name ?? '',
+      });
 
-      formData.append('name', values.name ?? '');
-
+      // Avatar changes
       if (avatarFile) {
-        formData.append('avatar', avatarFile);
+        await uploadUserAvatar(avatarFile);
+      } else if (shouldRemoveAvatar) {
+        await removeUserAvatar();
       }
 
-      if (avatarRemoved) {
-        formData.append('avatar', '');
-      }
-
-      await mutation.mutateAsync(formData);
+      await queryClient.invalidateQueries({
+        queryKey: ['users'],
+      });
 
       reset({
         name: values.name ?? '',
       });
 
       setAvatarFile(null);
-      setAvatarRemoved(false);
+      setAvatarTouched(false);
 
       setSaveMessage('Profile updated.');
     } catch (err) {
@@ -144,18 +155,20 @@ export function ProfileSettingsForm({
 
             <AvatarUpload
               value={avatarFile ? [avatarFile] : []}
-              defaultSrc={avatarRemoved ? null : (existingAvatar?.url ?? null)}
+              defaultSrc={
+                shouldRemoveAvatar ? null : (existingAvatar?.url ?? null)
+              }
               onValueChange={(files) => {
+                setAvatarTouched(true);
+
                 const file = files[0];
 
                 if (!file) {
                   setAvatarFile(null);
-                  setAvatarRemoved(true);
                   return;
                 }
 
                 setAvatarFile(file);
-                setAvatarRemoved(false);
               }}
             />
           </Field>
@@ -163,19 +176,9 @@ export function ProfileSettingsForm({
           <Field>
             {saveMessage && <FieldDescription>{saveMessage}</FieldDescription>}
 
-            {mutation.isError && (
-              <FieldDescription className="text-destructive">
-                {(mutation.error as Error)?.message ||
-                  'Unable to update profile.'}
-              </FieldDescription>
-            )}
-
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button
-                type="submit"
-                disabled={mutation.isPending || !hasChanges}
-              >
-                {mutation.isPending ? 'Saving...' : 'Save changes'}
+              <Button type="submit" disabled={!hasChanges}>
+                Save changes
               </Button>
             </div>
           </Field>
