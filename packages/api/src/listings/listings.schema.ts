@@ -13,12 +13,6 @@ export const createListingSchema = z.object({
   condition: ListingConditionSchema,
   meetupLocation: z.string().nullable().optional(),
   status: ListingStatusSchema.optional(),
-  uploadIds: z
-    .array(z.string())
-    .refine((arr) => new Set(arr).size === arr.length, {
-      message: 'Array must contain unique values',
-    })
-    .optional(),
 });
 
 export const updateListingSchema = z.object({

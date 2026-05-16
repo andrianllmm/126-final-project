@@ -13,10 +13,21 @@ import { ListingPolicy } from './listing.policy.js';
 
 const LISTING_INCLUDE = {
   category: true,
+
   images: {
     orderBy: { sortOrder: 'asc' },
-    include: { upload: true },
+    select: {
+      id: true,
+      sortOrder: true,
+      upload: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+    },
   },
+
   seller: {
     select: {
       id: true,
@@ -55,7 +66,6 @@ export class ListingsService {
 
   async create(sellerId: string, input: CreateListingInput) {
     await this.policy.assertValidCategory(input.categoryId);
-    await this.policy.assertValidUploadIds(input.uploadIds ?? [], sellerId);
 
     return this.prisma.listing.create({
       data: {
@@ -68,15 +78,6 @@ export class ListingsService {
 
         seller: { connect: { id: sellerId } },
         category: { connect: { id: input.categoryId } },
-
-        images: input.uploadIds?.length
-          ? {
-              create: input.uploadIds.map((id, i) => ({
-                upload: { connect: { id } },
-                sortOrder: i,
-              })),
-            }
-          : undefined,
       },
       include: LISTING_INCLUDE,
     });
@@ -91,14 +92,6 @@ export class ListingsService {
       await this.policy.assertValidCategory(input.categoryId);
     }
 
-    if (input.uploadIds !== undefined) {
-      await this.policy.assertValidUploadIds(input.uploadIds, userId);
-
-      await this.prisma.listingImage.deleteMany({
-        where: { listingId },
-      });
-    }
-
     return this.prisma.listing.update({
       where: { id: listingId },
       data: {
@@ -111,15 +104,6 @@ export class ListingsService {
 
         category: input.categoryId
           ? { connect: { id: input.categoryId } }
-          : undefined,
-
-        images: input.uploadIds?.length
-          ? {
-              create: input.uploadIds.map((id, i) => ({
-                upload: { connect: { id } },
-                sortOrder: i,
-              })),
-            }
           : undefined,
       },
       include: LISTING_INCLUDE,

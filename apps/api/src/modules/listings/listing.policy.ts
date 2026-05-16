@@ -13,7 +13,26 @@ import { Listing } from '../../generated/prisma/client.js';
 export class ListingPolicy {
   constructor(private readonly prisma: PrismaService) {}
 
-  assertOwner(listing: Listing, userId: string) {
+  async assertOwnerByListingId(listingId: string, userId: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+      select: { sellerId: true },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    if (listing.sellerId !== userId) {
+      throw new ForbiddenException('Not allowed');
+    }
+  }
+
+  assertOwner(listing: Pick<Listing, 'sellerId'> | null, userId: string) {
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
     if (listing.sellerId !== userId) {
       throw new ForbiddenException('Not allowed');
     }
