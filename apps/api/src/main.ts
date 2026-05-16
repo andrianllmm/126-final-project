@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module.js';
 import { env } from './config/env.js';
 
@@ -13,14 +12,6 @@ async function bootstrap() {
     origin: [env.webUrl],
     credentials: true,
   });
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
 
   const config = new DocumentBuilder()
     .setTitle('Iskommerce')
