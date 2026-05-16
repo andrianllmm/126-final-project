@@ -32,22 +32,23 @@ const LISTING_INCLUDE = {
 export class ListingsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(params: { sellerId?: string } = {}) {
+  async findAll() {
     return this.prisma.listing.findMany({
-      where: params.sellerId
-        ? { sellerId: params.sellerId }
-        : { status: ListingStatus.AVAILABLE },
+      where: {
+        // Anyone can view listings that are available
+        status: ListingStatus.AVAILABLE,
+      },
       orderBy: { createdAt: 'desc' },
       include: LISTING_INCLUDE,
     });
   }
 
-  async findOne(listingId: string, userId?: string) {
+  async findOne(listingId: string) {
     const listing = await this.getListingOrThrow(listingId);
 
     if (
-      listing.status !== ListingStatus.AVAILABLE &&
-      listing.sellerId !== userId
+      // Anyone can view listings that are available
+      listing.status !== ListingStatus.AVAILABLE
     ) {
       throw new NotFoundException('Listing not found');
     }

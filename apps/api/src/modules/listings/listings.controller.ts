@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
 import {
   AllowAnonymous,
@@ -26,8 +25,14 @@ export class ListingsController {
 
   @Get()
   @AllowAnonymous()
-  findAll(@Query('sellerId') sellerId?: string) {
-    return this.listingsService.findAll({ sellerId });
+  findAll() {
+    return this.listingsService.findAll();
+  }
+
+  @Get(':id')
+  @OptionalAuth()
+  findOne(@Param('id') listingId: string) {
+    return this.listingsService.findOne(listingId);
   }
 
   @Post()
@@ -36,12 +41,6 @@ export class ListingsController {
     @Body() createListingDto: CreateListingDto,
   ) {
     return this.listingsService.create(session.user.id, createListingDto);
-  }
-
-  @Get(':id')
-  @OptionalAuth()
-  findOne(@Param('id') listingId: string, @Session() session?: UserSession) {
-    return this.listingsService.findOne(listingId, session?.user.id);
   }
 
   @Patch(':id')
