@@ -6,12 +6,14 @@ import {
   Param,
   Patch,
   Post,
-  Query,
-  Req,
-  UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import {
+  AllowAnonymous,
+  OptionalAuth,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
+
 import { ListingsService } from './listings.service.js';
 import { CreateListingDto } from './dto/create-listing.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
@@ -23,97 +25,52 @@ export class ListingsController {
 
   @Get()
   @AllowAnonymous()
-  findAll(@Query('sellerId') sellerId?: string) {
-    return this.listingsService.findAll({ sellerId });
-  }
-
- 
-  @Post()
-  create(@Req() req: Request, @Body() createListingDto: CreateListingDto) {
-    const userId = this.getAuthenticatedUserId(req);
-
-    if (!userId) {
-      throw new UnauthorizedException(
-        'Authentication required to create a listing',
-      );
-    }
-
-    return this.listingsService.create(userId, createListingDto);
+  findAll() {
+    return this.listingsService.findAll();
   }
 
   @Get(':id')
-  @AllowAnonymous()
-  findOne(@Param('id') listingId: string, @Req() req: Request) {
-    const userId = this.getAuthenticatedUserId(req);
-    return this.listingsService.findOne(listingId, userId);
+  @OptionalAuth()
+  findOne(@Param('id') listingId: string) {
+    return this.listingsService.findOne(listingId);
+  }
+
+  @Post()
+  create(
+    @Session() session: UserSession,
+    @Body() createListingDto: CreateListingDto,
+  ) {
+    return this.listingsService.create(session.user.id, createListingDto);
   }
 
   @Patch(':id')
   update(
     @Param('id') listingId: string,
-    @Req() req: Request,
+    @Session() session: UserSession,
     @Body() updateListingDto: UpdateListingDto,
   ) {
-    const userId = this.getAuthenticatedUserId(req);
-
-    if (!userId) {
-      throw new UnauthorizedException(
-        'Authentication required to update a listing',
-      );
-    }
-
-    return this.listingsService.update(listingId, userId, updateListingDto);
+    return this.listingsService.update(
+      listingId,
+      session.user.id,
+      updateListingDto,
+    );
   }
 
   @Patch(':id/status')
   updateStatus(
     @Param('id') listingId: string,
-    @Req() req: Request,
+    @Session() session: UserSession,
     @Body() updateStatusDto: UpdateListingStatusDto,
   ) {
-    const userId = this.getAuthenticatedUserId(req);
-
-    if (!userId) {
-      throw new UnauthorizedException(
-        'Authentication required to update listing status',
-      );
-    }
-
     return this.listingsService.updateStatus(
       listingId,
-      userId,
+      session.user.id,
       updateStatusDto.status,
     );
   }
 
   @Delete(':id')
-  delete(@Param('id') listingId: string, @Req() req: Request) {
-    const userId = this.getAuthenticatedUserId(req);
-
-    if (!userId) {
-      throw new UnauthorizedException(
-        'Authentication required to delete a listing',
-      );
-    }
-
-    return this.listingsService.delete(listingId, userId);
-  }
-
-  private getAuthenticatedUserId(req: Request): string | undefined {
-    const anyReq = req as any;
-
-    if (anyReq.user?.id) {
-      return anyReq.user.id;
-    }
-
-    if (anyReq.user?.sub) {
-      return anyReq.user.sub;
-    }
-
-    if (anyReq.session?.user?.id) {
-      return anyReq.session.user.id;
-    }
-
-    return undefined;
+  delete(@Param('id') listingId: string, @Session() session: UserSession) {
+    return this.listingsService.delete(listingId, session.user.id);
   }
 }

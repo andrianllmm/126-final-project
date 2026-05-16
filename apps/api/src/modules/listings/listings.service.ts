@@ -4,287 +4,155 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
+import { Prisma, ListingStatus } from '../../generated/prisma/client.js';
+
 import { PrismaService } from '../../database/prisma.service.js';
+
 import { CreateListingDto } from './dto/create-listing.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
+import { LISTING_STATUS_TRANSITIONS } from './listings.constants.js';
+
+const LISTING_INCLUDE = {
+  category: true,
+  images: {
+    orderBy: { sortOrder: 'asc' },
+    include: { upload: true },
+  },
+  seller: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
+} satisfies Prisma.ListingInclude;
 
 @Injectable()
 export class ListingsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async validateUploadIds(uploadIds: string[], sellerId: string) {
-    if (uploadIds.length === 0) {
-      return;
-    }
-
-    const uniqueUploadIds = Array.from(new Set(uploadIds));
-    if (uniqueUploadIds.length !== uploadIds.length) {
-      throw new BadRequestException('Duplicate upload IDs are not allowed');
-    }
-
-    const uploads = await this.prisma.upload.findMany({
-      where: { id: { in: uploadIds } },
-    });
-
-    if (uploads.length !== uploadIds.length) {
-      throw new NotFoundException('One or more uploads were not found');
-    }
-
-    const unauthorizedUpload = uploads.find(
-      (upload) => upload.uploaderId !== sellerId,
-    );
-
-    if (unauthorizedUpload) {
-      throw new ForbiddenException(
-        'You may only attach uploads that belong to your account',
-      );
-    }
-  }
-
-  async findAll(params: { sellerId?: string } = {}) {
-    const where: any = {};
-
-    if (params.sellerId) {
-      where.sellerId = params.sellerId;
-    } else {
-      where.status = 'AVAILABLE';
-    }
-
+  async findAll() {
     return this.prisma.listing.findMany({
-      where,
+      where: {
+        // Anyone can view listings that are available
+        status: ListingStatus.AVAILABLE,
+      },
       orderBy: { createdAt: 'desc' },
-      include: {
-        category: true,
-        images: {
-          orderBy: { sortOrder: 'asc' },
-          include: { upload: true },
-        },
-        seller: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
+      include: LISTING_INCLUDE,
     });
   }
 
-  async update(
-    listingId: string,
-    userId: string,
-    updateListingDto: UpdateListingDto,
-  ) {
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
-      include: {
-        images: true,
-      },
-    });
+  async findOne(listingId: string) {
+    const listing = await this.getListingOrThrow(listingId);
 
-    if (!listing) {
-      throw new NotFoundException('Listing not found');
-    }
-
-    if (listing.sellerId !== userId) {
-      throw new ForbiddenException('You may only edit your own listing');
-    }
-
-    const title = updateListingDto.title?.trim();
-    const description = updateListingDto.description?.trim();
-    const meetupLocation = updateListingDto.meetupLocation?.trim();
-
-    if (updateListingDto.title !== undefined && !title) {
-      throw new BadRequestException('Listing title cannot be empty');
-    }
-
-    if (updateListingDto.description !== undefined && !description) {
-      throw new BadRequestException('Listing description cannot be empty');
-    }
-
-    let price: number | undefined;
-    if (updateListingDto.price !== undefined) {
-      price =
-        typeof updateListingDto.price === 'string'
-          ? Number(updateListingDto.price)
-          : updateListingDto.price;
-
-      if (typeof price !== 'number' || Number.isNaN(price) || price < 0) {
-        throw new BadRequestException(
-          'Listing price must be a valid non-negative number',
-        );
-      }
-    }
-
-    if (updateListingDto.categoryId) {
-      const category = await this.prisma.listingCategory.findUnique({
-        where: { id: updateListingDto.categoryId },
-      });
-
-      if (!category) {
-        throw new NotFoundException('Listing category not found');
-      }
-    }
-
-    const data: any = {};
-
-    if (title !== undefined) data.title = title;
-    if (description !== undefined) data.description = description;
-    if (price !== undefined) data.price = price;
-    if (updateListingDto.categoryId)
-      data.categoryId = updateListingDto.categoryId;
-    if (updateListingDto.condition) data.condition = updateListingDto.condition;
-    if (updateListingDto.status) data.status = updateListingDto.status;
-    if (updateListingDto.meetupLocation !== undefined) {
-      data.meetupLocation = meetupLocation || null;
-    }
-
-    if (updateListingDto.uploadIds !== undefined) {
-      await this.prisma.listingImage.deleteMany({
-        where: { listingId },
-      });
-
-      await this.validateUploadIds(updateListingDto.uploadIds, userId);
-
-      if (updateListingDto.uploadIds.length > 0) {
-        data.images = {
-          create: updateListingDto.uploadIds.map((uploadId, index) => ({
-            uploadId,
-            sortOrder: index,
-          })),
-        };
-      }
-    }
-
-    return this.prisma.listing.update({
-      where: { id: listingId },
-      data,
-      include: {
-        category: true,
-        images: {
-          orderBy: { sortOrder: 'asc' },
-          include: { upload: true },
-        },
-      },
-    });
-  }
-
-  async updateStatus(listingId: string, userId: string, newStatus: string) {
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
-    });
-
-    if (!listing) {
-      throw new NotFoundException('Listing not found');
-    }
-
-    if (listing.sellerId !== userId) {
-      throw new ForbiddenException(
-        'You may only update the status of your own listing',
-      );
-    }
-
-    // Validate status transition
-    const validStatuses = [
-      'DRAFT',
-      'AVAILABLE',
-      'RESERVED',
-      'SOLD',
-      'ARCHIVED',
-    ];
-    if (!validStatuses.includes(newStatus)) {
-      throw new BadRequestException(
-        `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
-      );
-    }
-
-    // Validate status transitions
-    const currentStatus = listing.status;
-    const invalidTransitions = {
-      SOLD: ['DRAFT', 'AVAILABLE', 'RESERVED'], // Can't go back from SOLD
-      ARCHIVED: ['DRAFT', 'AVAILABLE', 'RESERVED', 'SOLD'], // Can't go back from ARCHIVED
-    };
-
-    if (invalidTransitions[newStatus]?.includes(currentStatus)) {
-      throw new BadRequestException(
-        `Cannot change status from ${currentStatus} to ${newStatus}`,
-      );
-    }
-
-    const data: any = { status: newStatus };
-
-    // Set soldAt when status becomes SOLD
-    if (newStatus === 'SOLD' && currentStatus !== 'SOLD') {
-      data.soldAt = new Date();
-    }
-
-    return this.prisma.listing.update({
-      where: { id: listingId },
-      data,
-      include: {
-        category: true,
-        images: {
-          orderBy: { sortOrder: 'asc' },
-          include: { upload: true },
-        },
-      },
-    });
-  }
-
-  async findOne(listingId: string, userId?: string) {
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
-      include: {
-        category: true,
-        images: {
-          orderBy: { sortOrder: 'asc' },
-          include: { upload: true },
-        },
-        seller: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    if (!listing) {
-      throw new NotFoundException('Listing not found');
-    }
-
-    if (listing.status !== 'AVAILABLE' && listing.sellerId !== userId) {
+    if (
+      // Anyone can view listings that are available
+      listing.status !== ListingStatus.AVAILABLE
+    ) {
       throw new NotFoundException('Listing not found');
     }
 
     return listing;
   }
 
-  async delete(listingId: string, userId: string) {
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
+  async create(sellerId: string, dto: CreateListingDto) {
+    await this.assertCategoryExists(dto.categoryId);
+    await this.validateUploadIds(dto.uploadIds ?? [], sellerId);
+
+    return this.prisma.listing.create({
+      data: {
+        title: dto.title,
+        description: dto.description,
+        price: dto.price,
+        condition: dto.condition,
+        status: dto.status ?? ListingStatus.AVAILABLE,
+        meetupLocation: dto.meetupLocation ?? null,
+
+        seller: { connect: { id: sellerId } },
+        category: { connect: { id: dto.categoryId } },
+
+        images: this.mapImages(dto.uploadIds),
+      },
+      include: LISTING_INCLUDE,
     });
+  }
 
-    if (!listing) {
-      throw new NotFoundException('Listing not found');
+  async update(listingId: string, userId: string, dto: UpdateListingDto) {
+    const listing = await this.getListingOrThrow(listingId);
+    this.assertOwner(listing, userId);
+
+    if (dto.categoryId) {
+      await this.assertCategoryExists(dto.categoryId);
     }
 
-    if (listing.sellerId !== userId) {
-      throw new ForbiddenException('You may only delete your own listing');
+    if (dto.uploadIds !== undefined) {
+      await this.validateUploadIds(dto.uploadIds, userId);
+
+      await this.prisma.listingImage.deleteMany({
+        where: { listingId },
+      });
     }
 
-    // Prevent deletion of listings that are SOLD or RESERVED
-    if (listing.status === 'SOLD') {
+    return this.prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        price: dto.price,
+        condition: dto.condition,
+
+        meetupLocation: dto.meetupLocation ?? undefined,
+
+        category: dto.categoryId
+          ? { connect: { id: dto.categoryId } }
+          : undefined,
+
+        images: this.mapImages(dto.uploadIds),
+      },
+      include: LISTING_INCLUDE,
+    });
+  }
+
+  async updateStatus(
+    listingId: string,
+    userId: string,
+    newStatus: ListingStatus,
+  ) {
+    const listing = await this.getListingOrThrow(listingId);
+    this.assertOwner(listing, userId);
+
+    const allowed = LISTING_STATUS_TRANSITIONS[listing.status];
+
+    if (!allowed.includes(newStatus)) {
       throw new BadRequestException(
-        'Cannot delete a listing that has been sold',
+        `Invalid transition ${listing.status} → ${newStatus}`,
       );
     }
 
-    if (listing.status === 'RESERVED') {
-      throw new BadRequestException(
-        'Cannot delete a listing that is currently reserved. Cancel the reservation first.',
-      );
+    return this.prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        status: newStatus,
+        soldAt:
+          newStatus === ListingStatus.SOLD &&
+          listing.status !== ListingStatus.SOLD
+            ? new Date()
+            : undefined,
+      },
+      include: LISTING_INCLUDE,
+    });
+  }
+
+  async delete(listingId: string, userId: string) {
+    const listing = await this.getListingOrThrow(listingId);
+    this.assertOwner(listing, userId);
+
+    if (
+      listing.status === ListingStatus.SOLD ||
+      listing.status === ListingStatus.RESERVED
+    ) {
+      throw new BadRequestException('Listing cannot be deleted');
     }
 
     return this.prisma.listing.delete({
@@ -292,78 +160,57 @@ export class ListingsService {
     });
   }
 
-  async create(sellerId: string, createListingDto: CreateListingDto) {
-    const title = createListingDto.title?.trim();
-    const description = createListingDto.description?.trim();
-    const meetupLocation = createListingDto.meetupLocation?.trim();
-    const uploadIds = createListingDto.uploadIds ?? [];
-
-    if (!title) {
-      throw new BadRequestException('Listing title is required');
-    }
-
-    if (!description) {
-      throw new BadRequestException('Listing description is required');
-    }
-
-    const price =
-      typeof createListingDto.price === 'string'
-        ? Number(createListingDto.price)
-        : createListingDto.price;
-
-    if (typeof price !== 'number' || Number.isNaN(price) || price < 0) {
-      throw new BadRequestException(
-        'Listing price must be a valid non-negative number',
-      );
-    }
-
-    if (!createListingDto.categoryId) {
-      throw new BadRequestException('Listing categoryId is required');
-    }
-
-    if (!createListingDto.condition) {
-      throw new BadRequestException('Listing condition is required');
-    }
-
-    const category = await this.prisma.listingCategory.findUnique({
-      where: { id: createListingDto.categoryId },
+  private async getListingOrThrow(id: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id },
+      include: LISTING_INCLUDE,
     });
 
-    if (!category) {
-      throw new NotFoundException('Listing category not found');
+    if (!listing) throw new NotFoundException('Listing not found');
+    return listing;
+  }
+
+  private assertOwner(listing: { sellerId: string }, userId: string) {
+    if (listing.sellerId !== userId) {
+      throw new ForbiddenException('Not allowed');
+    }
+  }
+
+  private async assertCategoryExists(categoryId: string) {
+    const exists = await this.prisma.listingCategory.findUnique({
+      where: { id: categoryId },
+      select: { id: true },
+    });
+
+    if (!exists) throw new NotFoundException('Category not found');
+  }
+
+  private async validateUploadIds(uploadIds: string[], userId: string) {
+    if (!uploadIds?.length) return;
+
+    const unique = [...new Set(uploadIds)];
+
+    const uploads = await this.prisma.upload.findMany({
+      where: { id: { in: unique } },
+    });
+
+    if (uploads.length !== unique.length) {
+      throw new NotFoundException('Uploads not found');
     }
 
-    const data: any = {
-      sellerId,
-      title,
-      description,
-      price,
-      categoryId: createListingDto.categoryId,
-      condition: createListingDto.condition,
-      status: createListingDto.status ?? 'AVAILABLE',
-      meetupLocation: meetupLocation || null,
+    if (uploads.some((u) => u.uploaderId !== userId)) {
+      throw new ForbiddenException('Invalid upload ownership');
+    }
+  }
+
+  private mapImages(uploadIds?: string[]) {
+    if (!uploadIds?.length) return undefined;
+
+    return {
+      create: uploadIds.map((id, i) => ({
+        upload: { connect: { id } },
+        sortOrder: i,
+      })),
     };
-
-    if (uploadIds.length > 0) {
-      await this.validateUploadIds(uploadIds, sellerId);
-
-      data.images = {
-        create: uploadIds.map((uploadId, index) => ({
-          uploadId,
-          sortOrder: index,
-        })),
-      };
-    }
-
-    return this.prisma.listing.create({
-      data,
-      include: {
-        category: true,
-        images: {
-          orderBy: { sortOrder: 'asc' },
-          include: { upload: true },
-        },
-      },
-    });
   }
 }
