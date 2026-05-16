@@ -101,7 +101,6 @@ export class ListingsService {
         description: dto.description,
         price: dto.price,
         condition: dto.condition,
-        status: dto.status,
 
         meetupLocation: dto.meetupLocation ?? undefined,
 
