@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Patch,
+  Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -46,27 +48,36 @@ export class UsersController {
   }
 
   @Patch('me/profile')
+  @ZodResponse({ type: UserProfileDto })
+  async updateMyProfile(
+    @Session() session: UserSession,
+    @Body() body: UpdateMyProfileDto,
+  ) {
+    return this.usersService.updateProfileById(session.user.id, body);
+  }
+
+  @Post('me/avatar')
   @UseInterceptors(
     FileInterceptor('avatar', {
       limits: { fileSize: 5 * 1024 * 1024 },
     }),
   )
   @ZodResponse({ type: UserProfileDto })
-  updateMyProfile(
+  async uploadMyAvatar(
     @Session() session: UserSession,
-    @Body() body: UpdateMyProfileDto,
-    @UploadedFile(new ImageFileValidationPipe({ required: false }))
-    avatarFile?: any,
+    @UploadedFile(new ImageFileValidationPipe({ required: true }))
+    avatarFile: any,
   ) {
-    const shouldRemoveAvatar =
-      (body as unknown as { avatar?: unknown })?.avatar === '' && !avatarFile;
-
-    return this.usersService.updateProfileById(
+    return this.usersService.setAvatar(
       session.user.id,
-      body,
-      avatarFile ? toUploadFile(avatarFile) : undefined,
-      shouldRemoveAvatar,
+      toUploadFile(avatarFile),
     );
+  }
+
+  @Delete('me/avatar')
+  @ZodResponse({ type: UserProfileDto })
+  async removeMyAvatar(@Session() session: UserSession) {
+    return this.usersService.removeAvatar(session.user.id);
   }
 
   @Get(':id/stats')
