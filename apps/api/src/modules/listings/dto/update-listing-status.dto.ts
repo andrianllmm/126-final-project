@@ -1,3 +1,7 @@
+import { IsEnum } from 'class-validator';
+import { ListingStatus } from '../../../generated/prisma/enums.js';
+
 export class UpdateListingStatusDto {
-  status!: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'ARCHIVED';
+  @IsEnum(ListingStatus)
+  status!: ListingStatus;
 }
