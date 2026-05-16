@@ -5,7 +5,9 @@ import {
   userProfileStatsSchema,
 } from '@repo/api';
 
-export class UserProfileDto extends createZodDto(userProfileSchema) {}
+export class UserProfileDto extends createZodDto(userProfileSchema, {
+  codec: true,
+}) {}
 
 export class UpdateMyProfileDto extends createZodDto(userProfileUpdateSchema) {}
 

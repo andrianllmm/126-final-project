@@ -28,7 +28,7 @@ export function ProfileStats({ userId }: { userId: string }) {
     },
     {
       label: 'Response Rate',
-      value: `${data.responseRate}%`,
+      value: `${data.responseRate * 100}%`,
     },
   ];
 

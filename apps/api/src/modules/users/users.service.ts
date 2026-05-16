@@ -1,41 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
-import {
-  UserProfile,
-  UserProfileStats,
-  UserProfileUpdateInput,
-} from '@repo/api';
 import { UploadsService } from '../uploads/uploads.service.js';
 import { UploadFile } from '../uploads/uploads.types.js';
-
-const profileSelect = {
-  id: true,
-  name: true,
-  email: true,
-  avatarUpload: {
-    select: {
-      id: true,
-      url: true,
-    },
-  },
-  createdAt: true,
-  updatedAt: true,
-} as const;
-
-function toUserProfile(user: {
-  id: string;
-  name: string | null;
-  email: string;
-  avatarUpload: { id: string; url: string } | null;
-  createdAt: Date;
-  updatedAt: Date;
-}): UserProfile {
-  return {
-    ...user,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
-  };
-}
+import { UserProfile, UserProfileStats } from '@repo/api';
 
 @Injectable()
 export class UsersService {
@@ -45,21 +12,27 @@ export class UsersService {
   ) {}
 
   async findProfileById(id: string): Promise<UserProfile | null> {
-    const user = await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: { id },
-      select: profileSelect,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUpload: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
     });
-
-    if (!user) {
-      return null;
-    }
-
-    return toUserProfile(user);
   }
 
   async updateProfileById(
     id: string,
-    input: UserProfileUpdateInput,
+    input: { name?: string },
     avatarFile?: UploadFile,
     removeAvatar = false,
   ): Promise<UserProfile> {
@@ -73,28 +46,44 @@ export class UsersService {
     let nextAvatarUploadId = currentUser?.avatarUploadId ?? null;
 
     if (avatarFile) {
-      const uploadedAvatar = await this.uploadsService.upload(avatarFile, id);
-      nextAvatarUploadId = uploadedAvatar.id;
+      const uploaded = await this.uploadsService.upload(avatarFile, id);
+      nextAvatarUploadId = uploaded.id;
     }
+
+    const shouldRemoveAvatar = removeAvatar && !avatarFile;
+
+    const avatarUploadId = shouldRemoveAvatar
+      ? null
+      : avatarFile
+        ? nextAvatarUploadId
+        : (currentUser?.avatarUploadId ?? null);
 
     const user = await this.prisma.user.update({
       where: { id },
       data: {
         name: input.name,
-        avatarUploadId: avatarFile
-          ? nextAvatarUploadId
-          : removeAvatar
-            ? null
-            : nextAvatarUploadId,
+        avatarUploadId,
       },
-      select: profileSelect,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUpload: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
-    if ((avatarFile || removeAvatar) && currentUser?.avatarUploadId) {
+    if ((avatarFile || shouldRemoveAvatar) && currentUser?.avatarUploadId) {
       await this.uploadsService.delete(currentUser.avatarUploadId, id);
     }
 
-    return toUserProfile(user);
+    return user;
   }
 
   async getProfileStats(userId: string): Promise<UserProfileStats> {
@@ -162,8 +151,8 @@ export class UsersService {
     // % of conversations where seller has responded at least once
     const responseRate =
       totalConversations === 0
-        ? 100
-        : Math.round((respondedConversations / totalConversations) * 100);
+        ? 1
+        : respondedConversations / totalConversations;
 
     return {
       averageRating,

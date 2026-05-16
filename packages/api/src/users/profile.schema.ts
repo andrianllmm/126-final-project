@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { stringToDate } from '../codecs.js';
 
 const avatarUploadSchema = z.object({
   id: z.string(),
@@ -10,8 +11,8 @@ export const userProfileSchema = z.object({
   name: z.string().trim().nullable(),
   email: z.email(),
   avatarUpload: avatarUploadSchema.nullable(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export const userProfileUpdateSchema = z.object({
