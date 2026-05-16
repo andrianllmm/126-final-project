@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { Prisma } from '../../generated/prisma/client.js';
-
 import { PrismaService } from '../../database/prisma.service.js';
 
 import {
   CreateListingInput,
   UpdateListingInput,
   ListingStatus,
+  Listing,
+  ListingList,
 } from '@repo/api';
+
 import { ListingPolicy } from './listing.policy.js';
 
 const LISTING_INCLUDE = {
@@ -37,6 +38,11 @@ const LISTING_INCLUDE = {
   },
 } satisfies Prisma.ListingInclude;
 
+const mapListing = (listing: any) => ({
+  ...listing,
+  price: Number(listing.price),
+});
+
 @Injectable()
 export class ListingsService {
   constructor(
@@ -44,30 +50,32 @@ export class ListingsService {
     private readonly policy: ListingPolicy,
   ) {}
 
-  async findAll() {
-    return this.prisma.listing.findMany({
+  async findAll(): Promise<ListingList> {
+    const listings = await this.prisma.listing.findMany({
       where: {
         status: ListingStatus.AVAILABLE,
       },
       orderBy: { createdAt: 'desc' },
       include: LISTING_INCLUDE,
     });
+
+    return listings.map(mapListing);
   }
 
-  async findOne(listingId: string) {
+  async findOne(listingId: string): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
     if (listing.status !== ListingStatus.AVAILABLE) {
       throw new NotFoundException('Listing not found');
     }
 
-    return listing;
+    return mapListing(listing);
   }
 
-  async create(sellerId: string, input: CreateListingInput) {
+  async create(sellerId: string, input: CreateListingInput): Promise<Listing> {
     await this.policy.assertValidCategory(input.categoryId);
 
-    return this.prisma.listing.create({
+    const listing = await this.prisma.listing.create({
       data: {
         title: input.title,
         description: input.description,
@@ -81,9 +89,15 @@ export class ListingsService {
       },
       include: LISTING_INCLUDE,
     });
+
+    return mapListing(listing);
   }
 
-  async update(listingId: string, userId: string, input: UpdateListingInput) {
+  async update(
+    listingId: string,
+    userId: string,
+    input: UpdateListingInput,
+  ): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
     this.policy.assertOwner(listing, userId);
@@ -92,14 +106,13 @@ export class ListingsService {
       await this.policy.assertValidCategory(input.categoryId);
     }
 
-    return this.prisma.listing.update({
+    const updated = await this.prisma.listing.update({
       where: { id: listingId },
       data: {
         title: input.title,
         description: input.description,
         price: input.price,
         condition: input.condition,
-
         meetupLocation: input.meetupLocation ?? undefined,
 
         category: input.categoryId
@@ -108,19 +121,21 @@ export class ListingsService {
       },
       include: LISTING_INCLUDE,
     });
+
+    return mapListing(updated);
   }
 
   async updateStatus(
     listingId: string,
     userId: string,
     newStatus: ListingStatus,
-  ) {
+  ): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
     this.policy.assertOwner(listing, userId);
     this.policy.assertValidStatusTransition(listing.status, newStatus);
 
-    return this.prisma.listing.update({
+    const updated = await this.prisma.listing.update({
       where: { id: listingId },
       data: {
         status: newStatus,
@@ -132,17 +147,22 @@ export class ListingsService {
       },
       include: LISTING_INCLUDE,
     });
+
+    return mapListing(updated);
   }
 
-  async delete(listingId: string, userId: string) {
+  async delete(listingId: string, userId: string): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
     this.policy.assertOwner(listing, userId);
     this.policy.assertCanDelete(listing);
 
-    return this.prisma.listing.delete({
+    const deleted = await this.prisma.listing.delete({
       where: { id: listingId },
+      include: LISTING_INCLUDE,
     });
+
+    return mapListing(deleted);
   }
 
   private async getListingOrThrow(id: string) {
@@ -152,6 +172,7 @@ export class ListingsService {
     });
 
     if (!listing) throw new NotFoundException('Listing not found');
+
     return listing;
   }
 }
