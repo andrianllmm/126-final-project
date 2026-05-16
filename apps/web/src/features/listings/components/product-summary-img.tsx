@@ -34,16 +34,16 @@ export function ProductSummaryImg() {
     <div className="w-full not-prose">
       <div className="flex gap-2">
         {/* Thumbnails */}
-        <div className="flex flex-col gap-2 w-16 shrink-0">
+        <div className="flex flex-col gap-2 w-24 shrink-0">
           {productData.images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
               className={cn(
-                'aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-colors',
+                'aspect-square bg-muted rounded-lg overflow-hidden border-2 transition-colors',
                 currentImageIndex === index
-                  ? 'border-gray-900'
-                  : 'border-transparent hover:border-gray-300',
+                  ? 'border-primary'
+                  : 'border-transparent hover:border-primary/40',
               )}
             >
               <img
@@ -56,7 +56,7 @@ export function ProductSummaryImg() {
         </div>
 
         {/* Main Image */}
-        <div className="flex-1 relative aspect-[4/5] bg-gray-100 rounded-xl overflow-hidden">
+        <div className="flex-1 relative aspect-[4/5] bg-muted rounded-xl overflow-hidden">
           <img
             src={productData.images[currentImageIndex]}
             alt={productData.name}
@@ -65,24 +65,26 @@ export function ProductSummaryImg() {
 
           {/* Navigation Arrows */}
           <Button
-            variant="outline"
+            type="button"
+            variant="default"
             size="icon"
-            className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full h-8 w-8"
+            className="absolute left-3 top-1/2 -translate-y-1/2 bg-background text-foreground hover:bg-muted rounded-full h-10 w-10 border border-border shadow-md"
             onClick={prevImage}
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </Button>
           <Button
-            variant="outline"
+            type="button"
+            variant="default"
             size="icon"
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full h-8 w-8"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-background text-foreground hover:bg-muted rounded-full h-10 w-10 border border-border shadow-md"
             onClick={nextImage}
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </Button>
 
           {/* Image Counter */}
-          <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded-full">
+          <div className="absolute bottom-3 right-3 bg-foreground/60 text-background text-xs font-medium px-2 py-1 rounded-full">
             {currentImageIndex + 1} / {productData.images.length}
           </div>
         </div>

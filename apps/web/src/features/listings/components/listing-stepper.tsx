@@ -11,14 +11,16 @@ import {
   StepperTitle,
   StepperTrigger,
 } from '@/shared/components/ui/stepper';
-import { CheckIcon, LoaderCircleIcon } from 'lucide-react';
+import { CheckIcon, LoaderCircleIcon, ArrowLeft, Rocket } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 import { ListingForm } from '@/features/listings/components/listing-form';
 import { SellerTipsCard } from '@/features/listings/components/seller-tips-card';
 import { NeedHelpCard } from '@/features/listings/components/need-help-card';
 import { PhotoUploadForm } from './listing-form/photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
-import { ProductSummaryCardExample } from './product-summary-card';
+import { ProductSummaryCard } from './product-summary-card';
 import { ProductSummaryImg } from './product-summary-img';
+import { productSummaryDummyData } from './dummy-data';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
@@ -77,12 +79,42 @@ export function Pattern() {
 
         {/* Step 3 — Review */}
         <StepperContent value={3}>
-          <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <div className="mt-4 md:col-span-2">
-              <ProductSummaryCardExample />
+          <div className="max-w-6xl mx-auto px-4 md:px-6">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              {/* Left: Image Gallery */}
+              <div>
+                <ProductSummaryImg />
+              </div>
+
+              {/* Right: Product Details */}
+              <div>
+                <ProductSummaryCard {...productSummaryDummyData} />
+              </div>
             </div>
-            <div className="mt-4 space-y-3">
-              <ProductSummaryImg />
+
+            {/* Footer Actions */}
+            <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex items-center gap-2 px-6"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-muted-foreground">
+                  Almost there! Your listing is ready to soar.
+                </p>
+                <Button
+                  type="button"
+                  className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5"
+                >
+                  Publish Listing
+                  <Rocket className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </StepperContent>
