@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
 import { UploadsService } from '../uploads/uploads.service.js';
 import { UploadFile } from '../uploads/uploads.types.js';
-import { UserProfile, UserProfileStats } from '@repo/api';
+import {
+  UserProfile,
+  UserProfileUpdateInput,
+  UserProfileStats,
+} from '@repo/api';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +36,7 @@ export class UsersService {
 
   async updateProfileById(
     id: string,
-    input: { name?: string },
+    input: UserProfileUpdateInput,
   ): Promise<UserProfile> {
     return this.prisma.user.update({
       where: { id },
