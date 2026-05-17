@@ -7,7 +7,7 @@ import { getInitials } from '@/shared/lib/get-initials';
 
 type UserAvatarProps = {
   name?: string | null;
-  email: string;
+  email?: string;
   src?: string | null;
   sizeClassName?: string;
   fallbackClassName?: string;
