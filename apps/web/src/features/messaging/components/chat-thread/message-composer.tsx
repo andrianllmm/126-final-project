@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Send } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui/button';
@@ -7,11 +7,48 @@ import { Textarea } from '@/shared/components/ui/textarea';
 
 type Props = {
   onSend: (content: string) => void;
+  onTypingStateChange?: (isTyping: boolean) => void;
   disabled?: boolean;
 };
 
-export function ChatComposer({ onSend, disabled = false }: Props) {
+export function ChatComposer({
+  onSend,
+  onTypingStateChange,
+  disabled = false,
+}: Props) {
   const [value, setValue] = useState('');
+  const isTypingRef = useRef(false);
+  const stopTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const stopTyping = () => {
+    if (!isTypingRef.current) return;
+
+    isTypingRef.current = false;
+    onTypingStateChange?.(false);
+  };
+
+  const scheduleTypingStop = () => {
+    if (stopTypingTimeoutRef.current) {
+      clearTimeout(stopTypingTimeoutRef.current);
+    }
+
+    stopTypingTimeoutRef.current = setTimeout(() => {
+      stopTyping();
+      stopTypingTimeoutRef.current = null;
+    }, 1500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (stopTypingTimeoutRef.current) {
+        clearTimeout(stopTypingTimeoutRef.current);
+      }
+
+      stopTyping();
+    };
+  }, []);
 
   const submit = () => {
     const content = value.trim();
@@ -20,18 +57,56 @@ export function ChatComposer({ onSend, disabled = false }: Props) {
 
     onSend(content);
     setValue('');
+
+    if (stopTypingTimeoutRef.current) {
+      clearTimeout(stopTypingTimeoutRef.current);
+      stopTypingTimeoutRef.current = null;
+    }
+
+    stopTyping();
   };
 
   return (
     <div className="flex items-center gap-3 rounded-2xl border bg-background p-3">
       <Textarea
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={(event) => {
+          const nextValue = event.target.value;
+
+          setValue(nextValue);
+
+          if (disabled) return;
+
+          if (!nextValue.trim()) {
+            if (stopTypingTimeoutRef.current) {
+              clearTimeout(stopTypingTimeoutRef.current);
+              stopTypingTimeoutRef.current = null;
+            }
+
+            stopTyping();
+            return;
+          }
+
+          if (!isTypingRef.current) {
+            isTypingRef.current = true;
+            onTypingStateChange?.(true);
+          }
+
+          scheduleTypingStop();
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             submit();
           }
+        }}
+        onBlur={() => {
+          if (stopTypingTimeoutRef.current) {
+            clearTimeout(stopTypingTimeoutRef.current);
+            stopTypingTimeoutRef.current = null;
+          }
+
+          stopTyping();
         }}
         disabled={disabled}
         rows={2}

@@ -10,6 +10,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
 import { ChatThreadHeader } from './thread-header';
 import { ChatMessageList } from './message-list';
+import { TypingBubble } from './typing-bubble';
 
 import { ArrowLeftIcon } from 'lucide-react';
 
@@ -24,17 +25,22 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
   const {
     messages,
     sendMessage,
+    sendTypingStatus,
     isConnected,
+    typingUserIds,
     conversation,
     isConversationLoading,
   } = useMessaging(conversationId);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const currentUserId = session.data?.user?.id;
+  const isOtherUserTyping = typingUserIds.some(
+    (userId) => userId !== currentUserId,
+  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages]);
+  }, [messages, isOtherUserTyping]);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
@@ -71,11 +77,18 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
           <ChatMessageList messages={messages} currentUserId={currentUserId} />
+          {isOtherUserTyping ? (
+            <TypingBubble side="other" className="mt-3" />
+          ) : null}
           <div ref={bottomRef} />
         </div>
 
         <div className="border-t px-4 py-4 sm:px-6">
-          <ChatComposer onSend={sendMessage} disabled={!conversationId} />
+          <ChatComposer
+            onSend={sendMessage}
+            onTypingStateChange={sendTypingStatus}
+            disabled={!conversationId}
+          />
         </div>
       </div>
     </div>
