@@ -24,19 +24,19 @@ import {
   CATEGORIES,
 } from '@/features/listings/lib/listing-schema';
 
-// ─── Public ref handle ────────────────────────────────────────────────────────
+// Public ref handle
 export interface ListingFormHandle {
   /** Runs full validation; resolves true when all fields are valid. */
   triggerValidation: () => Promise<boolean>;
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// Props
 interface ListingFormProps {
   initialData?: Partial<ListingFormValues>;
   onChange?: (data: ListingFormValues) => void;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// Component
 export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
   function ListingForm({ initialData, onChange }, ref) {
     const {
@@ -81,7 +81,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
         </h1>
 
         <FieldGroup>
-          {/* ── Product Name ──────────────────────────────────────────── */}
+          {/*  Product Name  */}
           <FieldSet>
             <Field>
               <FieldLabel htmlFor="product-name">Product Name</FieldLabel>
@@ -99,7 +99,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
             </Field>
           </FieldSet>
 
-          {/* ── Category + Price ──────────────────────────────────────── */}
+          {/*  Category + Price  */}
           <FieldSet>
             <div className="grid grid-cols-2 gap-4">
               {/* Category */}
@@ -161,7 +161,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
             </div>
           </FieldSet>
 
-          {/* ── Meetup Location ───────────────────────────────────────── */}
+          {/*  Meetup Location  */}
           <FieldSet>
             <Field>
               <FieldLabel htmlFor="meetup-location">Meetup Location</FieldLabel>
@@ -179,7 +179,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
             </Field>
           </FieldSet>
 
-          {/* ── Description ───────────────────────────────────────────── */}
+          {/*  Description  */}
           <FieldSet>
             <FieldLegend>Description</FieldLegend>
             <textarea
