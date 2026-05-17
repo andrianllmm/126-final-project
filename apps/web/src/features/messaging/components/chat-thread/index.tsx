@@ -1,14 +1,24 @@
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 import { authClient } from '@/shared/lib/auth-client';
-import { Badge } from '@/shared/components/ui/badge';
 
 import { useMessaging } from '../../hooks/use-messaging';
+
+import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
 import { ChatThreadHeader } from './thread-header';
 import { ChatMessageList } from './message-list';
 
-export function ChatThread({ conversationId }: { conversationId?: string }) {
+import { ArrowLeftIcon } from 'lucide-react';
+
+type Props = {
+  conversationId?: string;
+  showBackButton?: boolean;
+};
+
+export function ChatThread({ conversationId, showBackButton }: Props) {
   const session = authClient.useSession();
 
   const {
@@ -28,12 +38,27 @@ export function ChatThread({ conversationId }: { conversationId?: string }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
-      <div className="flex items-center justify-between gap-3 border-b px-6 py-4">
-        <ChatThreadHeader
-          conversation={conversation}
-          isLoading={isConversationLoading}
-          currentUserId={currentUserId}
-        />
+      <div className="flex items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          {showBackButton ? (
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              asChild
+              className="md:hidden"
+            >
+              <Link href="/messages" aria-label="Back to conversations">
+                <ArrowLeftIcon className="size-5" />
+              </Link>
+            </Button>
+          ) : null}
+
+          <ChatThreadHeader
+            conversation={conversation}
+            isLoading={isConversationLoading}
+            currentUserId={currentUserId}
+          />
+        </div>
 
         <Badge
           variant={isConnected ? 'secondary' : 'outline'}
