@@ -60,7 +60,7 @@ export function ProductSummaryCard({
                 Asking Price
               </p>
               <p className="text-2xl font-bold text-primary tracking-tight">
-                {price}
+                ₱{parseFloat(price || '0').toFixed(2)}
               </p>
             </div>
           </div>

@@ -20,16 +20,18 @@ import { PhotoUploadForm } from './listing-form/photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
 import { ProductSummaryCard } from './product-summary-card';
 import { ProductSummaryImg } from './product-summary-img';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateListing } from '../hooks/use-create-listing';
 import { publishListing } from '../lib/mock-db';
+import type { ListingFormHandle } from './listing-form';
+import type { CategoryValue } from '../lib/listing-schema';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
 interface FormData {
   productName: string;
-  category: string;
+  category: CategoryValue;
   price: string;
   meetupLocation: string;
   description: string;
@@ -85,10 +87,13 @@ export function Pattern() {
   const router = useRouter();
   const { createListing, loading: creating } = useCreateListing();
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [validatingStep1, setValidatingStep1] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const listingFormRef = useRef<ListingFormHandle>(null);
 
   const [formData, setFormData] = useState<FormData>({
     productName: '',
-    category: '',
+    category: '' as CategoryValue,
     price: '',
     meetupLocation: '',
     description: '',
@@ -99,8 +104,38 @@ export function Pattern() {
     window.scrollTo(0, 0);
   }, [currentStep]);
 
-  const handleNext = () => {
+  // Validate step 1 form before allowing next
+  const handleNextFromStep1 = async () => {
+    setValidatingStep1(true);
+    setPhotoError(null);
+    try {
+      const isValid = await listingFormRef.current?.triggerValidation();
+      if (isValid) {
+        setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+      }
+    } finally {
+      setValidatingStep1(false);
+    }
+  };
+
+  // Validate photos before moving from step 2
+  const handleNextFromStep2 = () => {
+    if (photos.length === 0) {
+      setPhotoError('Please upload at least one photo before proceeding.');
+      return;
+    }
+    setPhotoError(null);
     setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
+
+  const handleNext = () => {
+    if (currentStep === 1) {
+      handleNextFromStep1();
+    } else if (currentStep === 2) {
+      handleNextFromStep2();
+    } else {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+    }
   };
 
   const handleBack = () => {
@@ -191,6 +226,7 @@ export function Pattern() {
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
               <ListingForm
+                ref={listingFormRef}
                 initialData={formData}
                 onChange={handleFormDataChange}
               />
@@ -208,8 +244,9 @@ export function Pattern() {
                   className="px-6"
                   variant="default"
                   onClick={handleNext}
+                  disabled={validatingStep1}
                 >
-                  Next →
+                  {validatingStep1 ? 'Validating...' : 'Next →'}
                 </Button>
               </div>
             </div>
@@ -224,6 +261,13 @@ export function Pattern() {
         <StepperContent value={2}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
+              {photoError && (
+                <div className="mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                  <p className="text-sm text-destructive font-medium">
+                    {photoError}
+                  </p>
+                </div>
+              )}
               <PhotoUploadForm photos={photos} onChange={handlePhotosChange} />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
@@ -261,7 +305,7 @@ export function Pattern() {
                 <ProductSummaryCard
                   productTitle={formData.productName}
                   category={formData.category}
-                  price={`₱${formData.price}`}
+                  price={formData.price}
                   description={formData.description}
                   meetupLocation={formData.meetupLocation}
                 />

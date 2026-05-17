@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/shared/components/ui/card';
 import { Plus } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
 
 interface UploadedPhoto {
   id: string;
