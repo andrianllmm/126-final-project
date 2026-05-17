@@ -33,17 +33,21 @@ const itemVariants = cva(
   },
 );
 
+type Participant = Conversation['seller'] | Conversation['buyer'];
+
 type Props = {
   conversation: Conversation;
+  userId: string;
   isActive?: boolean;
 };
 
 export function ConversationListItem({
   conversation,
+  userId,
   isActive = false,
 }: Props) {
-  const participantName =
-    conversation.buyer.name ?? conversation.seller.name ?? 'Conversation';
+  const participant =
+    userId == conversation.sellerId ? conversation.buyer : conversation.seller;
 
   const preview = conversation.messages?.[0]?.content ?? 'No messages yet';
 
@@ -53,7 +57,7 @@ export function ConversationListItem({
     <div className={cn(itemVariants({ active: isActive }), 'items-center')}>
       <ConversationContent
         conversation={conversation}
-        participantName={participantName}
+        participant={participant}
         preview={preview}
         isUnread={isUnread}
       />
@@ -65,12 +69,12 @@ export function ConversationListItem({
 
 function ConversationContent({
   conversation,
-  participantName,
+  participant,
   preview,
   isUnread,
 }: {
   conversation: Conversation;
-  participantName: string;
+  participant: Participant;
   preview: string;
   isUnread: boolean;
 }) {
@@ -80,8 +84,8 @@ function ConversationContent({
       className="flex flex-1 items-center gap-3 min-w-0"
     >
       <UserAvatar
-        name={conversation.buyer.name}
-        src={conversation.buyer.avatarUpload?.url}
+        name={participant.name}
+        src={participant.avatarUpload?.url}
         sizeClassName="size-14"
       />
 
@@ -109,7 +113,7 @@ function ConversationContent({
                   : 'text-muted-foreground',
               )}
             >
-              {participantName}
+              {participant.name}
             </div>
           </div>
         </div>

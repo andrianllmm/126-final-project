@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 
+import { authClient } from '@/shared/lib/auth-client';
+
 import { useConversations } from '../../hooks/use-conversations';
 import { ConversationListItem } from './conversation-list-item';
 import { ConversationListItemSkeleton } from './conversation-list-item-skeleton';
@@ -14,9 +16,10 @@ import { ArrowLeftIcon } from 'lucide-react';
 export function ConversationList() {
   const pathname = usePathname();
 
+  const { data: session, isPending } = authClient.useSession();
   const { data, isLoading, error } = useConversations();
 
-  if (isLoading) {
+  if (isPending || isLoading) {
     return (
       <div className="space-y-3 px-4 py-4">
         {Array.from({ length: 5 }).map((_, index) => (
@@ -55,6 +58,7 @@ export function ConversationList() {
             <ConversationListItem
               key={conversation.id}
               conversation={conversation}
+              userId={session?.user?.id ?? ''}
               isActive={pathname === `/messages/${conversation.id}`}
             />
           ))}
