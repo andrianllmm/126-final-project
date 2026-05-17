@@ -5,37 +5,62 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useState } from 'react';
 
-const productData = {
-  name: 'Vintage Leather Jacket',
-  images: [
-    'https://images.unsplash.com/photo-1502389614483-e475fc34407e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
-    'https://images.unsplash.com/photo-1618453292459-53424b66bb6a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=928',
-    'https://images.unsplash.com/photo-1618453292507-4959ece6429e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=928',
-    'https://images.unsplash.com/photo-1617984102437-a4aa52284d00?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
-    'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
-  ],
-};
+interface UploadedPhoto {
+  id: string;
+  file: File;
+  preview: string;
+  isMain?: boolean;
+}
 
-export function ProductSummaryImg() {
+interface ProductSummaryImgProps {
+  photos?: UploadedPhoto[];
+}
+
+export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // Use uploaded photos if available, otherwise show placeholder
+  const displayImages = photos.length > 0 ? photos.map((p) => p.preview) : [];
+
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % productData.images.length);
+    if (displayImages.length === 0) return;
+    setCurrentImageIndex((prev) => (prev + 1) % displayImages.length);
   };
 
   const prevImage = () => {
+    if (displayImages.length === 0) return;
     setCurrentImageIndex(
-      (prev) =>
-        (prev - 1 + productData.images.length) % productData.images.length,
+      (prev) => (prev - 1 + displayImages.length) % displayImages.length,
     );
   };
+
+  // If no photos uploaded, show empty state
+  if (displayImages.length === 0) {
+    return (
+      <div className="w-full not-prose">
+        <div className="flex gap-2">
+          <div className="flex flex-col gap-2 w-24 shrink-0">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="aspect-square bg-muted rounded-lg border-2 border-border"
+              />
+            ))}
+          </div>
+          <div className="flex-1 relative aspect-[4/5] bg-muted rounded-xl overflow-hidden flex items-center justify-center">
+            <p className="text-muted-foreground">No photos uploaded yet</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full not-prose">
       <div className="flex gap-2">
         {/* Thumbnails */}
         <div className="flex flex-col gap-2 w-24 shrink-0">
-          {productData.images.map((image, index) => (
+          {displayImages.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
@@ -48,7 +73,7 @@ export function ProductSummaryImg() {
             >
               <img
                 src={image}
-                alt={`${productData.name} ${index + 1}`}
+                alt={`Photo ${index + 1}`}
                 className="w-full h-full object-cover"
               />
             </button>
@@ -58,8 +83,8 @@ export function ProductSummaryImg() {
         {/* Main Image */}
         <div className="flex-1 relative aspect-[4/5] bg-muted rounded-xl overflow-hidden">
           <img
-            src={productData.images[currentImageIndex]}
-            alt={productData.name}
+            src={displayImages[currentImageIndex]}
+            alt="Product"
             className="w-full h-full object-cover"
           />
 
@@ -85,7 +110,7 @@ export function ProductSummaryImg() {
 
           {/* Image Counter */}
           <div className="absolute bottom-3 right-3 bg-foreground/60 text-background text-xs font-medium px-2 py-1 rounded-full">
-            {currentImageIndex + 1} / {productData.images.length}
+            {currentImageIndex + 1} / {displayImages.length}
           </div>
         </div>
       </div>

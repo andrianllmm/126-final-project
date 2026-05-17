@@ -20,15 +20,38 @@ import { PhotoUploadForm } from './listing-form/photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
 import { ProductSummaryCard } from './product-summary-card';
 import { ProductSummaryImg } from './product-summary-img';
-import { productSummaryDummyData } from './dummy-data';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ListingPhoto } from '../types/listing';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
+
+interface FormData {
+  productName: string;
+  category: string;
+  price: string;
+  meetupLocation: string;
+  description: string;
+}
+
+interface UploadedPhoto {
+  id: string;
+  file: File;
+  preview: string;
+  isMain?: boolean;
+}
 
 export function Pattern() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const [formData, setFormData] = useState<FormData>({
+    productName: '',
+    category: '',
+    price: '',
+    meetupLocation: '',
+    description: '',
+  });
+  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -44,6 +67,14 @@ export function Pattern() {
     } else {
       setCurrentStep((prev) => Math.max(prev - 1, 1));
     }
+  };
+
+  const handleFormDataChange = (data: FormData) => {
+    setFormData(data);
+  };
+
+  const handlePhotosChange = (newPhotos: UploadedPhoto[]) => {
+    setPhotos(newPhotos);
   };
 
   return (
@@ -77,7 +108,10 @@ export function Pattern() {
         <StepperContent value={1}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
-              <ListingForm />
+              <ListingForm
+                initialData={formData}
+                onChange={handleFormDataChange}
+              />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
                   type="button"
@@ -108,7 +142,7 @@ export function Pattern() {
         <StepperContent value={2}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
-              <PhotoUploadForm />
+              <PhotoUploadForm photos={photos} onChange={handlePhotosChange} />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
                   type="button"
@@ -140,12 +174,18 @@ export function Pattern() {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               {/* Left: Image Gallery */}
               <div>
-                <ProductSummaryImg />
+                <ProductSummaryImg photos={photos} />
               </div>
 
               {/* Right: Product Details */}
               <div>
-                <ProductSummaryCard {...productSummaryDummyData} />
+                <ProductSummaryCard
+                  productTitle={formData.productName}
+                  category={formData.category}
+                  price={`₱${formData.price}`}
+                  description={formData.description}
+                  meetupLocation={formData.meetupLocation}
+                />
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import {
@@ -18,12 +18,54 @@ import {
   FieldSet,
 } from '@/shared/components/ui/field';
 
-export function ListingForm() {
-  const [productName, setProductName] = useState('');
-  const [category, setCategory] = useState('');
-  const [price, setPrice] = useState('');
-  const [meetupLocation, setMeetupLocation] = useState('');
-  const [description, setDescription] = useState('');
+interface ListingFormProps {
+  initialData?: {
+    productName: string;
+    category: string;
+    price: string;
+    meetupLocation: string;
+    description: string;
+  };
+  onChange?: (data: {
+    productName: string;
+    category: string;
+    price: string;
+    meetupLocation: string;
+    description: string;
+  }) => void;
+}
+
+export function ListingForm({ initialData, onChange }: ListingFormProps) {
+  const [productName, setProductName] = useState(
+    initialData?.productName || '',
+  );
+  const [category, setCategory] = useState(initialData?.category || '');
+  const [price, setPrice] = useState(initialData?.price || '');
+  const [meetupLocation, setMeetupLocation] = useState(
+    initialData?.meetupLocation || '',
+  );
+  const [description, setDescription] = useState(
+    initialData?.description || '',
+  );
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    // Skip first mount to avoid circular updates
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (onChange) {
+      onChange({
+        productName,
+        category,
+        price,
+        meetupLocation,
+        description,
+      });
+    }
+  }, [productName, category, price, meetupLocation, description]);
 
   return (
     <div className="bg-background text-foreground rounded-lg border border-border p-8">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from '@/shared/components/ui/card';
 import { Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
@@ -12,9 +12,34 @@ interface UploadedPhoto {
   isMain?: boolean;
 }
 
-export function PhotoUploadForm() {
-  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+interface PhotoUploadFormProps {
+  photos?: UploadedPhoto[];
+  onChange?: (photos: UploadedPhoto[]) => void;
+}
+
+export function PhotoUploadForm({
+  photos = [],
+  onChange,
+}: PhotoUploadFormProps) {
+  const [localPhotos, setLocalPhotos] = useState<UploadedPhoto[]>(photos);
   const maxPhotos = 5;
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    setLocalPhotos(photos);
+  }, []);
+
+  useEffect(() => {
+    // Skip first mount to avoid circular updates
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (onChange) {
+      onChange(localPhotos);
+    }
+  }, [localPhotos]);
 
   const handlePhotoUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -32,27 +57,27 @@ export function PhotoUploadForm() {
         id: `photo-${Date.now()}`,
         file,
         preview,
-        isMain: index === 0 && photos.length === 0,
+        isMain: index === 0 && localPhotos.length === 0,
       };
 
-      const updatedPhotos = [...photos];
+      const updatedPhotos = [...localPhotos];
       updatedPhotos[index] = newPhoto;
-      setPhotos(updatedPhotos);
+      setLocalPhotos(updatedPhotos);
     };
 
     reader.readAsDataURL(file);
   };
 
   const removePhoto = (index: number) => {
-    const updatedPhotos = photos.filter((_, i) => i !== index);
-    setPhotos(updatedPhotos);
+    const updatedPhotos = localPhotos.filter((_, i) => i !== index);
+    setLocalPhotos(updatedPhotos);
   };
 
   const SmallSlot = ({ index }: { index: number }) =>
-    photos[index] ? (
+    localPhotos[index] ? (
       <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
         <img
-          src={photos[index].preview}
+          src={localPhotos[index].preview}
           alt={`Photo ${index + 1}`}
           className="w-full h-full object-cover"
         />
@@ -105,10 +130,10 @@ export function PhotoUploadForm() {
 
       <div className="flex gap-4 items-start">
         <div className="flex-[2] h-[300px]">
-          {photos[0] ? (
+          {localPhotos[0] ? (
             <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
               <img
-                src={photos[0].preview}
+                src={localPhotos[0].preview}
                 alt="Main photo"
                 className="w-full h-full object-cover"
               />
@@ -187,7 +212,7 @@ export function PhotoUploadForm() {
       </div>
 
       <div className="text-sm text-gray-500 dark:text-gray-400">
-        {photos.length} of {maxPhotos} photos added
+        {localPhotos.length} of {maxPhotos} photos added
       </div>
     </div>
   );

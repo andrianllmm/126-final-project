@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { MapPin } from 'lucide-react';
-import { productSummaryDummyData } from './dummy-data';
 
 interface ProductSummaryCardProps {
   productTitle: string;
@@ -93,8 +92,4 @@ export function ProductSummaryCard({
       </Card>
     </div>
   );
-}
-
-export function ProductSummaryCardExample() {
-  return <ProductSummaryCard {...productSummaryDummyData} />;
 }
