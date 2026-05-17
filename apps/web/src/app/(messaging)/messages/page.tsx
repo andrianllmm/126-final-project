@@ -24,9 +24,5 @@ export default function Page() {
     return null;
   }
 
-  return (
-    <div className="h-screen">
-      <MessagingView />
-    </div>
-  );
+  return <MessagingView />;
 }
