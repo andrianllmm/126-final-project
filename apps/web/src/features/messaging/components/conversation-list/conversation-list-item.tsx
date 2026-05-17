@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { cva } from 'class-variance-authority';
 import { MoreHorizontal } from 'lucide-react';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 import { Conversation } from '@repo/api';
 import { UserAvatar } from '@/features/users/components/user-avatar';
@@ -111,24 +112,31 @@ function ConversationContent({
               {participantName}
             </div>
           </div>
-
-          {conversation.lastMessageAt && (
-            <span className="shrink-0 text-[10px] text-muted-foreground">
-              {new Intl.DateTimeFormat('en', {
-                month: 'short',
-                day: 'numeric',
-              }).format(new Date(conversation.lastMessageAt))}
-            </span>
-          )}
         </div>
 
         <div
           className={cn(
-            'mt-1 truncate text-[13px]',
+            'mt-1 flex items-center justify-start gap-2 text-[13px]',
             isUnread ? 'font-medium text-foreground' : 'text-muted-foreground',
           )}
         >
-          {preview}
+          <span className="truncate">{preview}</span>
+
+          {conversation.lastMessageAt && (
+            <>
+              <span className="text-muted-foreground/60">•</span>
+              <span>
+                <span>
+                  {formatDistanceToNowStrict(
+                    new Date(conversation.lastMessageAt),
+                    {
+                      addSuffix: false,
+                    },
+                  )}
+                </span>
+              </span>
+            </>
+          )}
         </div>
       </div>
     </Link>
