@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateListing } from '../api/listings-api';
+import { updateListingStatus } from '../api/listings-api';
 
-export function useUpdateListing() {
+export function useUpdateListingStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -10,8 +10,8 @@ export function useUpdateListing() {
       input,
     }: {
       id: string;
-      input: Parameters<typeof updateListing>[1];
-    }) => updateListing(id, input),
+      input: Parameters<typeof updateListingStatus>[1];
+    }) => updateListingStatus(id, input),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['listings'] });
       queryClient.invalidateQueries({
