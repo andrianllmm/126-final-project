@@ -22,7 +22,8 @@ import { ProductSummaryCard } from './product-summary-card';
 import { ProductSummaryImg } from './product-summary-img';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ListingPhoto } from '../types/listing';
+import { useCreateListing } from '../hooks/use-create-listing';
+import { publishListing } from '../lib/mock-db';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
@@ -41,9 +42,50 @@ interface UploadedPhoto {
   isMain?: boolean;
 }
 
+/**
+ * Saves a photo File to the /uploads folder using the File System Access API
+ * (where available) or falls back to an anchor-download approach.
+ * Returns the filename that was saved.
+ */
+async function savePhotoToUploads(photo: UploadedPhoto): Promise<string> {
+  const filename = `${photo.id}-${photo.file.name}`;
+
+  // Use the modern File System Access API when available (Chrome 86+)
+  if ('showSaveFilePicker' in window) {
+    try {
+      const fileHandle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        startIn: 'pictures',
+      });
+      const writable = await fileHandle.createWritable();
+      await writable.write(photo.file);
+      await writable.close();
+      return filename;
+    } catch {
+      // User cancelled or API unavailable — fall through
+    }
+  }
+
+  // Fallback: trigger a browser download so the file ends up in the user's
+  // Downloads / uploads folder manually.
+  const url = URL.createObjectURL(photo.file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  return filename;
+}
+
 export function Pattern() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
+  const { createListing, loading: creating } = useCreateListing();
+  const [publishError, setPublishError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState<FormData>({
     productName: '',
     category: '',
@@ -75,6 +117,46 @@ export function Pattern() {
 
   const handlePhotosChange = (newPhotos: UploadedPhoto[]) => {
     setPhotos(newPhotos);
+  };
+
+  const handlePublish = async () => {
+    try {
+      setPublishError(null);
+
+      // 1. Save each photo file to the uploads folder and collect filenames
+      const savedFilenames = await Promise.all(
+        photos.map((photo) => savePhotoToUploads(photo)),
+      );
+
+      // 2. Build ListingPhoto objects that reference the saved files
+      const listingPhotos = photos.map((photo, i) => ({
+        id: photo.id,
+        file: photo.file,
+        preview: photo.preview, // keep base64 preview for in-app display
+        savedPath: `/uploads/${savedFilenames[i]}`, // persisted path
+        isMain: photo.isMain ?? i === 0,
+      }));
+
+      // 3. Create the listing in the mock DB (status: 'draft')
+      const newListing = await createListing({
+        productName: formData.productName,
+        category: formData.category,
+        price: parseFloat(formData.price) || 0,
+        meetupLocation: formData.meetupLocation,
+        description: formData.description,
+        photos: listingPhotos,
+      });
+
+      // 4. Immediately publish it (status: 'published')
+      publishListing(newListing.id);
+
+      // 5. Navigate to the listings page (adjust route as needed)
+      router.push('/listings');
+    } catch (err) {
+      setPublishError(
+        err instanceof Error ? err.message : 'Failed to publish listing.',
+      );
+    }
   };
 
   return (
@@ -172,12 +254,9 @@ export function Pattern() {
         <StepperContent value={3}>
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-              {/* Left: Image Gallery */}
               <div>
                 <ProductSummaryImg photos={photos} />
               </div>
-
-              {/* Right: Product Details */}
               <div>
                 <ProductSummaryCard
                   productTitle={formData.productName}
@@ -189,6 +268,11 @@ export function Pattern() {
               </div>
             </div>
 
+            {/* Error message */}
+            {publishError && (
+              <p className="mt-4 text-sm text-destructive">{publishError}</p>
+            )}
+
             {/* Footer Actions */}
             <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
               <Button
@@ -196,6 +280,7 @@ export function Pattern() {
                 variant="outline"
                 className="flex items-center gap-2 px-6"
                 onClick={handleBack}
+                disabled={creating}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
@@ -207,9 +292,11 @@ export function Pattern() {
                 </p>
                 <Button
                   type="button"
+                  onClick={handlePublish}
+                  disabled={creating}
                   className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5"
                 >
-                  Publish Listing
+                  {creating ? 'Publishing…' : 'Publish Listing'}
                   <Rocket className="h-4 w-4" />
                 </Button>
               </div>

@@ -12,6 +12,12 @@ interface ProductSummaryCardProps {
   meetupTime?: string;
 }
 
+/** Capitalizes the first letter of a string (e.g. "electronics" → "Electronics") */
+function capitalize(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function ProductSummaryCard({
   productTitle,
   category,
@@ -46,7 +52,7 @@ export function ProductSummaryCard({
                 Category
               </p>
               <p className="text-base font-semibold text-foreground">
-                {category}
+                {capitalize(category)}
               </p>
             </div>
             <div className="space-y-1.5">

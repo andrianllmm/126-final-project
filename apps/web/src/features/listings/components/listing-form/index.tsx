@@ -35,6 +35,15 @@ interface ListingFormProps {
   }) => void;
 }
 
+// Categories with capitalized labels
+const CATEGORIES = [
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'books', label: 'Books' },
+  { value: 'furniture', label: 'Furniture' },
+  { value: 'clothing', label: 'Clothing' },
+  { value: 'other', label: 'Other' },
+];
+
 export function ListingForm({ initialData, onChange }: ListingFormProps) {
   const [productName, setProductName] = useState(
     initialData?.productName || '',
@@ -97,11 +106,11 @@ export function ListingForm({ initialData, onChange }: ListingFormProps) {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="electronics">Electronics</SelectItem>
-                  <SelectItem value="books">Books</SelectItem>
-                  <SelectItem value="furniture">Furniture</SelectItem>
-                  <SelectItem value="clothing">Clothing</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {CATEGORIES.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
