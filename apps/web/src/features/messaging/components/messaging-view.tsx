@@ -1,14 +1,30 @@
 import { ChatThread } from './chat-thread';
 import { ConversationList } from './conversation-list';
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/shared/components/ui/resizable';
+
 export function MessagingView({ conversationId }: { conversationId?: string }) {
   return (
-    <div className="grid h-full min-h-0 bg-muted/20 lg:grid-cols-[360px_minmax(0,1fr)]">
-      <aside className="min-h-0 border-r bg-background">
+    <ResizablePanelGroup
+      orientation="horizontal"
+      className="h-full min-h-0 bg-muted/20"
+    >
+      <ResizablePanel
+        defaultSize="25%"
+        minSize="20%"
+        maxSize="40%"
+        className="min-h-0 border-r bg-background"
+      >
         <ConversationList />
-      </aside>
+      </ResizablePanel>
 
-      <main className="min-h-0 bg-background">
+      <ResizableHandle />
+
+      <ResizablePanel className="min-h-0 bg-background">
         {conversationId ? (
           <ChatThread conversationId={conversationId} />
         ) : (
@@ -20,7 +36,7 @@ export function MessagingView({ conversationId }: { conversationId?: string }) {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }
