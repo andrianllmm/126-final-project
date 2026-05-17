@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
+import { useMarkConversationAsRead } from '../../hooks/use-conversations';
 
 const itemVariants = cva(
   'group relative flex items-stretch gap-3 rounded-2xl px-3 py-2 transition-colors hover:bg-muted/60',
@@ -135,6 +136,8 @@ function ConversationContent({
 }
 
 function ConversationActions({ conversation }: { conversation: Conversation }) {
+  const { mutate: markAsRead } = useMarkConversationAsRead();
+
   return (
     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
       <DropdownMenu>
@@ -151,6 +154,9 @@ function ConversationActions({ conversation }: { conversation: Conversation }) {
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
             <Link href={`/profile/${conversation.buyerId}`}>View profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => markAsRead(conversation.id)}>
+            Mark as read
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

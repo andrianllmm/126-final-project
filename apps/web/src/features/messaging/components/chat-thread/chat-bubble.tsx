@@ -1,5 +1,6 @@
 import type { Message } from '@repo/api';
 import { cva } from 'class-variance-authority';
+import { Check, CheckCheck } from 'lucide-react';
 
 import {
   Avatar,
@@ -60,6 +61,16 @@ export function ChatBubble({ message, isOwn = false }: Props) {
     </Avatar>
   );
 
+  const renderReceipt = () => {
+    if (!isOwn) return null;
+
+    if (message.isRead) {
+      return <CheckCheck className="size-3 text-primary-foreground/70" />;
+    }
+
+    return <Check className="size-3 text-primary-foreground/30" />;
+  };
+
   return (
     <div className={containerVariants({ variant })}>
       {!isOwn && avatar}
@@ -69,7 +80,16 @@ export function ChatBubble({ message, isOwn = false }: Props) {
           {message.content}
         </div>
 
-        <div className={cn(timeVariants({ variant }))}>{time}</div>
+        <div
+          className={cn(
+            'mt-1 flex items-center gap-1',
+            isOwn ? 'justify-end' : 'justify',
+          )}
+        >
+          {renderReceipt()}
+
+          <div className={timeVariants({ variant })}>{time}</div>
+        </div>
       </div>
     </div>
   );
