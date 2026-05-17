@@ -46,10 +46,17 @@ export function ConversationList() {
               <ArrowLeftIcon className="size-5" />
             </Link>
           </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">Chat</h1>
+          <Link
+            href="/messages"
+            className="text-2xl font-semibold tracking-tight hover:text-primary"
+          >
+            Chat
+          </Link>
         </div>
 
-        <Badge variant="secondary">{data?.length ?? 0}</Badge>
+        <Badge variant="secondary" className="rounded-full aspect-square">
+          {data?.length ?? 0}
+        </Badge>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
