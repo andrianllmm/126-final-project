@@ -71,8 +71,6 @@ export function ChatBubble({ message, isOwn = false }: Props) {
 
         <div className={cn(timeVariants({ variant }))}>{time}</div>
       </div>
-
-      {isOwn && avatar}
     </div>
   );
 }
