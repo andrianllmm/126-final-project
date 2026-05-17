@@ -58,8 +58,8 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
 
           <ChatThreadHeader
             conversation={conversation}
-            isLoading={isConversationLoading}
             currentUserId={currentUserId}
+            isLoading={isConversationLoading}
           />
         </div>
 

@@ -1,17 +1,19 @@
+import { UserAvatar } from '@/features/users/components/user-avatar';
 import { Badge } from '@/shared/components/ui/badge';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import type { Conversation } from '@repo/api';
+import Link from 'next/link';
 
 type Props = {
   conversation?: Conversation;
-  isLoading?: boolean;
   currentUserId?: string;
+  isLoading?: boolean;
 };
 
 export function ChatThreadHeader({
   conversation,
-  isLoading,
   currentUserId,
+  isLoading,
 }: Props) {
   if (isLoading && !conversation) {
     return (
@@ -39,17 +41,27 @@ export function ChatThreadHeader({
       : conversation.buyer;
 
   return (
-    <div className="min-w-0 space-y-1">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="truncate text-sm font-medium text-foreground">
+    <div className="flex items-center gap-2 min-w-0">
+      <Link href={`/profile/${otherParticipant.id}`}>
+        <UserAvatar
+          name={otherParticipant.name}
+          src={otherParticipant.avatarUpload?.url}
+          sizeClassName="size-10 border-2 border-primary"
+        />
+      </Link>
+      <div className="flex flex-col min-w-0">
+        <Link
+          href={`/listings/${conversation.listingId}`}
+          className="truncate text-sm font-semibold text-foreground hover:text-primary"
+        >
           {conversation.listing.title}
-        </h2>
-        <Badge variant="outline" className="shrink-0">
-          {conversation.listing.status ?? 'Active conversation'}
-        </Badge>
-      </div>
-      <div className="text-sm text-muted-foreground">
-        {otherParticipant.name ?? 'Conversation'}
+        </Link>
+        <Link
+          href={`/profile/${otherParticipant.id}`}
+          className="text-sm text-muted-foreground hover:text-primary"
+        >
+          {otherParticipant.name ?? 'Conversation'}
+        </Link>
       </div>
     </div>
   );
