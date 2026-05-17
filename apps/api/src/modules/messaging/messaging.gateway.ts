@@ -8,8 +8,8 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { AuthGuard, AuthService } from '@thallesp/nestjs-better-auth';
+import { Logger, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '@thallesp/nestjs-better-auth';
 import { fromNodeHeaders } from 'better-auth/node';
 import { auth } from '../auth/auth.config.js';
 import { MessagingService } from './messaging.service.js';
@@ -30,7 +30,6 @@ type AuthenticatedSocket = Socket & {
     credentials: true,
   },
 })
-@UseGuards(AuthGuard)
 export class MessagingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
