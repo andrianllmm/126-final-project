@@ -7,6 +7,9 @@ import { ConversationListItem } from './conversation-list-item';
 import { ConversationListItemSkeleton } from './conversation-list-item-skeleton';
 
 import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
+import Link from 'next/link';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export function ConversationList() {
   const pathname = usePathname();
@@ -34,7 +37,14 @@ export function ConversationList() {
   return (
     <div className="flex h-full flex-col bg-background">
       <div className="flex items-center justify-between gap-3 px-4 py-4">
-        <h1 className="text-4xl font-semibold tracking-tight">Chat</h1>
+        <div className="flex items-center gap-3">
+          <Button size="icon-sm" variant="ghost" asChild>
+            <Link href="/">
+              <ArrowLeftIcon className="size-5" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-semibold tracking-tight">Chat</h1>
+        </div>
 
         <Badge variant="secondary">{data?.length ?? 0}</Badge>
       </div>
