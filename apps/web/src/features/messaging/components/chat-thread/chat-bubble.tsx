@@ -14,32 +14,11 @@ type Props = {
   isOwn?: boolean;
 };
 
-const bubbleVariants = cva(
-  'max-w-[min(32rem,85%)] rounded-2xl px-3 py-2 text-sm',
-  {
-    variants: {
-      variant: {
-        own: 'rounded-br-sm bg-primary text-primary-foreground',
-        other: 'rounded-bl-sm border bg-background text-foreground',
-      },
-    },
-  },
-);
-
-const timeVariants = cva('text-xs', {
+const bubbleVariants = cva('max-w-[32rem] rounded-2xl px-3 py-2 text-sm', {
   variants: {
     variant: {
-      own: 'text-primary-foreground/70',
-      other: 'text-muted-foreground',
-    },
-  },
-});
-
-const containerVariants = cva('flex items-end gap-2', {
-  variants: {
-    variant: {
-      own: 'justify-end',
-      other: '',
+      own: 'rounded-br-sm bg-primary text-primary-foreground text-end',
+      other: 'rounded-bl-sm border bg-background text-foreground text-start',
     },
   },
 });
@@ -65,30 +44,43 @@ export function ChatBubble({ message, isOwn = false }: Props) {
     if (!isOwn) return null;
 
     if (message.isRead) {
-      return <CheckCheck className="size-3 text-primary-foreground/70" />;
+      return <CheckCheck className="size-3 text-muted-foreground/70" />;
     }
 
-    return <Check className="size-3 text-primary-foreground/30" />;
+    return <Check className="size-3 text-muted-foreground/30" />;
   };
 
   return (
-    <div className={containerVariants({ variant })}>
+    <div className={cn('flex items-end gap-2', isOwn ? 'justify-end' : '')}>
+      {/* Avatar */}
       {!isOwn && avatar}
 
-      <div className={bubbleVariants({ variant })}>
-        <div className="whitespace-pre-wrap leading-relaxed">
+      <div
+        className={cn(
+          'flex flex-col justify-center gap-1',
+          isOwn ? 'items-end' : 'items-start',
+        )}
+      >
+        {/* Content */}
+        <div
+          className={cn(
+            'whitespace-pre-wrap leading-relaxed',
+            bubbleVariants({ variant }),
+          )}
+        >
           {message.content}
         </div>
 
+        {/* Metadata */}
         <div
           className={cn(
-            'mt-1 flex items-center gap-1',
-            isOwn ? 'justify-end' : 'justify',
+            'flex items-center gap-1 text-xs text-muted-foreground',
+            isOwn ? 'justify-end' : 'justify-start',
           )}
         >
           {renderReceipt()}
 
-          <div className={timeVariants({ variant })}>{time}</div>
+          <div>{time}</div>
         </div>
       </div>
     </div>
