@@ -19,15 +19,7 @@ export function ConversationList() {
   const { data: session, isPending } = authClient.useSession();
   const { data, isLoading, error } = useConversations();
 
-  if (isPending || isLoading) {
-    return (
-      <div className="space-y-3 px-4 py-4">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <ConversationListItemSkeleton key={index} />
-        ))}
-      </div>
-    );
-  }
+  const loading = isPending || isLoading;
 
   if (error) {
     return (
@@ -55,20 +47,24 @@ export function ConversationList() {
         </div>
 
         <Badge variant="secondary" className="rounded-full aspect-square">
-          {data?.length ?? 0}
+          {loading ? '' : (data?.length ?? 0)}
         </Badge>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         <div className="space-y-1">
-          {data?.map((conversation) => (
-            <ConversationListItem
-              key={conversation.id}
-              conversation={conversation}
-              userId={session?.user?.id ?? ''}
-              isActive={pathname === `/messages/${conversation.id}`}
-            />
-          ))}
+          {loading
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <ConversationListItemSkeleton key={index} />
+              ))
+            : data?.map((conversation) => (
+                <ConversationListItem
+                  key={conversation.id}
+                  conversation={conversation}
+                  userId={session?.user?.id ?? ''}
+                  isActive={pathname === `/messages/${conversation.id}`}
+                />
+              ))}
         </div>
       </div>
     </div>

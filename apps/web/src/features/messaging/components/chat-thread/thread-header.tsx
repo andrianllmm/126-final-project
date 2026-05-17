@@ -1,29 +1,13 @@
 import { UserAvatar } from '@/features/users/components/user-avatar';
-import { Badge } from '@/shared/components/ui/badge';
-import { Skeleton } from '@/shared/components/ui/skeleton';
 import type { Conversation } from '@repo/api';
 import Link from 'next/link';
 
 type Props = {
   conversation?: Conversation;
   currentUserId?: string;
-  isLoading?: boolean;
 };
 
-export function ChatThreadHeader({
-  conversation,
-  currentUserId,
-  isLoading,
-}: Props) {
-  if (isLoading && !conversation) {
-    return (
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-44" />
-        <Skeleton className="h-3 w-56" />
-      </div>
-    );
-  }
-
+export function ChatThreadHeader({ conversation, currentUserId }: Props) {
   if (!conversation) {
     return (
       <div>

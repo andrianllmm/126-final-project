@@ -9,7 +9,7 @@ type Props = {
 export function ChatMessageList({ messages, currentUserId }: Props) {
   if (messages.length === 0) {
     return (
-      <div className="flex h-full min-h-56 items-center justify-center rounded-2xl border border-dashed bg-muted/20 px-6 text-center text-sm text-muted-foreground">
+      <div className="flex h-full min-h-56 items-center justify-center px-6 text-center text-sm text-muted-foreground">
         No messages yet. Start the conversation below.
       </div>
     );

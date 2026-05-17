@@ -13,6 +13,7 @@ import { ChatMessageList } from './message-list';
 import { TypingBubble } from './typing-bubble';
 
 import { ArrowLeftIcon } from 'lucide-react';
+import { Spinner } from '@/shared/components/ui/spinner';
 
 type Props = {
   conversationId?: string;
@@ -39,6 +40,14 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages, isPeerTyping]);
 
+  if (isConversationLoading) {
+    return (
+      <div className="h-full min-h-0 flex flex-col items-center justify-center">
+        <Spinner className="size-8 text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
       <div className="flex items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
@@ -59,7 +68,6 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
           <ChatThreadHeader
             conversation={conversation}
             currentUserId={currentUserId}
-            isLoading={isConversationLoading}
           />
         </div>
 
