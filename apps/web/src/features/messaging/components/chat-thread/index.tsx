@@ -27,20 +27,17 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
     sendMessage,
     sendTypingStatus,
     isConnected,
-    typingUserIds,
+    isPeerTyping,
     conversation,
     isConversationLoading,
   } = useMessaging(conversationId);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const currentUserId = session.data?.user?.id;
-  const isOtherUserTyping = typingUserIds.some(
-    (userId) => userId !== currentUserId,
-  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages, isOtherUserTyping]);
+  }, [messages, isPeerTyping]);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
@@ -77,9 +74,7 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
           <ChatMessageList messages={messages} currentUserId={currentUserId} />
-          {isOtherUserTyping ? (
-            <TypingBubble side="other" className="mt-3" />
-          ) : null}
+          {isPeerTyping ? <TypingBubble side="other" className="mt-3" /> : null}
           <div ref={bottomRef} />
         </div>
 

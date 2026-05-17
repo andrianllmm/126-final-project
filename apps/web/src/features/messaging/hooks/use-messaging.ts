@@ -8,15 +8,15 @@ import { useConversation } from './use-conversations';
 export const useMessaging = (conversationId?: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [typingUserIds, setTypingUserIds] = useState<string[]>([]);
+  const [isPeerTyping, setIsPeerTyping] = useState(false);
   const conversationQuery = useConversation(conversationId);
   const queryClient = useQueryClient();
   const session = authClient.useSession();
 
   const hydratedConversationIdRef = useRef<string | undefined>(undefined);
   const activeConversationIdRef = useRef<string | undefined>(conversationId);
-  const typingTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
-    new Map(),
+  const peerTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
   );
 
   useEffect(() => {
@@ -40,13 +40,12 @@ export const useMessaging = (conversationId?: string) => {
   useEffect(() => {
     setMessages([]);
     hydratedConversationIdRef.current = undefined;
-    setTypingUserIds([]);
+    setIsPeerTyping(false);
 
-    for (const timeout of typingTimeoutsRef.current.values()) {
-      clearTimeout(timeout);
+    if (peerTypingTimeoutRef.current) {
+      clearTimeout(peerTypingTimeoutRef.current);
+      peerTypingTimeoutRef.current = null;
     }
-
-    typingTimeoutsRef.current.clear();
   }, [conversationId]);
 
   const sendTypingStatus = useCallback(
@@ -126,13 +125,13 @@ export const useMessaging = (conversationId?: string) => {
     const handleNewMessage = (message: Message) => {
       if (message.conversationId !== activeConversationIdRef.current) return;
 
-      setTypingUserIds((prev) => prev.filter((id) => id !== message.senderId));
+      if (message.senderId !== currentUserId) {
+        setIsPeerTyping(false);
 
-      const senderTimeout = typingTimeoutsRef.current.get(message.senderId);
-
-      if (senderTimeout) {
-        clearTimeout(senderTimeout);
-        typingTimeoutsRef.current.delete(message.senderId);
+        if (peerTypingTimeoutRef.current) {
+          clearTimeout(peerTypingTimeoutRef.current);
+          peerTypingTimeoutRef.current = null;
+        }
       }
 
       upsertMessage(message);
@@ -147,34 +146,26 @@ export const useMessaging = (conversationId?: string) => {
       if (payload.userId === currentUserId) return;
 
       if (!payload.isTyping) {
-        setTypingUserIds((prev) => prev.filter((id) => id !== payload.userId));
+        setIsPeerTyping(false);
 
-        const existingTimeout = typingTimeoutsRef.current.get(payload.userId);
-
-        if (existingTimeout) {
-          clearTimeout(existingTimeout);
-          typingTimeoutsRef.current.delete(payload.userId);
+        if (peerTypingTimeoutRef.current) {
+          clearTimeout(peerTypingTimeoutRef.current);
+          peerTypingTimeoutRef.current = null;
         }
 
         return;
       }
 
-      setTypingUserIds((prev) =>
-        prev.includes(payload.userId) ? prev : [...prev, payload.userId],
-      );
+      setIsPeerTyping(true);
 
-      const existingTimeout = typingTimeoutsRef.current.get(payload.userId);
-
-      if (existingTimeout) {
-        clearTimeout(existingTimeout);
+      if (peerTypingTimeoutRef.current) {
+        clearTimeout(peerTypingTimeoutRef.current);
       }
 
-      const timeout = setTimeout(() => {
-        setTypingUserIds((prev) => prev.filter((id) => id !== payload.userId));
-        typingTimeoutsRef.current.delete(payload.userId);
+      peerTypingTimeoutRef.current = setTimeout(() => {
+        setIsPeerTyping(false);
+        peerTypingTimeoutRef.current = null;
       }, 2500);
-
-      typingTimeoutsRef.current.set(payload.userId, timeout);
     };
 
     const handleMessagesRead = (payload: {
@@ -258,11 +249,10 @@ export const useMessaging = (conversationId?: string) => {
       socket.off('messagesRead', handleMessagesRead);
       socket.off('userTyping', handleUserTyping);
 
-      for (const timeout of typingTimeoutsRef.current.values()) {
-        clearTimeout(timeout);
+      if (peerTypingTimeoutRef.current) {
+        clearTimeout(peerTypingTimeoutRef.current);
+        peerTypingTimeoutRef.current = null;
       }
-
-      typingTimeoutsRef.current.clear();
     };
   }, [conversationId, queryClient, session.data?.user?.id]);
 
@@ -294,7 +284,7 @@ export const useMessaging = (conversationId?: string) => {
     sendMessage,
     sendTypingStatus,
     isConnected,
-    typingUserIds,
+    isPeerTyping,
     conversation: conversationQuery.data,
     isConversationLoading: conversationQuery.isLoading,
   };
