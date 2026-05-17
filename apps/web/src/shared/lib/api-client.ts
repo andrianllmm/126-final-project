@@ -33,6 +33,21 @@ class ApiError<TError = unknown> extends Error {
   }
 }
 
+function getErrorMessage(data: unknown, fallback: string): string {
+  if (typeof data === 'string' && data) return data;
+
+  if (data && typeof data === 'object') {
+    const record = data as Record<string, unknown>;
+    const message = record.message;
+
+    if (typeof message === 'string') return message;
+    if (Array.isArray(message)) return message.join(', ');
+    if (typeof record.error === 'string') return record.error;
+  }
+
+  return fallback;
+}
+
 /**
  * Converts query parameter object into URL query string.
  */
@@ -98,7 +113,11 @@ async function request<TResponse, TBody = unknown>(
     : await res.text();
 
   if (!res.ok) {
-    throw new ApiError('Request failed', res.status, data as TResponse);
+    throw new ApiError(
+      getErrorMessage(data, `Request failed with status ${res.status}`),
+      res.status,
+      data as TResponse,
+    );
   }
 
   return data as TResponse;

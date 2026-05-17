@@ -17,6 +17,14 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
+const LISTING_CATEGORIES = [
+  { categoryName: 'Electronics', slug: 'electronics' },
+  { categoryName: 'Books', slug: 'books' },
+  { categoryName: 'Furniture', slug: 'furniture' },
+  { categoryName: 'Clothing', slug: 'clothing' },
+  { categoryName: 'Other', slug: 'other' },
+];
+
 // Helper to simulate upload records
 async function createUpload(url: string, key: string) {
   return prisma.upload.create({
@@ -98,18 +106,16 @@ async function main() {
   });
 
   // CATEGORIES
-  const electronics = await prisma.listingCategory.create({
-    data: {
-      categoryName: 'Electronics',
-      slug: 'electronics',
-    },
+  await prisma.listingCategory.createMany({
+    data: LISTING_CATEGORIES,
   });
 
-  const books = await prisma.listingCategory.create({
-    data: {
-      categoryName: 'Books',
-      slug: 'books',
-    },
+  const electronics = await prisma.listingCategory.findUniqueOrThrow({
+    where: { slug: 'electronics' },
+  });
+
+  const books = await prisma.listingCategory.findUniqueOrThrow({
+    where: { slug: 'books' },
   });
 
   // LISTINGS

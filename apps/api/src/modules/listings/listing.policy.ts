@@ -55,14 +55,18 @@ export class ListingPolicy {
     }
   }
 
-  async assertValidCategory(categoryId: string) {
-    const exists = await this.prisma.listingCategory.findUnique({
-      where: { id: categoryId },
+  async getCategoryIdOrThrow(categoryIdOrSlug: string) {
+    const category = await this.prisma.listingCategory.findFirst({
+      where: {
+        OR: [{ id: categoryIdOrSlug }, { slug: categoryIdOrSlug }],
+      },
       select: { id: true },
     });
 
-    if (!exists) {
+    if (!category) {
       throw new NotFoundException('Category not found');
     }
+
+    return category.id;
   }
 }

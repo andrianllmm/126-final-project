@@ -23,9 +23,10 @@ import { ProductSummaryImg } from './product-summary-img';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateListing } from '../hooks/use-create-listing';
-import { publishListing } from '../lib/mock-db';
+import { useAddListingImages } from '../hooks/use-listing-images';
 import type { ListingFormHandle } from './listing-form';
 import type { CategoryValue } from '../lib/listing-schema';
+import { ListingCondition } from '@repo/api';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
@@ -44,48 +45,17 @@ interface UploadedPhoto {
   isMain?: boolean;
 }
 
-/**
- * Saves a photo File to the /uploads folder using the File System Access API
- * (where available) or falls back to an anchor-download approach.
- * Returns the filename that was saved.
- */
-async function savePhotoToUploads(photo: UploadedPhoto): Promise<string> {
-  const filename = `${photo.id}-${photo.file.name}`;
-
-  // Use the modern File System Access API when available (Chrome 86+)
-  if ('showSaveFilePicker' in window) {
-    try {
-      const fileHandle = await (window as any).showSaveFilePicker({
-        suggestedName: filename,
-        startIn: 'pictures',
-      });
-      const writable = await fileHandle.createWritable();
-      await writable.write(photo.file);
-      await writable.close();
-      return filename;
-    } catch {
-      // User cancelled or API unavailable — fall through
-    }
-  }
-
-  // Fallback: trigger a browser download so the file ends up in the user's
-  // Downloads / uploads folder manually.
-  const url = URL.createObjectURL(photo.file);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  return filename;
-}
-
 export function Pattern() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
-  const { createListing, loading: creating } = useCreateListing();
+
+  // ─── Hooks ────────────────────────────────────────────────────────────────
+  const createListingMutation = useCreateListing();
+  const addImagesMutation = useAddListingImages();
+
+  const isSubmitting =
+    createListingMutation.isPending || addImagesMutation.isPending;
+
   const [publishError, setPublishError] = useState<string | null>(null);
   const [validatingStep1, setValidatingStep1] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -104,7 +74,7 @@ export function Pattern() {
     window.scrollTo(0, 0);
   }, [currentStep]);
 
-  // Validate step 1 form before allowing next
+  // ─── Step navigation ──────────────────────────────────────────────────────
   const handleNextFromStep1 = async () => {
     setValidatingStep1(true);
     setPhotoError(null);
@@ -118,7 +88,6 @@ export function Pattern() {
     }
   };
 
-  // Validate photos before moving from step 2
   const handleNextFromStep2 = () => {
     if (photos.length === 0) {
       setPhotoError('Please upload at least one photo before proceeding.');
@@ -146,47 +115,32 @@ export function Pattern() {
     }
   };
 
-  const handleFormDataChange = (data: FormData) => {
-    setFormData(data);
-  };
-
-  const handlePhotosChange = (newPhotos: UploadedPhoto[]) => {
-    setPhotos(newPhotos);
-  };
-
+  // ─── Publish ──────────────────────────────────────────────────────────────
   const handlePublish = async () => {
     try {
       setPublishError(null);
 
-      // 1. Save each photo file to the uploads folder and collect filenames
-      const savedFilenames = await Promise.all(
-        photos.map((photo) => savePhotoToUploads(photo)),
-      );
-
-      // 2. Build ListingPhoto objects that reference the saved files
-      const listingPhotos = photos.map((photo, i) => ({
-        id: photo.id,
-        file: photo.file,
-        preview: photo.preview, // keep base64 preview for in-app display
-        savedPath: `/uploads/${savedFilenames[i]}`, // persisted path
-        isMain: photo.isMain ?? i === 0,
-      }));
-
-      // 3. Create the listing in the mock DB (status: 'draft')
-      const newListing = await createListing({
-        productName: formData.productName,
-        category: formData.category,
+      // 1. Create the listing record
+      const newListing = await createListingMutation.mutateAsync({
+        title: formData.productName,
+        categoryId: formData.category,
+        condition: ListingCondition.GOOD,
         price: parseFloat(formData.price) || 0,
         meetupLocation: formData.meetupLocation,
         description: formData.description,
-        photos: listingPhotos,
       });
 
-      // 4. Immediately publish it (status: 'published')
-      publishListing(newListing.id);
+      // 2. Upload photos if any were selected
+      if (photos.length > 0) {
+        const files = photos.map((p) => p.file);
+        await addImagesMutation.mutateAsync({
+          listingId: newListing.id,
+          files,
+        });
+      }
 
-      // 5. Navigate to the listings page (adjust route as needed)
-      router.push('/listings');
+      // 3. Navigate to the new listing's detail page (or listings index)
+      router.push(`/listings/${newListing.id}`);
     } catch (err) {
       setPublishError(
         err instanceof Error ? err.message : 'Failed to publish listing.',
@@ -228,7 +182,7 @@ export function Pattern() {
               <ListingForm
                 ref={listingFormRef}
                 initialData={formData}
-                onChange={handleFormDataChange}
+                onChange={setFormData}
               />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
@@ -257,7 +211,7 @@ export function Pattern() {
           </div>
         </StepperContent>
 
-        {/* Step 2 — Photo */}
+        {/* Step 2 — Photos */}
         <StepperContent value={2}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
@@ -268,7 +222,7 @@ export function Pattern() {
                   </p>
                 </div>
               )}
-              <PhotoUploadForm photos={photos} onChange={handlePhotosChange} />
+              <PhotoUploadForm photos={photos} onChange={setPhotos} />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
                   type="button"
@@ -312,19 +266,17 @@ export function Pattern() {
               </div>
             </div>
 
-            {/* Error message */}
             {publishError && (
               <p className="mt-4 text-sm text-destructive">{publishError}</p>
             )}
 
-            {/* Footer Actions */}
             <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
               <Button
                 type="button"
                 variant="outline"
                 className="flex items-center gap-2 px-6"
                 onClick={handleBack}
-                disabled={creating}
+                disabled={isSubmitting}
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
@@ -337,10 +289,10 @@ export function Pattern() {
                 <Button
                   type="button"
                   onClick={handlePublish}
-                  disabled={creating}
+                  disabled={isSubmitting}
                   className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5"
                 >
-                  {creating ? 'Publishing…' : 'Publish Listing'}
+                  {isSubmitting ? 'Publishing…' : 'Publish Listing'}
                   <Rocket className="h-4 w-4" />
                 </Button>
               </div>

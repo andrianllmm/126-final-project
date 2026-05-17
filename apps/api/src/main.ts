@@ -5,9 +5,7 @@ import { AppModule } from './app.module.js';
 import { env } from './config/env.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bodyParser: false,
-  });
+  const app = await NestFactory.create(AppModule);
 
   const openApiDoc = SwaggerModule.createDocument(
     app,
