@@ -21,6 +21,8 @@ import { Logo } from '@/shared/components/brand/logo';
 import { Wordmark } from '@/shared/components/brand/wordmark';
 
 import { navItems } from './navbar.data';
+import { MessageCircleIcon, MessageSquareIcon } from 'lucide-react';
+import { Button } from '../ui/button';
 
 function NavMenuItem({
   title,
@@ -104,9 +106,18 @@ export function Navbar({ className }: { className?: string }) {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* User */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Theme */}
           <ThemeToggle />
+
+          {/* Messages */}
+          <Link href="/messages">
+            <Button variant="ghost" size="icon">
+              <MessageCircleIcon />
+            </Button>
+          </Link>
+
+          {/* User */}
           <NavUser />
         </div>
       </div>
