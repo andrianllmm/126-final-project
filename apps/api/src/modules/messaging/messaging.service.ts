@@ -24,10 +24,12 @@ export class MessagingService {
       throw new ForbiddenException('Cannot message your own listing');
     }
 
-    if (
-      listing.status === ListingStatus.SOLD ||
-      listing.status === ListingStatus.ARCHIVED
-    ) {
+    const validStatuses: ListingStatus[] = [
+      ListingStatus.AVAILABLE,
+      ListingStatus.RESERVED,
+    ];
+
+    if (!validStatuses.includes(listing.status)) {
       throw new ForbiddenException('Listing is not available for messaging');
     }
 
