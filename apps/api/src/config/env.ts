@@ -28,4 +28,9 @@ export const env = {
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
     publicUrl: process.env.S3_PUBLIC_URL!,
   },
+
+  email: {
+    from: process.env.EMAIL_FROM!,
+    resendApiKey: process.env.RESEND_API_KEY!,
+  },
 } as const;

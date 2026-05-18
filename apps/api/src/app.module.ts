@@ -30,6 +30,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
 
+import { EmailModule } from './modules/email/email.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { ListingsModule } from './modules/listings/listings.module.js';
@@ -66,6 +67,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       isGlobal: true,
     }),
     DatabaseModule,
+    EmailModule,
     AuthModule.forRoot({
       auth,
       bodyParser: {
