@@ -2,18 +2,24 @@
 
 import { FieldGroup } from '@/shared/components/ui/field';
 
-import { ChangePasswordField } from './change-password-field';
+import { AccountLinkingField } from './account-linking-field';
+import { PasswordField } from './password-field';
 import { DeleteAccountField } from './delete-account-field';
 
 type AccountSettingsFormProps = {
   userId: string;
 };
 
-export function AccountSettingsForm({ userId }: AccountSettingsFormProps) {
+export function AccountSettingsForm({
+  userId: _userId,
+}: AccountSettingsFormProps) {
+  void _userId;
+
   return (
     <div>
       <FieldGroup>
-        <ChangePasswordField />
+        <AccountLinkingField />
+        <PasswordField />
         <DeleteAccountField />
       </FieldGroup>
     </div>

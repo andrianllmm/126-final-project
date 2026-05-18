@@ -30,6 +30,19 @@ export const auth = betterAuth({
     enabled: true,
   },
 
+  account: {
+    accountLinking: {
+      enabled: true,
+    },
+  },
+
+  socialProviders: {
+    google: {
+      clientId: env.googleClientId,
+      clientSecret: env.googleClientSecret,
+    },
+  },
+
   trustedOrigins: [env.webUrl],
 
   user: {

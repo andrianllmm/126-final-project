@@ -19,11 +19,13 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import Link from 'next/link';
 
 import { signUpSchema, SignUpInput } from '@repo/api';
+import { GoogleAuthButton } from './google-auth-button';
 
 export function SignupForm({
   className,
@@ -65,79 +67,97 @@ export function SignupForm({
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Juan Dela Cruz"
-                {...register('name')}
-              />
-              {errors.name && (
-                <FieldDescription className="text-destructive">
-                  {errors.name.message}
+          <div className="space-y-4">
+            <GoogleAuthButton
+              className="w-full"
+              label="Sign up with Google"
+              onAuthError={(message) =>
+                setError('root', {
+                  message,
+                })
+              }
+            />
+
+            <FieldSeparator className="my-4">or</FieldSeparator>
+
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Juan Dela Cruz"
+                  {...register('name')}
+                />
+                {errors.name && (
+                  <FieldDescription className="text-destructive">
+                    {errors.name.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  {...register('email')}
+                />
+                {errors.email && (
+                  <FieldDescription className="text-destructive">
+                    {errors.email.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register('password')}
+                />
+                {errors.password && (
+                  <FieldDescription className="text-destructive">
+                    {errors.password.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="confirm-password">
+                  Confirm Password
+                </FieldLabel>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  {...register('confirmPassword')}
+                />
+                {errors.confirmPassword && (
+                  <FieldDescription className="text-destructive">
+                    {errors.confirmPassword.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              {errors.root && (
+                <FieldDescription className="text-destructive text-center">
+                  {errors.root.message}
                 </FieldDescription>
               )}
-            </Field>
 
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                {...register('email')}
-              />
-              {errors.email && (
-                <FieldDescription className="text-destructive">
-                  {errors.email.message}
+              <Field>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Creating...' : 'Create Account'}
+                </Button>
+
+                <FieldDescription className="px-6 text-center">
+                  Already have an account? <Link href="/sign-in">Sign in</Link>
                 </FieldDescription>
-              )}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" {...register('password')} />
-              {errors.password && (
-                <FieldDescription className="text-destructive">
-                  {errors.password.message}
-                </FieldDescription>
-              )}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <Input
-                id="confirm-password"
-                type="password"
-                {...register('confirmPassword')}
-              />
-              {errors.confirmPassword && (
-                <FieldDescription className="text-destructive">
-                  {errors.confirmPassword.message}
-                </FieldDescription>
-              )}
-            </Field>
-
-            {errors.root && (
-              <FieldDescription className="text-destructive text-center">
-                {errors.root.message}
-              </FieldDescription>
-            )}
-
-            <Field>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Account'}
-              </Button>
-
-              <FieldDescription className="px-6 text-center">
-                Already have an account? <Link href="/sign-in">Sign in</Link>
-              </FieldDescription>
-            </Field>
-          </FieldGroup>
+              </Field>
+            </FieldGroup>
+          </div>
         </form>
       </CardContent>
     </Card>
