@@ -49,28 +49,32 @@ async function main() {
   await prisma.listingCategory.deleteMany();
 
   // USERS
-  await auth.api.signUpEmail({
-    body: {
-      email: 'seller@demo.com',
-      password: 'password123',
-      name: 'Seller One',
-    },
-  });
+  await auth.api
+    .signUpEmail({
+      body: {
+        email: 'seller@up.edu.ph',
+        password: 'password123',
+        name: 'Seller One',
+      },
+    })
+    .catch(console.error);
 
-  await auth.api.signUpEmail({
-    body: {
-      email: 'buyer@demo.com',
-      password: 'password123',
-      name: 'Buyer One',
-    },
-  });
+  await auth.api
+    .signUpEmail({
+      body: {
+        email: 'buyer@up.edu.ph',
+        password: 'password123',
+        name: 'Buyer One',
+      },
+    })
+    .catch(console.error);
 
   const seller = await prisma.user.findUniqueOrThrow({
-    where: { email: 'seller@demo.com' },
+    where: { email: 'seller@up.edu.ph' },
   });
 
   const buyer = await prisma.user.findUniqueOrThrow({
-    where: { email: 'buyer@demo.com' },
+    where: { email: 'buyer@up.edu.ph' },
   });
 
   const sellerAvatar = await createUpload(
