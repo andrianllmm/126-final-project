@@ -38,6 +38,7 @@ model User {
   listings      Listing[]
   messages      Message[]
 
+  image          String?
   avatarUploadId String? @unique
   avatarUpload   Upload? @relation("UserAvatar", fields: [avatarUploadId], references: [id], onDelete: SetNull)
 
