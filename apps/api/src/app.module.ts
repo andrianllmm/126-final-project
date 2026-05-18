@@ -39,6 +39,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module.j
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { AuthController } from './modules/auth/auth.controller.js';
 
 import { env } from './config/env.js';
 
@@ -90,7 +91,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     NotificationsModule,
     HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [
     AppService,
     {
