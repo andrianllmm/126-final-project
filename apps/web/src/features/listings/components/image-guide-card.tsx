@@ -56,16 +56,6 @@ export function PhotoGuidelines() {
           );
         })}
       </div>
-
-      <div className="mt-6 pt-6 border-t border-border">
-        <div className="w-full h-40 bg-muted rounded-lg overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop"
-            alt="Example product photo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </div>
     </Card>
   );
 }

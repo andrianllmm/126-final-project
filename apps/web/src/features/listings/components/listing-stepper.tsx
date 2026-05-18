@@ -215,13 +215,6 @@ export function Pattern() {
         <StepperContent value={2}>
           <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <div className="mt-4 md:col-span-2">
-              {photoError && (
-                <div className="mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/20">
-                  <p className="text-sm text-destructive font-medium">
-                    {photoError}
-                  </p>
-                </div>
-              )}
               <PhotoUploadForm photos={photos} onChange={setPhotos} />
               <div className="flex justify-between pt-6 border-t border-border">
                 <Button
@@ -244,6 +237,13 @@ export function Pattern() {
             </div>
             <div className="mt-4 space-y-3">
               <PhotoGuidelines />
+              {photoError && (
+                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                  <p className="text-sm text-destructive font-medium">
+                    {photoError}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </StepperContent>

@@ -1,16 +1,26 @@
 import { Card } from '@/shared/components/ui/card';
+import { HelpCircle } from 'lucide-react';
 
 export function NeedHelpCard() {
   return (
     <Card className="border border-border">
-      <div className="p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground mb-2">
-          Need Help?
-        </h3>
-        <p className="text-xs text-muted-foreground mb-3">
-          Check out our safety guidelines for in-person campus meetups.
-        </p>
-        <button className="text-xs font-semibold text-foreground underline underline-offset-2 hover:opacity-70 transition-opacity">
+      <div className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <HelpCircle className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold text-black">Need Help?</h3>
+        </div>
+
+        <div className="space-y-5">
+          <div className="flex gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-black mt-0.5">
+                Check out our safety guidelines for in-person campus meetups.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button className="mt-5 text-sm font-bold text-black underline underline-offset-2 hover:opacity-70 transition-opacity">
           View Safety Tips ↗
         </button>
       </div>
