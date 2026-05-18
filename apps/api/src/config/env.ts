@@ -13,6 +13,9 @@ export const env = {
 
   betterAuthUrl: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
 
+  googleClientId: process.env.GOOGLE_CLIENT_ID!,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
   uploadDriver: (process.env.UPLOAD_DRIVER ?? 'local') as 'local' | 's3',
 
   uploadDir: process.env.UPLOAD_DIR ?? 'uploads',
