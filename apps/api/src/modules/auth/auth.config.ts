@@ -2,6 +2,7 @@ import { APIError, betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { sendEmail } from '../../common/email.js';
 import { env } from '../../config/env.js';
 import { ALLOWED_EMAIL_DOMAINS } from '@repo/api';
 
@@ -29,6 +30,26 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: 'Verify your email',
+          text: `Verify your account: ${url}`,
+        });
+      },
+      sendOnSignUp: true,
+    },
+
+    sendResetPassword: async ({ user, url }) => {
+      console.log('sendResetPassword', url);
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your password',
+        text: `Reset your password: ${url}`,
+      });
+    },
   },
 
   account: {
