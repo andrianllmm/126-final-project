@@ -143,22 +143,6 @@ export class MessagingGateway
         .to(`conversation:${conversationId}`)
         .emit('newMessage', typedMessage);
 
-      const conversation = await this.messagingService.getConversation(
-        userId,
-        conversationId,
-      );
-
-      const recipientId =
-        conversation.buyerId === userId
-          ? conversation.sellerId
-          : conversation.buyerId;
-
-      this.server.to(`user:${recipientId}`).emit('messageNotification', {
-        conversationId,
-        message: typedMessage,
-        listing: conversation.listing,
-      });
-
       return typedMessage;
     } catch (error) {
       return {

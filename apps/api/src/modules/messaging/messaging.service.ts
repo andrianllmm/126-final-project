@@ -4,11 +4,18 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
-import { ListingStatus } from '@repo/api';
+import { ListingStatus, NotificationType } from '@repo/api';
+import { NotificationsGateway } from '../notifications/notifications.gateway.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
+import { truncateText } from '../../common/truncate-text.js';
 
 @Injectable()
 export class MessagingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+    private readonly notificationsGateway: NotificationsGateway,
+  ) {}
 
   async createConversation(userId: string, listingId: string) {
     const listing = await this.prisma.listing.findUnique({
@@ -98,6 +105,23 @@ export class MessagingService {
       where: { id: conversationId },
       data: { lastMessageAt: new Date() },
     });
+
+    const recipientId =
+      conversation.buyerId === userId
+        ? conversation.sellerId
+        : conversation.buyerId;
+
+    const notification = await this.notificationsService.create(
+      recipientId,
+      NotificationType.MESSAGE,
+      'New message',
+      truncateText(content, 60),
+      {
+        conversationId,
+      },
+    );
+
+    this.notificationsGateway.emitNotificationCreated(notification);
 
     return message;
   }
