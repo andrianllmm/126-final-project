@@ -50,7 +50,7 @@ export const useMessaging = (conversationId?: string) => {
 
   const sendTypingStatus = useCallback(
     (isTyping: boolean) => {
-      const socket = getSocket();
+      const socket = getSocket('/messaging');
 
       if (!socket || !conversationId) return;
 
@@ -257,7 +257,7 @@ export const useMessaging = (conversationId?: string) => {
   }, [conversationId, queryClient, session.data?.user?.id]);
 
   const sendMessage = (content: string) => {
-    const socket = getSocket();
+    const socket = getSocket('/messaging');
     if (!socket || !conversationId) return;
 
     socket.emit(

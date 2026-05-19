@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { authClient } from '@/shared/lib/auth-client';
+import { disconnectSocket } from '@/shared/lib/socket-client';
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
 
 import {
@@ -29,6 +30,7 @@ export function NavUser() {
   const profileQuery = useUserProfile(user?.id ?? '');
 
   const handleLogout = async () => {
+    disconnectSocket();
     await authClient.signOut();
     session.refetch();
     router.push('/sign-in');

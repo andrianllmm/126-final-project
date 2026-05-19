@@ -1,23 +1,41 @@
 import { io, Socket } from 'socket.io-client';
 
-let socket: Socket | null = null;
+const sockets = new Map<string, Socket>();
 
 export const initializeSocket = (namespace = '/'): Socket => {
-  if (socket) return socket;
+  const normalizedNamespace = namespace.startsWith('/')
+    ? namespace
+    : `/${namespace}`;
 
-  socket = io(`${process.env.NEXT_PUBLIC_API_URL}${namespace}`, {
-    withCredentials: true,
-    autoConnect: false,
-  });
+  const existingSocket = sockets.get(normalizedNamespace);
+
+  if (existingSocket) return existingSocket;
+
+  const socket = io(
+    `${process.env.NEXT_PUBLIC_API_URL}${normalizedNamespace}`,
+    {
+      withCredentials: true,
+      autoConnect: false,
+    },
+  );
+
+  sockets.set(normalizedNamespace, socket);
 
   return socket;
 };
 
-export const getSocket = (): Socket | null => socket;
+export const getSocket = (namespace = '/'): Socket | null => {
+  const normalizedNamespace = namespace.startsWith('/')
+    ? namespace
+    : `/${namespace}`;
+
+  return sockets.get(normalizedNamespace) ?? null;
+};
 
 export const disconnectSocket = (): void => {
-  if (socket) {
+  for (const socket of sockets.values()) {
     socket.disconnect();
-    socket = null;
   }
+
+  sockets.clear();
 };

@@ -4,7 +4,7 @@ import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { sendEmail } from '../../common/email.js';
 import { env } from '../../config/env.js';
-import { ALLOWED_EMAIL_DOMAINS } from '@repo/api';
+import { ALLOWED_EMAIL_DOMAINS, NotificationType } from '@repo/api';
 
 const databaseUrl = env.databaseUrl;
 
@@ -102,6 +102,16 @@ export const auth = betterAuth({
               message: 'Only university email addresses are allowed.',
             });
           }
+        },
+        after: async (user) => {
+          await prisma.notification.create({
+            data: {
+              userId: user.id,
+              type: NotificationType.SYSTEM,
+              title: 'Welcome to Iskommerce',
+              message: 'Your account is ready. Start exploring listings.',
+            },
+          });
         },
       },
     },
