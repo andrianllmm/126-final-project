@@ -4,6 +4,7 @@ import { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/shared/components/ui/input';
+import { Textarea } from '@/shared/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -182,18 +183,9 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
           {/*  Description  */}
           <FieldSet>
             <FieldLegend>Description</FieldLegend>
-            <textarea
+            <Textarea
               placeholder="Describe the item's condition, age, and any specific details..."
               aria-invalid={!!errors.description}
-              className={`
-                w-full px-4 py-3 h-48 resize-none rounded
-                bg-background text-foreground
-                border transition-colors
-                placeholder:text-muted-foreground
-                focus:outline-none focus:ring-2 focus:ring-ring
-                ${errors.description ? 'border-destructive' : 'border-border'}
-              `}
-              rows={6}
               {...register('description')}
             />
             {errors.description && (
