@@ -17,12 +17,14 @@ import {
 import { NavUser } from './nav-user';
 import { ThemeToggle } from '../theme-toggle';
 
+import { navItems } from './navbar.data';
+
+import { Button } from '../ui/button';
 import { Logo } from '@/shared/components/brand/logo';
 import { Wordmark } from '@/shared/components/brand/wordmark';
+import { NotificationBell } from '@/features/notifications/components/notification-bell';
 
-import { navItems } from './navbar.data';
-import { MessageCircleIcon, MessageSquareIcon } from 'lucide-react';
-import { Button } from '../ui/button';
+import { MessageCircleIcon } from 'lucide-react';
 
 function NavMenuItem({
   title,
@@ -116,6 +118,9 @@ export function Navbar({ className }: { className?: string }) {
               <MessageCircleIcon />
             </Button>
           </Link>
+
+          {/* Notifications */}
+          <NotificationBell />
 
           {/* User */}
           <NavUser />
