@@ -25,19 +25,23 @@ export function SellerTipsCard() {
       <div className="p-6">
         <div className="flex items-center gap-2 mb-6">
           <Lightbulb className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-black">Seller Tips</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white">
+            Seller Tips
+          </h3>
         </div>
 
         <div className="space-y-5">
           {tips.map((tip, index) => (
             <div key={index} className="flex gap-3">
               <div className="flex-shrink-0">
-                <span className="font-bold text-black text-sm mt-0.5 block">
+                <span className="font-bold text-black dark:text-white text-sm mt-0.5 block">
                   {tip.number}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-black mt-0.5">{tip.description}</p>
+                <p className="text-sm text-black dark:text-white mt-0.5">
+                  {tip.description}
+                </p>
               </div>
             </div>
           ))}

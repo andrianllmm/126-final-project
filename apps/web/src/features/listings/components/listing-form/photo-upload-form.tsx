@@ -145,7 +145,7 @@ export function PhotoUploadForm({
     return (
       <Card
         onClick={() => triggerUploadAtBox(index)}
-        className="border-2 border-dashed border-gray-300 dark:border-gray-600/50 hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full dark:bg-gray-700/30 cursor-pointer"
+        className="border-2 border-dashed border-border hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full bg-muted/40 cursor-pointer"
       >
         <div className="flex flex-col items-center justify-center h-full group">
           <Plus className="w-5 h-5 text-gray-400 dark:text-gray-500 mb-1 group-hover:text-rose-500 dark:group-hover:text-rose-400 transition-colors" />
@@ -210,10 +210,10 @@ export function PhotoUploadForm({
           ) : (
             <Card
               onClick={() => triggerUploadAtBox(0)}
-              className="border-2 border-dashed border-gray-300 dark:border-gray-600/50 hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full dark:bg-gray-700/30 cursor-pointer"
+              className="border-2 border-dashed border-border hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full bg-muted/50 cursor-pointer"
             >
               <div className="flex flex-col items-center justify-center h-full group">
-                <div className="w-14 h-14 bg-gray-100 dark:bg-gray-600/40 rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
                   <svg
                     className="w-7 h-7 text-gray-400 dark:text-gray-400 group-hover:text-rose-400 transition-colors"
                     fill="none"
