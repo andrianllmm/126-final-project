@@ -5,11 +5,14 @@
     "DIRECT_URL",
     "BETTER_AUTH_SECRET",
     "BETTER_AUTH_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "BASE_URL",
     "WEB_URL",
+    "NEXT_PUBLIC_BASE_URL",
     "NEXT_PUBLIC_API_URL",
     "PORT",
     "HOST",
-    "BASE_URL",
     "UPLOAD_DRIVER",
     "UPLOAD_DIR",
     "S3_REGION",
@@ -17,7 +20,9 @@
     "S3_ENDPOINT",
     "S3_ACCESS_KEY_ID",
     "S3_SECRET_ACCESS_KEY",
-    "S3_PUBLIC_URL"
+    "S3_PUBLIC_URL",
+    "EMAIL_FROM",
+    "RESEND_API_KEY"
   ],
   "globalDependencies": ["**/.env.*local"],
   "tasks": {

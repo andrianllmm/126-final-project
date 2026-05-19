@@ -1,8 +1,10 @@
-import { betterAuth } from 'better-auth';
+import { APIError, betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { sendEmail } from '../../common/email.js';
 import { env } from '../../config/env.js';
+import { ALLOWED_EMAIL_DOMAINS, NotificationType } from '@repo/api';
 
 const databaseUrl = env.databaseUrl;
 
@@ -28,9 +30,46 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: 'Verify your email',
+          text: `Verify your account: ${url}`,
+        });
+      },
+      sendOnSignUp: true,
+    },
+
+    sendResetPassword: async ({ user, url }) => {
+      console.log('sendResetPassword', url);
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your password',
+        text: `Reset your password: ${url}`,
+      });
+    },
+  },
+
+  account: {
+    accountLinking: {
+      enabled: true,
+    },
+  },
+
+  socialProviders: {
+    google: {
+      clientId: env.googleClientId,
+      clientSecret: env.googleClientSecret,
+    },
   },
 
   trustedOrigins: [env.webUrl],
+
+  onAPIError: {
+    errorURL: `${env.webUrl}/auth/error`,
+  },
 
   user: {
     deleteUser: {
@@ -42,6 +81,38 @@ export const auth = betterAuth({
         type: 'string',
         required: false,
         input: true,
+      },
+    },
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const email = user.email?.toLowerCase() ?? '';
+          const domain = email.split('@')[1];
+
+          if (!domain)
+            throw new APIError('BAD_REQUEST', {
+              message: 'Invalid email address',
+            });
+
+          if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
+            throw new APIError('UNPROCESSABLE_ENTITY', {
+              message: 'Only university email addresses are allowed.',
+            });
+          }
+        },
+        after: async (user) => {
+          await prisma.notification.create({
+            data: {
+              userId: user.id,
+              type: NotificationType.SYSTEM,
+              title: 'Welcome to Iskommerce',
+              message: 'Your account is ready. Start exploring listings.',
+            },
+          });
+        },
       },
     },
   },

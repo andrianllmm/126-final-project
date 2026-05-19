@@ -13,6 +13,9 @@ export const env = {
 
   betterAuthUrl: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
 
+  googleClientId: process.env.GOOGLE_CLIENT_ID!,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
   uploadDriver: (process.env.UPLOAD_DRIVER ?? 'local') as 'local' | 's3',
 
   uploadDir: process.env.UPLOAD_DIR ?? 'uploads',
@@ -24,5 +27,10 @@ export const env = {
     accessKeyId: process.env.S3_ACCESS_KEY_ID!,
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
     publicUrl: process.env.S3_PUBLIC_URL!,
+  },
+
+  email: {
+    from: process.env.EMAIL_FROM!,
+    resendApiKey: process.env.RESEND_API_KEY!,
   },
 } as const;

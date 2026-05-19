@@ -30,6 +30,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { AppService } from './app.service.js';
 import { AppController } from './app.controller.js';
 
+import { EmailModule } from './modules/email/email.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { ListingsModule } from './modules/listings/listings.module.js';
@@ -39,6 +40,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module.j
 import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { AuthController } from './modules/auth/auth.controller.js';
 
 import { env } from './config/env.js';
 
@@ -65,6 +67,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       isGlobal: true,
     }),
     DatabaseModule,
+    EmailModule,
     AuthModule.forRoot({
       auth,
       bodyParser: {
@@ -90,7 +93,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     NotificationsModule,
     HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [
     AppService,
     {
