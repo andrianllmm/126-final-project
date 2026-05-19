@@ -186,6 +186,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
             <Textarea
               placeholder="Describe the item's condition, age, and any specific details..."
               aria-invalid={!!errors.description}
+              className="min-h-48"
               {...register('description')}
             />
             {errors.description && (

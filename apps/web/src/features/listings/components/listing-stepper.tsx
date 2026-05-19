@@ -11,7 +11,13 @@ import {
   StepperTitle,
   StepperTrigger,
 } from '@/shared/components/ui/stepper';
-import { CheckIcon, LoaderCircleIcon, ArrowLeft, Rocket } from 'lucide-react';
+import {
+  CheckIcon,
+  LoaderCircleIcon,
+  ArrowLeft,
+  ArrowRight,
+  Rocket,
+} from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { ListingForm } from '@/features/listings/components/listing-form';
 import { SellerTipsCard } from '@/features/listings/components/seller-tips-card';
@@ -191,7 +197,8 @@ export function Pattern() {
                   className="px-6"
                   onClick={handleBack}
                 >
-                  ← Back
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
                 </Button>
                 <Button
                   type="button"
@@ -200,7 +207,8 @@ export function Pattern() {
                   onClick={handleNext}
                   disabled={validatingStep1}
                 >
-                  {validatingStep1 ? 'Validating...' : 'Next →'}
+                  {validatingStep1 ? 'Validating...' : 'Next'}
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -223,7 +231,8 @@ export function Pattern() {
                   className="px-6"
                   onClick={handleBack}
                 >
-                  ← Back
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
                 </Button>
                 <Button
                   type="button"
@@ -231,7 +240,8 @@ export function Pattern() {
                   variant="default"
                   onClick={handleNext}
                 >
-                  Next →
+                  Next
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
