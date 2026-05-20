@@ -28,10 +28,6 @@ export default function BuyListingPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
-    if (!user) router.push('/sign-in');
-  }, [user, router]);
-
-  useEffect(() => {
     if (!isLoading && !listing) {
       toast.error('Listing not found');
       router.push('/');

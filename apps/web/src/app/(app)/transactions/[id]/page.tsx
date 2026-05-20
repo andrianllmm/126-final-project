@@ -52,12 +52,6 @@ export default function TransactionDetailPage() {
     transaction: null,
   });
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/sign-in');
-    }
-  }, [user, router]);
-
   if (!user) return null;
 
   if (isLoading) {
