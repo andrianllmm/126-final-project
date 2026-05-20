@@ -7,7 +7,7 @@ import { env } from '../../config/env.js';
 export class EmailService {
   constructor(
     @Inject(RESEND_CLIENT)
-    private readonly resend: Resend,
+    private readonly resend: Resend | null,
   ) {}
 
   async sendEmail(params: {
@@ -15,6 +15,11 @@ export class EmailService {
     subject: string;
     html: string;
   }) {
+    if (!this.resend) {
+      console.warn('Email provider not configured');
+      return;
+    }
+
     return this.resend.emails.send({
       from: env.email.from,
       to: params.to,

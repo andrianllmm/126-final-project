@@ -1,7 +1,9 @@
 import { Resend } from 'resend';
 import { env } from '../config/env.js';
 
-const resend = new Resend(env.email.resendApiKey);
+const resend = env.email.resendApiKey
+  ? new Resend(env.email.resendApiKey)
+  : null;
 
 export async function sendEmail(params: {
   to: string;
@@ -9,7 +11,11 @@ export async function sendEmail(params: {
   text?: string;
   html?: string;
 }) {
-  console.log('sendEmail', params, env.email.from);
+  if (!resend) {
+    console.warn('Email provider not configured');
+    return;
+  }
+
   const { data, error } = await resend.emails.send({
     from: env.email.from,
     to: params.to,
