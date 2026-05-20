@@ -20,7 +20,7 @@ import {
   FieldSet,
 } from '@/shared/components/ui/field';
 import {
-  listingSchema,
+  listingFormSchema,
   ListingFormValues,
   CATEGORIES,
 } from '@/features/listings/lib/listing-schema';
@@ -47,15 +47,16 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
       watch,
       formState: { errors },
     } = useForm<ListingFormValues>({
-      resolver: zodResolver(listingSchema),
+      resolver: zodResolver(listingFormSchema),
       defaultValues: {
-        productName: initialData?.productName ?? '',
-        category: initialData?.category as ListingFormValues['category'],
-        price: initialData?.price ?? '',
+        title: initialData?.title ?? '',
+        categoryId: initialData?.categoryId ?? '',
+        price: initialData?.price ?? 0,
         meetupLocation: initialData?.meetupLocation ?? '',
         description: initialData?.description ?? '',
+        condition: initialData?.condition ?? '',
       },
-      mode: 'onTouched', // validate on blur, then live after first touch
+      mode: 'onTouched',
     });
 
     // Expose triggerValidation to the parent stepper via ref
@@ -68,11 +69,12 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
     useEffect(() => {
       onChange?.(values);
     }, [
-      values.productName,
-      values.category,
+      values.title,
+      values.categoryId,
       values.price,
       values.meetupLocation,
       values.description,
+      values.condition,
     ]);
 
     return (
@@ -89,12 +91,12 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
               <Input
                 id="product-name"
                 placeholder="e.g. Calculus Textbook, Mini Fridge"
-                aria-invalid={!!errors.productName}
-                {...register('productName')}
+                aria-invalid={!!errors.title}
+                {...register('title')}
               />
-              {errors.productName && (
+              {errors.title && (
                 <p className="mt-1 text-xs text-destructive">
-                  {errors.productName.message}
+                  {errors.title.message}
                 </p>
               )}
             </Field>
@@ -107,13 +109,13 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
               <Field>
                 <FieldLabel htmlFor="category">Category</FieldLabel>
                 <Controller
-                  name="category"
+                  name="categoryId"
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger
                         id="category"
-                        aria-invalid={!!errors.category}
+                        aria-invalid={!!errors.categoryId}
                         onBlur={field.onBlur}
                       >
                         <SelectValue placeholder="Select a category" />
@@ -128,9 +130,9 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
                     </Select>
                   )}
                 />
-                {errors.category && (
+                {errors.categoryId && (
                   <p className="mt-1 text-xs text-destructive">
-                    {errors.category.message}
+                    {errors.categoryId.message}
                   </p>
                 )}
               </Field>
@@ -150,7 +152,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
                     placeholder="0.00"
                     aria-invalid={!!errors.price}
                     className="pl-7"
-                    {...register('price')}
+                    {...register('price', { valueAsNumber: true })}
                   />
                 </div>
                 {errors.price && (
@@ -175,6 +177,40 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
               {errors.meetupLocation && (
                 <p className="mt-1 text-xs text-destructive">
                   {errors.meetupLocation.message}
+                </p>
+              )}
+            </Field>
+          </FieldSet>
+
+          {/*  Condition  */}
+          <FieldSet>
+            <Field>
+              <FieldLabel htmlFor="condition">Condition</FieldLabel>
+              <Controller
+                name="condition"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      id="condition"
+                      aria-invalid={!!errors.condition}
+                      onBlur={field.onBlur}
+                    >
+                      <SelectValue placeholder="Select condition" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NEW">New</SelectItem>
+                      <SelectItem value="LIKE_NEW">Like New</SelectItem>
+                      <SelectItem value="GOOD">Good</SelectItem>
+                      <SelectItem value="FAIR">Fair</SelectItem>
+                      <SelectItem value="POOR">Poor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.condition && (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.condition.message}
                 </p>
               )}
             </Field>
