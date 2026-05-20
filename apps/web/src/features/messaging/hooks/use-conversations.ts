@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  createConversation,
+  getOrCreateConversation as getOrCreateConversation,
   getConversation,
   getConversations,
   markConversationAsRead,
@@ -21,11 +21,11 @@ export const useConversation = (id?: string) => {
   });
 };
 
-export const useCreateConversation = () => {
+export const useGetOrCreateConversation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createConversation,
+    mutationFn: getOrCreateConversation,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['conversations'],

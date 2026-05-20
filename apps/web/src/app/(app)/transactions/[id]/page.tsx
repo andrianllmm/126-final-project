@@ -28,6 +28,7 @@ import {
 } from '@repo/api';
 import { toast } from 'sonner';
 import { CopyText } from '@/shared/components/copy-text';
+import { MessageButton } from '@/features/messaging/components/message-button';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -129,12 +130,9 @@ export default function TransactionDetailPage() {
               />
             </div>
 
-            <Button className="gap-1" asChild>
-              <Link href={`/messages`}>
-                <MessageCircle />
-                Chat
-              </Link>
-            </Button>
+            <MessageButton listingId={transaction.listingId}>
+              Message
+            </MessageButton>
           </div>
         </div>
 

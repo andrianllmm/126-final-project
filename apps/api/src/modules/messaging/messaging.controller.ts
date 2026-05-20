@@ -7,11 +7,14 @@ export class MessagingController {
   constructor(private messagingService: MessagingService) {}
 
   @Post('conversations')
-  createConversation(
-    @Body() { listingId }: { listingId: string },
+  async getOrCreateConversation(
+    @Body() body: { listingId: string },
     @Session() session: UserSession,
   ) {
-    return this.messagingService.createConversation(session.user.id, listingId);
+    return this.messagingService.getOrCreateConversation(
+      session.user.id,
+      body.listingId,
+    );
   }
 
   @Get('conversations')

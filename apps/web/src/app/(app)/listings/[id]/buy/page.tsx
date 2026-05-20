@@ -6,7 +6,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import { Checkbox } from '@/shared/components/ui/checkbox';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useListing } from '@/features/listings/hooks/use-listing-detail';
 import { useCreateTransaction } from '@/features/transactions/hooks/use-create-transaction';
@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { UserCardCompact } from '@/features/transactions/components/user-card-compact';
 import { ListingCardCompact } from '@/features/transactions/components/listing-card-compact';
+import Link from 'next/link';
+import { MessageButton } from '@/features/messaging/components/message-button';
 
 export default function BuyListingPage() {
   const params = useParams();
@@ -128,6 +130,17 @@ export default function BuyListingPage() {
             </ul>
           </AlertDescription>
         </Alert>
+
+        <Separator />
+
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium">Still not sure?</h3>
+          <MessageButton listingId={listingId}>
+            Message the seller
+          </MessageButton>
+        </div>
+
+        <Separator />
 
         <div className="flex items-start gap-2">
           <Checkbox

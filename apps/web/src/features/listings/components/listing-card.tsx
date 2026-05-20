@@ -10,16 +10,16 @@ import { ListingConditionBadge } from './listing-condition-badge';
 import { ListingStatusBadge } from './listing-status-badge';
 import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
 
-import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from '@/shared/components/ui/card';
-import { MapPin, MessageCircleIcon, Package } from 'lucide-react';
+import { MapPin, Package } from 'lucide-react';
 
 import { ListingStatus, type Listing } from '@repo/api';
+import { MessageButton } from '@/features/messaging/components/message-button';
 
 interface ListingCardProps {
   listing: Listing;
@@ -45,11 +45,6 @@ export function ListingCard({
   const goToSeller = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/profile/${listing.seller.id}`);
-  };
-
-  const goToMessages = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push(`/messages?listingId=${listing.id}`);
   };
 
   return (
@@ -107,14 +102,12 @@ export function ListingCard({
         <div className="flex items-center justify-between">
           {/* Seller + Message */}
           <div className="flex items-center gap-1">
-            <Button
+            <MessageButton
+              listingId={listing.id}
               size="icon"
               variant="ghost"
               className="size-6 hover:text-primary"
-              onClick={goToMessages}
-            >
-              <MessageCircleIcon />
-            </Button>
+            />
 
             <button
               className="truncate text-sm font-medium hover:text-primary"
