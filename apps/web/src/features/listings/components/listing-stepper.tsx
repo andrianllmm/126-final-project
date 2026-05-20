@@ -31,19 +31,10 @@ import { useRouter } from 'next/navigation';
 import { useCreateListing } from '../hooks/use-create-listing';
 import { useAddListingImages } from '../hooks/use-listing-images';
 import type { ListingFormHandle } from './listing-form';
-import type { CategoryValue } from '../lib/listing-schema';
+import type { ListingFormValues } from '../lib/listing-schema';
 import { ListingCondition } from '@repo/api';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
-
-interface FormData {
-  title: string;
-  categoryId: CategoryValue;
-  price: number;
-  meetupLocation: string;
-  description: string;
-  condition: string;
-}
 
 interface UploadedPhoto {
   id: string;
@@ -68,9 +59,9 @@ export function Pattern() {
   const [photoError, setPhotoError] = useState<string | null>(null);
   const listingFormRef = useRef<ListingFormHandle>(null);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<ListingFormValues>({
     title: '',
-    categoryId: '' as CategoryValue,
+    categoryId: '',
     price: 0,
     meetupLocation: '',
     description: '',

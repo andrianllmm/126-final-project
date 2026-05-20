@@ -51,7 +51,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
       defaultValues: {
         title: initialData?.title ?? '',
         categoryId: initialData?.categoryId ?? '',
-        price: initialData?.price ?? 0,
+        price: initialData?.price ?? 0.0,
         meetupLocation: initialData?.meetupLocation ?? '',
         description: initialData?.description ?? '',
         condition: initialData?.condition ?? '',
@@ -203,7 +203,7 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
                       <SelectItem value="LIKE_NEW">Like New</SelectItem>
                       <SelectItem value="GOOD">Good</SelectItem>
                       <SelectItem value="FAIR">Fair</SelectItem>
-                      <SelectItem value="POOR">Poor</SelectItem>
+                      <SelectItem value="FOR_PARTS">For Parts</SelectItem>
                     </SelectContent>
                   </Select>
                 )}

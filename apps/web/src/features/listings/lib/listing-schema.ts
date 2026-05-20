@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createListingSchema } from '@repo/api';
+import { createListingSchema, ListingConditionSchema } from '@repo/api';
 
 export const CATEGORIES = [
   { value: 'electronics', label: 'Electronics' },
@@ -35,10 +35,13 @@ export const listingFormSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .max(1000, 'Description must be 1000 characters or fewer'),
 
-  condition: z.string().min(1, 'Condition is required'),
+  condition: z
+    .union([ListingConditionSchema, z.literal('')])
+    .refine((condition) => condition !== '', 'Condition is required'),
 });
 
-export type ListingFormValues = z.infer<typeof listingFormSchema>;
+export type ListingFormValues = z.input<typeof listingFormSchema>;
+export type ValidListingFormValues = z.output<typeof listingFormSchema>;
 
 export function validateListingInput(data: ListingFormValues) {
   return createListingSchema.safeParse(data);
