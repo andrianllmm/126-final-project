@@ -11,7 +11,8 @@ import {
   TransactionQueryDto,
 } from './transactions.dto.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
-import { NotificationType, TransactionStatus } from '@repo/api';
+import { ListingStatus, NotificationType, TransactionStatus } from '@repo/api';
+import { PrismaTx } from '../../common/prisma-tx.js';
 
 @Injectable()
 export class TransactionsService {
@@ -149,7 +150,7 @@ export class TransactionsService {
         include: { listing: true, buyer: true, seller: true },
       });
 
-      await this.syncListingStatus(transaction.listingId, 'REJECTED');
+      await this.syncListingStatus(tx, transaction.listingId, 'REJECTED');
 
       await this.notificationsService.createWithTx(
         tx,
@@ -199,22 +200,20 @@ export class TransactionsService {
         },
       });
 
-      await tx.notification.createMany({
-        data: [
-          {
-            userId: transaction.buyerId,
-            type: NotificationType.TRANSACTION,
-            title: 'Transaction completed',
-            message: `${transaction.listing.title} transaction completed`,
-          },
-          {
-            userId: transaction.sellerId,
-            type: NotificationType.TRANSACTION,
-            title: 'Transaction completed',
-            message: `${transaction.listing.title} transaction completed`,
-          },
-        ],
-      });
+      await this.notificationsService.createWithTx(
+        tx,
+        transaction.buyerId,
+        NotificationType.TRANSACTION,
+        'Transaction completed',
+        `${transaction.listing.title} transaction completed`,
+      );
+      await this.notificationsService.createWithTx(
+        tx,
+        transaction.sellerId,
+        NotificationType.TRANSACTION,
+        'Transaction completed',
+        `${transaction.listing.title} transaction completed`,
+      );
 
       return updatedTransaction;
     });
@@ -248,7 +247,7 @@ export class TransactionsService {
         include: { listing: true, buyer: true, seller: true },
       });
 
-      await this.syncListingStatus(transaction.listingId, 'CANCELLED');
+      await this.syncListingStatus(tx, transaction.listingId, 'CANCELLED');
 
       await tx.notification.createMany({
         data: [
@@ -379,23 +378,23 @@ export class TransactionsService {
   }
 
   private async syncListingStatus(
+    tx: PrismaTx,
     listingId: string,
     newStatus: TransactionStatus,
   ): Promise<void> {
-    const listingUpdates = {
+    const listingUpdates: Record<
+      TransactionStatus,
+      { status: ListingStatus; soldAt?: Date } | null
+    > = {
+      PENDING: null,
       ACCEPTED: { status: 'RESERVED' },
-      COMPLETED: { status: 'SOLD', soldAt: new Date() },
       REJECTED: { status: 'AVAILABLE' },
+      COMPLETED: { status: 'SOLD', soldAt: new Date() },
       CANCELLED: { status: 'AVAILABLE' },
     };
-
     const update = listingUpdates[newStatus];
-
     if (update) {
-      await this.prisma.listing.update({
-        where: { id: listingId },
-        data: update,
-      });
+      await tx.listing.update({ where: { id: listingId }, data: update });
     }
   }
 }

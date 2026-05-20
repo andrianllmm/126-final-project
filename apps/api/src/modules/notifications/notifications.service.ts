@@ -3,12 +3,7 @@ import { PrismaService } from '../../database/prisma.service.js';
 import { NotificationFilters, NotificationType } from '@repo/api';
 import { NotificationsGateway } from './notifications.gateway.js';
 import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
-import { TransactionClient } from '../../generated/prisma/internal/prismaNamespace.js';
-
-type PrismaTx = Omit<
-  TransactionClient,
-  '$connect' | '$disconnect' | '$on' | '$transaction'
->;
+import { PrismaTx } from '../../common/prisma-tx.js';
 
 @Injectable()
 export class NotificationsService {
