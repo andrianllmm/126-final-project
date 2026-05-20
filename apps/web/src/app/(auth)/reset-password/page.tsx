@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { authClient } from '@/shared/lib/auth-client';
 
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import {
   Card,
   CardContent,
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from '@/shared/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -57,8 +57,7 @@ export default function ResetPasswordPage() {
             <FieldGroup>
               <Field>
                 <FieldLabel>New password</FieldLabel>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

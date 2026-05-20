@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 
 import {
   Field,
@@ -36,7 +36,6 @@ export function PasswordSetField({
     try {
       await setUserPassword({
         newPassword: values.newPassword,
-        confirmPassword: values.confirmPassword,
       });
     } catch {
       setError('root', {
@@ -69,9 +68,8 @@ export function PasswordSetField({
           <Field>
             <FieldLabel htmlFor="new-password">New password</FieldLabel>
 
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               autoComplete="new-password"
               {...register('newPassword')}
             />
@@ -79,25 +77,6 @@ export function PasswordSetField({
             {errors.newPassword && (
               <FieldDescription className="text-destructive">
                 {errors.newPassword.message}
-              </FieldDescription>
-            )}
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="confirm-password">
-              Confirm new password
-            </FieldLabel>
-
-            <Input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
-
-            {errors.confirmPassword && (
-              <FieldDescription className="text-destructive">
-                {errors.confirmPassword.message}
               </FieldDescription>
             )}
           </Field>
