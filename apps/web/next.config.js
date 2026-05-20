@@ -3,7 +3,9 @@ import createMDX from '@next/mdx';
 
 const isDev = process.env.NODE_ENV === 'development';
 
-const apiUrl = new URL(process.env.NEXT_PUBLIC_API_URL);
+const apiUrlString = process.env.NEXT_PUBLIC_API_URL;
+
+const apiUrl = apiUrlString ? new URL(apiUrlString) : null;
 
 const nextConfig = {
   allowedDevOrigins: ['http://localhost:3000'],
@@ -12,17 +14,19 @@ const nextConfig = {
 
   images: {
     remotePatterns: [
-      {
-        protocol: apiUrl.protocol.replace(':', ''),
-        hostname: apiUrl.hostname,
-        port: apiUrl.port || '',
-        pathname: '/uploads/**',
-      },
+      apiUrl
+        ? {
+            protocol: apiUrl.protocol.replace(':', ''),
+            hostname: apiUrl.hostname,
+            port: apiUrl.port || undefined,
+            pathname: '/uploads/**',
+          }
+        : null,
       {
         protocol: 'https',
         hostname: '**',
       },
-    ],
+    ].filter(Boolean),
 
     ...(isDev
       ? {
