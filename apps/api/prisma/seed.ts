@@ -272,17 +272,6 @@ async function main() {
       },
     ],
   });
-
-  console.log({
-    seller,
-    buyer,
-    electronics,
-    books,
-    keyboard,
-    textbook,
-    conversation,
-    transaction,
-  });
 }
 
 main()
