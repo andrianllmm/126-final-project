@@ -22,6 +22,7 @@ import {
   FieldSeparator,
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 import Link from 'next/link';
 
 import { signInSchema, SignInInput } from '@repo/api';
@@ -104,11 +105,7 @@ export function SignInForm({
                     </Link>
                   </div>
 
-                  <Input
-                    id="password"
-                    type="password"
-                    {...register('password')}
-                  />
+                  <PasswordInput id="password" {...register('password')} />
 
                   {errors.password && (
                     <FieldDescription className="text-destructive">

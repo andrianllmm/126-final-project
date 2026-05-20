@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { authClient } from '@/shared/lib/auth-client';
 
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import {
   Field,
   FieldDescription,
@@ -23,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/components/ui/dialog';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 
 export function DeleteAccountField() {
   const router = useRouter();
@@ -81,9 +81,8 @@ export function DeleteAccountField() {
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
 
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
