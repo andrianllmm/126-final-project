@@ -3,23 +3,23 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-import { MapPin, MessageCircleIcon, Package } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { currencyFormatter } from '@/shared/lib/currency-formatter';
 
+import { ListingConditionBadge } from './listing-condition-badge';
+import { ListingStatusBadge } from './listing-status-badge';
+import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
+
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from '@/shared/components/ui/card';
-
-import { cn } from '@/shared/lib/utils';
-
-import { ListingConditionBadge } from './listing-condition-badge';
-import { ListingStatusBadge } from './listing-status-badge';
+import { MapPin, MessageCircleIcon, Package } from 'lucide-react';
 
 import { ListingStatus, type Listing } from '@repo/api';
-import { currencyFormatter } from '@/shared/lib/currency-formatter';
-import { Button } from '@/shared/components/ui/button';
 
 interface ListingCardProps {
   listing: Listing;
@@ -41,11 +41,6 @@ export function ListingCard({
   const isUnavailable = ListingStatus.AVAILABLE != listing.status;
 
   const goToListing = () => router.push(href);
-
-  const goToBuy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    router.push(`/listings/${listing.id}/buy`);
-  };
 
   const goToSeller = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -141,9 +136,7 @@ export function ListingCard({
 
       {/* FOOTER */}
       <CardFooter className="px-4 pb-4 pt-4">
-        <Button className="w-full" disabled={isUnavailable} onClick={goToBuy}>
-          Buy
-        </Button>
+        <TransactionRequestButton listing={listing} />
       </CardFooter>
     </Card>
   );
