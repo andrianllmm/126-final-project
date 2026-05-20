@@ -37,11 +37,12 @@ import { ListingCondition } from '@repo/api';
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
 interface FormData {
-  productName: string;
-  category: CategoryValue;
-  price: string;
+  title: string;
+  categoryId: CategoryValue;
+  price: number;
   meetupLocation: string;
   description: string;
+  condition: string;
 }
 
 interface UploadedPhoto {
@@ -68,11 +69,12 @@ export function Pattern() {
   const listingFormRef = useRef<ListingFormHandle>(null);
 
   const [formData, setFormData] = useState<FormData>({
-    productName: '',
-    category: '' as CategoryValue,
-    price: '',
+    title: '',
+    categoryId: '' as CategoryValue,
+    price: 0,
     meetupLocation: '',
     description: '',
+    condition: '',
   });
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
 
@@ -128,10 +130,10 @@ export function Pattern() {
 
       // 1. Create the listing record
       const newListing = await createListingMutation.mutateAsync({
-        title: formData.productName,
-        categoryId: formData.category,
-        condition: ListingCondition.GOOD,
-        price: parseFloat(formData.price) || 0,
+        title: formData.title,
+        categoryId: formData.categoryId,
+        condition: formData.condition || ListingCondition.GOOD,
+        price: formData.price || 0,
         meetupLocation: formData.meetupLocation,
         description: formData.description,
       });
@@ -267,11 +269,12 @@ export function Pattern() {
               </div>
               <div>
                 <ProductSummaryCard
-                  productTitle={formData.productName}
-                  category={formData.category}
-                  price={formData.price}
+                  productTitle={formData.title}
+                  category={formData.categoryId}
+                  price={formData.price.toString()}
                   description={formData.description}
                   meetupLocation={formData.meetupLocation}
+                  condition={formData.condition}
                 />
               </div>
             </div>

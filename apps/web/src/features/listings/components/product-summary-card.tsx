@@ -10,6 +10,7 @@ interface ProductSummaryCardProps {
   description: string;
   meetupLocation: string;
   meetupTime?: string;
+  condition?: string;
 }
 
 /** Capitalizes the first letter of a string (e.g. "electronics" → "Electronics") */
@@ -25,6 +26,7 @@ export function ProductSummaryCard({
   description,
   meetupLocation,
   meetupTime,
+  condition,
 }: ProductSummaryCardProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -64,6 +66,18 @@ export function ProductSummaryCard({
               </p>
             </div>
           </div>
+
+          {/* Condition */}
+          {condition && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Condition
+              </p>
+              <p className="text-base font-semibold text-foreground">
+                {capitalize(condition)}
+              </p>
+            </div>
+          )}
 
           {/* Description */}
           <div className="space-y-1.5">
