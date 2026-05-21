@@ -14,6 +14,7 @@ import { currencyFormatter } from '@/shared/lib/currency-formatter';
 import { ListingConditionBadge } from '@/features/listings/components/listing-condition-badge';
 import { ListingStatusBadge } from '@/features/listings/components/listing-status-badge';
 import { getListingById } from '@/features/listings/api/listings-api';
+import { UserAvatar } from '@/features/users/components/user-avatar';
 
 import { ListingBreadcrumb } from './listing-detail-breadcrumb';
 
@@ -71,9 +72,9 @@ export function ListingDetail() {
         Back
       </Button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Images Section */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 lg:col-span-3">
           {primaryImage && (
             <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-muted">
               <Image
@@ -113,7 +114,7 @@ export function ListingDetail() {
         </div>
 
         {/* Details Section */}
-        <div className="space-y-4">
+        <div className="space-y-4 lg:col-span-2">
           {/* Badges */}
           <div className="flex gap-2">
             <ListingConditionBadge condition={listing.condition} />
@@ -124,7 +125,7 @@ export function ListingDetail() {
           <div>
             <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
             <p className="text-3xl font-bold text-primary">
-              {currencyFormatter.format(listing.price)}
+              ₱{listing.price.toFixed(2)}
             </p>
           </div>
 
@@ -135,18 +136,71 @@ export function ListingDetail() {
 
           {/* Meetup Location */}
           {listing.meetupLocation && (
-            <Card>
-              <CardContent className="flex gap-3">
-                <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
+            <div className="rounded-2xl border border-primary/40 bg-muted/50 p-5">
+              <div className="flex gap-3">
+                <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold">Meetup Location</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Meetup Location
+                  </p>
+                  <p className="text-base font-bold">
                     {listing.meetupLocation}
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
+
+          {/* Seller Info */}
+          <Card className="p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1">
+                <UserAvatar
+                  name={listing.seller.name}
+                  email={listing.seller.email}
+                  src={listing.seller.image ?? undefined}
+                  sizeClassName="size-12"
+                  fallbackClassName="text-sm font-semibold"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm">
+                    {listing.seller.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Joined{' '}
+                    {new Date(listing.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                    })}{' '}
+                    • 4.8 Rating
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/profile/${listing.seller.id}`)}
+              >
+                View Profile
+              </Button>
+            </div>
+          </Card>
+
+          {/* Action Buttons */}
+          <Button
+            className="w-full py-6 text-base"
+            onClick={() => router.push(`/listings/${listing.id}/buy`)}
+          >
+            Buy Now
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full py-6 text-base"
+            onClick={() => router.push(`/messages?listingId=${listing.id}`)}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Message Seller
+          </Button>
         </div>
       </div>
     </div>
