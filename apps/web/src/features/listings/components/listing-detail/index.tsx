@@ -1,3 +1,10 @@
+import { ListingBreadcrumb } from './listing-detail-breadcrumb';
+
 export function ListingDetail() {
-  return <div></div>;
+  return (
+    <div>
+      <ListingBreadcrumb />
+      <div>Listing Detail Content</div>
+    </div>
+  );
 }

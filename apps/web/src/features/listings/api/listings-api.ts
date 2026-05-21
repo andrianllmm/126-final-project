@@ -29,3 +29,5 @@ export const updateListingStatus = (
 
 export const deleteListing = (id: string) =>
   apiClient.delete<Listing>(`/listings/${id}`);
+
+export const getListingById = (id: string) => getListing(id);
