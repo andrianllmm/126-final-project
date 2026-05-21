@@ -22,6 +22,7 @@ import {
   FieldSeparator,
 } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 import Link from 'next/link';
 
 import { signUpSchema, SignUpInput } from '@repo/api';
@@ -113,30 +114,10 @@ export function SignupForm({
 
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  {...register('password')}
-                />
+                <PasswordInput id="password" {...register('password')} />
                 {errors.password && (
                   <FieldDescription className="text-destructive">
                     {errors.password.message}
-                  </FieldDescription>
-                )}
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="confirm-password">
-                  Confirm Password
-                </FieldLabel>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  {...register('confirmPassword')}
-                />
-                {errors.confirmPassword && (
-                  <FieldDescription className="text-destructive">
-                    {errors.confirmPassword.message}
                   </FieldDescription>
                 )}
               </Field>

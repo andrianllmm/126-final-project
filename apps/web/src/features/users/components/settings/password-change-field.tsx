@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { authClient } from '@/shared/lib/auth-client';
 
-import { Input } from '@/shared/components/ui/input';
+import { PasswordInput } from '@/shared/components/ui/password-input';
 
 import {
   Field,
@@ -71,9 +71,8 @@ export function PasswordChangeField({
           <Field>
             <FieldLabel htmlFor="current-password">Current password</FieldLabel>
 
-            <Input
+            <PasswordInput
               id="current-password"
-              type="password"
               autoComplete="current-password"
               {...register('currentPassword')}
             />
@@ -88,9 +87,8 @@ export function PasswordChangeField({
           <Field>
             <FieldLabel htmlFor="new-password">New password</FieldLabel>
 
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               autoComplete="new-password"
               {...register('newPassword')}
             />
@@ -98,25 +96,6 @@ export function PasswordChangeField({
             {errors.newPassword && (
               <FieldDescription className="text-destructive">
                 {errors.newPassword.message}
-              </FieldDescription>
-            )}
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="confirm-password">
-              Confirm new password
-            </FieldLabel>
-
-            <Input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
-
-            {errors.confirmPassword && (
-              <FieldDescription className="text-destructive">
-                {errors.confirmPassword.message}
               </FieldDescription>
             )}
           </Field>

@@ -5,7 +5,7 @@ export const signInSchema = z.object({
   email: z
     .email('Invalid email address')
     .refine(isAllowedEmail, 'Only university email addresses are allowed'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 export type SignInInput = z.infer<typeof signInSchema>;

@@ -16,7 +16,9 @@ export default function Page() {
 
   if (isError) {
     return (
-      <div className="p-6 text-sm text-red-500">Failed to load listings.</div>
+      <div className="p-6 text-sm text-destructive">
+        Failed to load listings.
+      </div>
     );
   }
 
