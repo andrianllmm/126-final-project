@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 
 import {
   Breadcrumb,
@@ -9,7 +11,17 @@ import {
   BreadcrumbSeparator,
 } from '@/shared/components/ui/breadcrumb';
 
+import { getListingById } from '@/features/listings/api/listings-api';
+
 export function ListingBreadcrumb() {
+  const params = useParams();
+  const listingId = params.id as string;
+
+  const { data: listing } = useQuery({
+    queryKey: ['listing', listingId],
+    queryFn: () => getListingById(listingId),
+  });
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -21,12 +33,12 @@ export function ListingBreadcrumb() {
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/components">Components</Link>
+            <Link href="/search">Listings</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+          <BreadcrumbPage>{listing?.title || 'Loading...'}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
