@@ -116,7 +116,7 @@ export function ListingDetail() {
         {/* Details Section */}
         <div className="space-y-4 lg:col-span-2">
           {/* Badges */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-sm">
             <ListingConditionBadge condition={listing.condition} />
             <ListingStatusBadge status={listing.status} />
           </div>
