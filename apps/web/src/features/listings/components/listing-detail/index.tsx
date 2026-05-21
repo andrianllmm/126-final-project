@@ -113,22 +113,40 @@ export function ListingDetail() {
         </div>
 
         {/* Details Section */}
-        <div className="space-y-6">
+        <div className="space-y-4">
+          {/* Badges */}
+          <div className="flex gap-2">
+            <ListingConditionBadge condition={listing.condition} />
+            <ListingStatusBadge status={listing.status} />
+          </div>
+
           {/* Title and Price */}
           <div>
             <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
             <p className="text-3xl font-bold text-primary">
               {currencyFormatter.format(listing.price)}
             </p>
-
-            {/* Badges */}
-            <div className="flex gap-2 pt-4">
-              <ListingConditionBadge condition={listing.condition} />
-              <ListingStatusBadge status={listing.status} />
-            </div>
-
-            <p className="text-muted-foreground pt-4">{listing.description}</p>
           </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <p className="text-muted-foreground">{listing.description}</p>
+          </div>
+
+          {/* Meetup Location */}
+          {listing.meetupLocation && (
+            <Card>
+              <CardContent className="flex gap-3">
+                <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold">Meetup Location</h3>
+                  <p className="text-muted-foreground">
+                    {listing.meetupLocation}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
