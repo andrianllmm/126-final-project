@@ -40,7 +40,7 @@ export function ListingCardCompact({
               <h3 className="font-semibold line-clamp-2 mb-1">
                 {listing.title}
               </h3>
-              <p className="text-2xl font-bold">
+              <p className="text-2xl font-bold mb-1">
                 {currencyFormatter.format(listing.price)}
               </p>
               <ListingStatusBadge status={listing.status} />
