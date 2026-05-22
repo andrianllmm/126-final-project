@@ -104,6 +104,7 @@ export function ListingCard({
           <div className="flex items-center gap-1">
             <MessageButton
               listingId={listing.id}
+              disabled={listing.status === ListingStatus.SOLD}
               size="icon"
               variant="ghost"
               className="size-6 hover:text-primary"

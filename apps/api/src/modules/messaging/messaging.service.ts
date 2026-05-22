@@ -31,15 +31,6 @@ export class MessagingService {
       throw new ForbiddenException('Cannot message your own listing');
     }
 
-    const validStatuses: ListingStatus[] = [
-      ListingStatus.AVAILABLE,
-      ListingStatus.RESERVED,
-    ];
-
-    if (!validStatuses.includes(listing.status)) {
-      throw new ForbiddenException('Listing is not available for messaging');
-    }
-
     // Check for existing conversation
     const existing = await this.prisma.conversation.findUnique({
       where: {
@@ -82,6 +73,15 @@ export class MessagingService {
 
     if (existing) {
       return existing;
+    }
+
+    const validStatuses: ListingStatus[] = [
+      ListingStatus.AVAILABLE,
+      ListingStatus.RESERVED,
+    ];
+
+    if (!validStatuses.includes(listing.status)) {
+      throw new ForbiddenException('Listing is not available for messaging');
     }
 
     // Create new conversation

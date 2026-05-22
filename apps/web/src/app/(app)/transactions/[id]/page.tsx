@@ -130,7 +130,10 @@ export default function TransactionDetailPage() {
               />
             </div>
 
-            <MessageButton listingId={transaction.listingId}>
+            <MessageButton
+              listingId={transaction.listingId}
+              disabled={transaction.status === TransactionStatus.COMPLETED}
+            >
               Message
             </MessageButton>
           </div>
