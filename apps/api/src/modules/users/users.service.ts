@@ -22,6 +22,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        emailVerified: true,
         avatarUpload: {
           select: {
             id: true,
@@ -47,6 +48,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        emailVerified: true,
         avatarUpload: {
           select: {
             id: true,
@@ -78,6 +80,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        emailVerified: true,
         avatarUpload: {
           select: {
             id: true,
@@ -113,6 +116,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        emailVerified: true,
         avatarUpload: {
           select: {
             id: true,
