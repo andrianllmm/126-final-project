@@ -25,7 +25,6 @@ import {
   UpdateListingStatusDto,
 } from './listings.dto.js';
 import { TransactionStatus } from '@repo/api';
-import { TransactionListDto } from '../transactions/transactions.dto.js';
 
 @Controller('listings')
 export class ListingsController {
