@@ -10,6 +10,7 @@ export const userProfileSchema = z.object({
   id: z.string(),
   name: z.string().trim().nullable(),
   email: z.email(),
+  emailVerified: z.boolean(),
   avatarUpload: avatarUploadSchema.nullable(),
   createdAt: stringToDate,
   updatedAt: stringToDate,

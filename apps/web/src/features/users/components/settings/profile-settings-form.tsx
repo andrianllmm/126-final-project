@@ -30,7 +30,6 @@ import {
 } from '../../api/users-api';
 
 type ProfileSettingsFormProps = {
-  userId: string;
   profile: UserProfile;
 };
 
@@ -38,10 +37,7 @@ const profileSettingsSchema = userProfileUpdateSchema;
 
 type ProfileSettingsValues = UserProfileUpdateInput;
 
-export function ProfileSettingsForm({
-  userId,
-  profile,
-}: ProfileSettingsFormProps) {
+export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
   const queryClient = useQueryClient();
 
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -120,7 +116,7 @@ export function ProfileSettingsForm({
         </p>
 
         <Link
-          href={`/profile/${userId}`}
+          href={`/profile/${profile.id}`}
           className="text-sm font-medium text-primary hover:underline"
         >
           View profile

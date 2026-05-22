@@ -20,7 +20,7 @@ type SettingsViewProps = {
 };
 
 export function SettingsView({ userId }: SettingsViewProps) {
-  const profileQuery = useUserProfile(userId);
+  const { data: profile, isLoading, error } = useUserProfile(userId);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -37,7 +37,7 @@ export function SettingsView({ userId }: SettingsViewProps) {
     });
   };
 
-  if (profileQuery.isLoading) {
+  if (isLoading) {
     return (
       <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center">
@@ -47,12 +47,12 @@ export function SettingsView({ userId }: SettingsViewProps) {
     );
   }
 
-  if (profileQuery.error || !profileQuery.data) {
+  if (error || !profile) {
     return (
       <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8 space-y-4">
         <p className="text-lg font-semibold">Profile unavailable</p>
         <p className="text-sm text-muted-foreground">
-          {profileQuery.error?.message ?? 'Unable to load your profile.'}
+          {error?.message ?? 'Unable to load your profile.'}
         </p>
       </div>
     );
@@ -69,11 +69,11 @@ export function SettingsView({ userId }: SettingsViewProps) {
         </TabsList>
 
         <TabsContent value="account">
-          <AccountSettingsForm userId={userId} />
+          <AccountSettingsForm profile={profile} />
         </TabsContent>
 
         <TabsContent value="profile">
-          <ProfileSettingsForm userId={userId} profile={profileQuery.data} />
+          <ProfileSettingsForm profile={profile} />
         </TabsContent>
       </Tabs>
     </div>

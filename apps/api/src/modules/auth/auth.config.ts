@@ -30,17 +30,7 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-
-    emailVerification: {
-      sendVerificationEmail: async ({ user, url }) => {
-        await sendEmail({
-          to: user.email,
-          subject: 'Verify your email',
-          text: `Verify your account: ${url}`,
-        });
-      },
-      sendOnSignUp: true,
-    },
+    requireEmailVerification: false,
 
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
@@ -49,6 +39,17 @@ export const auth = betterAuth({
         text: `Reset your password: ${url}`,
       });
     },
+  },
+
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: 'Verify your email',
+        text: `Verify your account: ${url}`,
+      });
+    },
+    sendOnSignUp: true,
   },
 
   account: {
