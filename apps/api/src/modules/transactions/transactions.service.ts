@@ -249,22 +249,20 @@ export class TransactionsService {
 
       await this.syncListingStatus(tx, transaction.listingId, 'CANCELLED');
 
-      await tx.notification.createMany({
-        data: [
-          {
-            userId: transaction.buyerId,
-            type: NotificationType.TRANSACTION,
-            title: 'Transaction cancelled',
-            message: `${transaction.listing.title} transaction cancelled`,
-          },
-          {
-            userId: transaction.sellerId,
-            type: NotificationType.TRANSACTION,
-            title: 'Transaction cancelled',
-            message: `${transaction.listing.title} transaction cancelled`,
-          },
-        ],
-      });
+      await this.notificationsService.createWithTx(
+        tx,
+        transaction.buyerId,
+        NotificationType.TRANSACTION,
+        'Transaction completed',
+        `${transaction.listing.title} transaction completed`,
+      );
+      await this.notificationsService.createWithTx(
+        tx,
+        transaction.sellerId,
+        NotificationType.TRANSACTION,
+        'Transaction completed',
+        `${transaction.listing.title} transaction completed`,
+      );
 
       return updatedTransaction;
     });
