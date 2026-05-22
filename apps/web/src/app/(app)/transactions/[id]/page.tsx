@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 import { format } from 'date-fns';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
@@ -20,7 +19,7 @@ import { UserCardCompact } from '@/features/transactions/components/user-card-co
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { Spinner } from '@/shared/components/ui/spinner';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import {
   TransactionAction,
   TransactionStatus,
@@ -57,7 +56,7 @@ export default function TransactionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl py-8 flex items-center justify-center min-h-100">
+      <div className="container max-w-6xl py-8 flex items-center justify-center min-h-100">
         <Spinner className="size-8 text-primary" />
       </div>
     );
@@ -65,7 +64,7 @@ export default function TransactionDetailPage() {
 
   if (!transaction) {
     return (
-      <div className="container max-w-4xl py-8">
+      <div className="container max-w-6xl py-8">
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">Transaction not found</p>
           <Button onClick={() => router.push('/transactions')}>Back</Button>
@@ -110,7 +109,7 @@ export default function TransactionDetailPage() {
 
   return (
     <>
-      <div className="container max-w-4xl py-8 space-y-8">
+      <div className="container max-w-6xl py-8 space-y-8">
         <Button
           variant="ghost"
           className="mb-2"
@@ -120,80 +119,87 @@ export default function TransactionDetailPage() {
           Back
         </Button>
 
-        <div className="space-y-2">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl font-semibold">Transaction Details</h1>
-              <CopyText
-                value={transaction.transactionId}
-                className="text-sm text-muted-foreground"
-              />
+        {/* MAIN + SIDEBAR LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* MAIN COLUMN */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h1 className="text-xl font-semibold">Transaction Details</h1>
+                  <CopyText
+                    value={transaction.transactionId}
+                    className="text-sm text-muted-foreground"
+                  />
+                </div>
+
+                <MessageButton
+                  listingId={transaction.listingId}
+                  disabled={transaction.status === TransactionStatus.COMPLETED}
+                >
+                  Message
+                </MessageButton>
+              </div>
             </div>
 
-            <MessageButton
-              listingId={transaction.listingId}
-              disabled={transaction.status === TransactionStatus.COMPLETED}
-            >
-              Message
-            </MessageButton>
-          </div>
-        </div>
+            <TransactionStatusMessage
+              transaction={transaction}
+              userRole={userRole}
+            />
 
-        <TransactionStatusMessage
-          transaction={transaction}
-          userRole={userRole}
-        />
-
-        <Separator />
-
-        <section className="space-y-3">
-          <h3 className="text-lg font-semibold">Item</h3>
-          <ListingCardCompact listing={transaction.listing} />
-        </section>
-
-        <Separator />
-
-        <section className="space-y-3">
-          <h3 className="text-lg font-semibold">Info</h3>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Agreed Price</p>
-              <p className="text-xl font-bold text-primary">
-                {currencyFormatter.format(transaction.agreedPrice)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground">Created</p>
-              <p>{format(new Date(transaction.createdAt), 'PPp')}</p>
-            </div>
-          </div>
-        </section>
-
-        <Separator />
-
-        <section className="space-y-3">
-          <h3 className="text-lg font-semibold">
-            {userRole === 'buyer' ? 'Seller' : 'Buyer'}
-          </h3>
-          <UserCardCompact user={counterparty} />
-        </section>
-
-        {transaction.status != TransactionStatus.COMPLETED && (
-          <>
             <Separator />
 
             <section className="space-y-3">
-              <h3 className="text-lg font-semibold">Actions</h3>
-              <TransactionActions
-                transaction={transaction}
-                userRole={userRole}
-                onAction={handleAction}
-              />
+              <h3 className="text-lg font-semibold">Info</h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Agreed Price</p>
+                  <p className="text-xl font-bold text-primary">
+                    {currencyFormatter.format(transaction.agreedPrice)}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground">Created</p>
+                  <p>{format(new Date(transaction.createdAt), 'PPp')}</p>
+                </div>
+              </div>
             </section>
-          </>
-        )}
+
+            {transaction.status !== TransactionStatus.COMPLETED && (
+              <>
+                <Separator />
+
+                <section className="space-y-3">
+                  <h3 className="text-lg font-semibold">Actions</h3>
+                  <TransactionActions
+                    transaction={transaction}
+                    userRole={userRole}
+                    onAction={handleAction}
+                  />
+                </section>
+              </>
+            )}
+          </div>
+
+          {/* SIDEBAR */}
+          <aside className="space-y-6">
+            <section className="space-y-3">
+              <h3 className="text-lg font-semibold">Item</h3>
+              <ListingCardCompact listing={transaction.listing} />
+            </section>
+
+            <Separator />
+
+            <section className="space-y-3">
+              <h3 className="text-lg font-semibold">
+                {userRole === 'buyer' ? 'Seller' : 'Buyer'}
+              </h3>
+              <UserCardCompact user={counterparty} />
+            </section>
+          </aside>
+        </div>
       </div>
 
       {dialog.transaction && dialog.action && (
