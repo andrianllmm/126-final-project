@@ -29,7 +29,11 @@ import { ProductSummaryImg } from './product-summary-img';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateListing } from '../hooks/use-create-listing';
-import { useAddListingImages } from '../hooks/use-listing-images';
+import {
+  useAddListingImages,
+  useRemoveListingImage,
+} from '../hooks/use-listing-images';
+import { useUpdateListing } from '../hooks/use-update-listing';
 import type { ListingFormHandle } from './listing-form';
 import type { ListingFormValues } from '../lib/listing-schema';
 import { ListingCondition } from '@repo/api';
@@ -38,36 +42,72 @@ const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
 
 interface UploadedPhoto {
   id: string;
-  file: File;
   preview: string;
+  file?: File;
+  existingImageId?: string;
   isMain?: boolean;
 }
 
-export function Pattern() {
+interface ListingStepperProps {
+  mode?: 'create' | 'edit';
+  listingId?: string;
+  initialData?: ListingFormValues;
+  initialPhotos?: UploadedPhoto[];
+}
+
+export function Pattern({
+  mode = 'create',
+  listingId,
+  initialData,
+  initialPhotos,
+}: ListingStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
 
   // ─── Hooks ────────────────────────────────────────────────────────────────
   const createListingMutation = useCreateListing();
+  const updateListingMutation = useUpdateListing();
   const addImagesMutation = useAddListingImages();
+  const removeListingImageMutation = useRemoveListingImage();
 
   const isSubmitting =
-    createListingMutation.isPending || addImagesMutation.isPending;
+    createListingMutation.isPending ||
+    updateListingMutation.isPending ||
+    addImagesMutation.isPending ||
+    removeListingImageMutation.isPending;
 
   const [publishError, setPublishError] = useState<string | null>(null);
   const [validatingStep1, setValidatingStep1] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const listingFormRef = useRef<ListingFormHandle>(null);
 
-  const [formData, setFormData] = useState<ListingFormValues>({
-    title: '',
-    categoryId: '',
-    price: 0,
-    meetupLocation: '',
-    description: '',
-    condition: '',
-  });
-  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const [formData, setFormData] = useState<ListingFormValues>(
+    initialData ?? {
+      title: '',
+      categoryId: '',
+      price: 0,
+      meetupLocation: '',
+      description: '',
+      condition: '',
+    },
+  );
+  const [photos, setPhotos] = useState<UploadedPhoto[]>(initialPhotos ?? []);
+  const [originalImageIds, setOriginalImageIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    setPhotos(initialPhotos ?? []);
+    setOriginalImageIds(
+      (initialPhotos ?? [])
+        .filter((photo) => Boolean(photo.existingImageId))
+        .map((photo) => photo.existingImageId as string),
+    );
+  }, [initialPhotos]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -119,30 +159,60 @@ export function Pattern() {
     try {
       setPublishError(null);
 
-      // 1. Create the listing record
-      const newListing = await createListingMutation.mutateAsync({
+      const listingPayload = {
         title: formData.title,
         categoryId: formData.categoryId,
         condition: formData.condition || ListingCondition.GOOD,
         price: formData.price || 0,
         meetupLocation: formData.meetupLocation,
         description: formData.description,
-      });
+      };
 
-      // 2. Upload photos if any were selected
-      if (photos.length > 0) {
-        const files = photos.map((p) => p.file);
+      const listing =
+        mode === 'edit' && listingId
+          ? await updateListingMutation.mutateAsync({
+              id: listingId,
+              input: listingPayload,
+            })
+          : await createListingMutation.mutateAsync(listingPayload);
+
+      if (mode === 'edit' && listingId && originalImageIds.length > 0) {
+        const keptExistingIds = photos
+          .filter((photo) => Boolean(photo.existingImageId))
+          .map((photo) => photo.existingImageId as string);
+
+        const removedImageIds = originalImageIds.filter(
+          (id) => !keptExistingIds.includes(id),
+        );
+
+        if (removedImageIds.length > 0) {
+          await Promise.all(
+            removedImageIds.map((imageId) =>
+              removeListingImageMutation.mutateAsync({ listingId, imageId }),
+            ),
+          );
+        }
+      }
+
+      const newFiles = photos
+        .filter((photo) => photo.file)
+        .map((photo) => photo.file as File);
+
+      if (newFiles.length > 0) {
         await addImagesMutation.mutateAsync({
-          listingId: newListing.id,
-          files,
+          listingId: listing.id,
+          files: newFiles,
         });
       }
 
-      // 3. Navigate to the new listing's detail page (or listings index)
-      router.push(`/listings/${newListing.id}`);
+      router.push(`/listings/${listing.id}`);
     } catch (err) {
       setPublishError(
-        err instanceof Error ? err.message : 'Failed to publish listing.',
+        err instanceof Error
+          ? err.message
+          : mode === 'edit'
+            ? 'Failed to save listing changes.'
+            : 'Failed to publish listing.',
       );
     }
   };
@@ -180,6 +250,7 @@ export function Pattern() {
             <div className="mt-4 md:col-span-2">
               <ListingForm
                 ref={listingFormRef}
+                title={mode === 'edit' ? 'Edit Listing Details' : undefined}
                 initialData={formData}
                 onChange={setFormData}
               />
@@ -296,7 +367,13 @@ export function Pattern() {
                   disabled={isSubmitting}
                   className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5"
                 >
-                  {isSubmitting ? 'Publishing…' : 'Publish Listing'}
+                  {isSubmitting
+                    ? mode === 'edit'
+                      ? 'Saving…'
+                      : 'Publishing…'
+                    : mode === 'edit'
+                      ? 'Save Changes'
+                      : 'Publish Listing'}
                   <Rocket className="h-4 w-4" />
                 </Button>
               </div>

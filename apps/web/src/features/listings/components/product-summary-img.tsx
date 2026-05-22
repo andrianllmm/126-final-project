@@ -5,15 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useState } from 'react';
 
-interface UploadedPhoto {
-  id: string;
-  file: File;
-  preview: string;
-  isMain?: boolean;
-}
-
 interface ProductSummaryImgProps {
-  photos?: UploadedPhoto[];
+  photos?: { preview: string }[];
 }
 
 export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
@@ -47,7 +40,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
               />
             ))}
           </div>
-          <div className="flex-1 relative aspect-[4/5] bg-muted rounded-xl overflow-hidden flex items-center justify-center">
+          <div className="flex-1 relative aspect-4/5 bg-muted rounded-xl overflow-hidden flex items-center justify-center">
             <p className="text-muted-foreground">No photos uploaded yet</p>
           </div>
         </div>
@@ -81,7 +74,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
         </div>
 
         {/* Main Image */}
-        <div className="flex-1 relative aspect-[4/5] bg-muted rounded-xl overflow-hidden">
+        <div className="flex-1 relative aspect-4/5 bg-muted rounded-xl overflow-hidden">
           <img
             src={displayImages[currentImageIndex]}
             alt="Product"

@@ -33,18 +33,20 @@ export interface ListingFormHandle {
 
 // Props
 interface ListingFormProps {
+  title?: string;
   initialData?: Partial<ListingFormValues>;
   onChange?: (data: ListingFormValues) => void;
 }
 
 // Component
 export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
-  function ListingForm({ initialData, onChange }, ref) {
+  function ListingForm({ title, initialData, onChange }, ref) {
     const {
       register,
       control,
       trigger,
       watch,
+      reset,
       formState: { errors },
     } = useForm<ListingFormValues>({
       resolver: zodResolver(listingFormSchema),
@@ -58,6 +60,21 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
       },
       mode: 'onTouched',
     });
+
+    useEffect(() => {
+      if (!initialData) {
+        return;
+      }
+
+      reset({
+        title: initialData.title ?? '',
+        categoryId: initialData.categoryId ?? '',
+        price: initialData.price ?? 0.0,
+        meetupLocation: initialData.meetupLocation ?? '',
+        description: initialData.description ?? '',
+        condition: initialData.condition ?? '',
+      });
+    }, [initialData, reset]);
 
     // Expose triggerValidation to the parent stepper via ref
     useImperativeHandle(ref, () => ({
@@ -77,11 +94,11 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
       values.condition,
     ]);
 
+    const heading = title ?? 'Create New Listing';
+
     return (
       <div className="bg-background text-foreground rounded-lg border border-border p-8">
-        <h1 className="text-2xl font-bold mb-6 text-foreground">
-          Create New Listing
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-foreground">{heading}</h1>
 
         <FieldGroup>
           {/*  Product Name  */}

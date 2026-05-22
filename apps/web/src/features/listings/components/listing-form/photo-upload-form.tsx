@@ -6,8 +6,9 @@ import { Plus, X } from 'lucide-react';
 
 interface UploadedPhoto {
   id: string;
-  file: File;
   preview: string;
+  file?: File;
+  existingImageId?: string;
   isMain?: boolean;
 }
 
@@ -180,7 +181,7 @@ export function PhotoUploadForm({
 
       <div className="flex gap-4 items-start">
         {/* Main/Cover Slot */}
-        <div className="flex-[2] h-[300px]">
+        <div className="flex-2 h-75">
           {localPhotos[0] ? (
             <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
               <img
@@ -245,14 +246,14 @@ export function PhotoUploadForm({
           )}
         </div>
 
-        <div className="flex-1 h-[300px]">
+        <div className="flex-1 h-75">
           <SmallSlot index={1} />
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
         {[2, 3, 4].map((index) => (
-          <div key={index} className="h-[200px]">
+          <div key={index} className="h-50">
             <SmallSlot index={index} />
           </div>
         ))}
