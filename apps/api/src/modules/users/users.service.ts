@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
 import { UploadsService } from '../uploads/uploads.service.js';
 import { UploadFile } from '../uploads/uploads.types.js';
@@ -77,7 +77,11 @@ export class UsersService {
 
     // cleanup old avatar
     if (currentUser?.image) {
-      await this.uploadsService.deleteByUrl(currentUser.image, id);
+      try {
+        await this.uploadsService.deleteByUrl(currentUser.image, id);
+      } catch (error) {
+        if (!(error instanceof NotFoundException)) throw error;
+      }
     }
 
     return user;

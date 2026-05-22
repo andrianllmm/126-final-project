@@ -64,7 +64,7 @@ export class UploadsService {
     });
 
     if (!upload) {
-      throw new NotFoundException('Upload not found');
+      return;
     }
 
     return this.delete(upload.id, userId);
