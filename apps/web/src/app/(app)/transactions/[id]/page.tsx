@@ -170,15 +170,12 @@ export default function TransactionDetailPage() {
             {transaction.status !== TransactionStatus.COMPLETED && (
               <>
                 <Separator />
-
-                <section className="space-y-3">
-                  <h3 className="text-lg font-semibold">Actions</h3>
-                  <TransactionActions
-                    transaction={transaction}
-                    userRole={userRole}
-                    onAction={handleAction}
-                  />
-                </section>
+                <TransactionActions
+                  transaction={transaction}
+                  userRole={userRole}
+                  onAction={handleAction}
+                  showHeader
+                />
               </>
             )}
           </div>
