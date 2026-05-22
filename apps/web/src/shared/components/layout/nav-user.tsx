@@ -54,7 +54,7 @@ export function NavUser() {
   const profile = profileQuery.data;
   const displayName = profile?.name ?? name;
   const displayEmail = profile?.email ?? email;
-  const avatarUrl = profile?.avatarUpload?.url ?? null;
+  const avatarUrl = profile?.image ?? null;
 
   return (
     <DropdownMenu>

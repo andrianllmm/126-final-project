@@ -9,6 +9,12 @@ import { NotificationsGateway } from '../notifications/notifications.gateway.js'
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { truncateText } from '../../common/truncate-text.js';
 
+const conversationUserSelect = {
+  id: true,
+  name: true,
+  image: true,
+} as const;
+
 @Injectable()
 export class MessagingService {
   constructor(
@@ -49,13 +55,19 @@ export class MessagingService {
             category: true,
           },
         },
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
-            sender: { include: { avatarUpload: true } },
+            sender: {
+              select: conversationUserSelect,
+            },
           },
         },
         _count: {
@@ -101,13 +113,19 @@ export class MessagingService {
             category: true,
           },
         },
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
-            sender: { include: { avatarUpload: true } },
+            sender: {
+              select: conversationUserSelect,
+            },
           },
         },
         _count: {
@@ -149,7 +167,9 @@ export class MessagingService {
         content,
       },
       include: {
-        sender: { include: { avatarUpload: true } },
+        sender: {
+          select: conversationUserSelect,
+        },
       },
     });
 
@@ -193,8 +213,12 @@ export class MessagingService {
             },
           },
         },
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -233,12 +257,18 @@ export class MessagingService {
             category: true,
           },
         },
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'asc' },
           include: {
-            sender: { include: { avatarUpload: true } },
+            sender: {
+              select: conversationUserSelect,
+            },
           },
         },
       },
