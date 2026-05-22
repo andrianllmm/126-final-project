@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
+import { ZodResponse } from 'nestjs-zod';
 import {
   AllowAnonymous,
   OptionalAuth,
@@ -22,7 +24,8 @@ import {
   UpdateListingDto,
   UpdateListingStatusDto,
 } from './listings.dto.js';
-import { ZodResponse } from 'nestjs-zod';
+import { TransactionStatus } from '@repo/api';
+import { TransactionListDto } from '../transactions/transactions.dto.js';
 
 @Controller('listings')
 export class ListingsController {
@@ -72,5 +75,13 @@ export class ListingsController {
   @ZodResponse({ type: ListingDto })
   delete(@Param('id') id: string, @Session() session: UserSession) {
     return this.listingsService.delete(id, session.user.id);
+  }
+
+  @Get(':id/transactions')
+  getListingTransactions(
+    @Param('id') listingId: string,
+    @Query('status') status?: TransactionStatus | TransactionStatus[],
+  ) {
+    return this.listingsService.getListingTransactions(listingId, status);
   }
 }
