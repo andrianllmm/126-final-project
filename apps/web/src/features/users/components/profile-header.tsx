@@ -10,6 +10,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 
 import { UserAvatar } from './user-avatar';
+import { VerifiedBadge } from './user-verified-badge';
 
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
@@ -40,8 +41,9 @@ export function ProfileHeader({ userId }: { userId: string }) {
           />
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">
+            <h1 className="flex items-center gap-1 text-3xl font-bold">
               {data.name ?? 'Unnamed user'}
+              {data.emailVerified && <VerifiedBadge />}
             </h1>
 
             <p className="text-muted-foreground">{data.email}</p>
