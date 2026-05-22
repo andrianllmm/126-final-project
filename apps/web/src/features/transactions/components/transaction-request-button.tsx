@@ -7,7 +7,9 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from 'sonner';
 
-import { ListingStatus, type Listing } from '@repo/api';
+import { useListingTransactions } from '@/features/listings/hooks/use-listing-transactions';
+
+import { ListingStatus, TransactionStatus, type Listing } from '@repo/api';
 
 interface TransactionRequestButtonProps {
   listing: Listing;
@@ -21,23 +23,44 @@ export function TransactionRequestButton({
   const { user } = useAuth();
   const router = useRouter();
 
-  const goToBuy = (e: React.MouseEvent) => {
+  const { data: transactions, isLoading } = useListingTransactions(listing.id, [
+    TransactionStatus.PENDING,
+    TransactionStatus.ACCEPTED,
+  ]);
+
+  const activeTransaction = transactions?.find((t) => t.buyerId === user?.id);
+
+  const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!user) {
+      toast.error('Please sign in to buy');
+      router.push('/sign-in');
+      return;
+    }
+
+    if (user.id === listing.seller.id) {
+      return;
+    }
+
+    if (activeTransaction) {
+      router.push(`/transactions/${activeTransaction.transactionId}`);
+      return;
+    }
+
     router.push(`/listings/${listing.id}/buy`);
   };
-  const goToSignIn = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.error('Please sign in to buy');
-    router.push(`/sign-in`);
-  };
 
-  // Don't show if user is not logged in
+  const isDisabled = listing.status !== ListingStatus.AVAILABLE || isLoading;
+
+  const label = activeTransaction ? 'Continue request' : 'Buy';
+
   if (!user) {
     return (
       <Button
         size="lg"
         className={cn('w-full', className)}
-        onClick={goToSignIn}
+        onClick={handleClick}
         disabled={listing.status !== ListingStatus.AVAILABLE}
       >
         Buy
@@ -45,7 +68,6 @@ export function TransactionRequestButton({
     );
   }
 
-  // Don't show if user is the seller
   if (user.id === listing.seller.id) {
     return null;
   }
@@ -54,10 +76,10 @@ export function TransactionRequestButton({
     <Button
       size="lg"
       className={cn('w-full', className)}
-      onClick={goToBuy}
-      disabled={listing.status !== ListingStatus.AVAILABLE}
+      onClick={handleClick}
+      disabled={isDisabled}
     >
-      Buy
+      {label}
     </Button>
   );
 }
