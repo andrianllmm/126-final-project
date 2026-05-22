@@ -7,5 +7,6 @@ export * from './auth/change-password.schema.js';
 export * from './auth/set-password.schema.js';
 export * from './users/profile.schema.js';
 export * from './listings/listings.schema.js';
+export * from './transactions/transactions.schema.js';
 export * from './messaging/messaging.schema.js';
 export * from './notifications/notifications.schema.js';

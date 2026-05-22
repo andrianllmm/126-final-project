@@ -6,7 +6,15 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 /**
  * Query string parameters.
  */
-type QueryParams = Record<string, string | number | boolean | null | undefined>;
+type QueryParamValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Array<string | number | boolean>;
+
+type QueryParams = Record<string, QueryParamValue>;
 
 /**
  * Options for API requests.
@@ -42,7 +50,13 @@ function buildQuery(params?: QueryParams): string {
   const search = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null) {
+    if (value === undefined || value === null) continue;
+
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        search.append(key, String(v));
+      }
+    } else {
       search.append(key, String(value));
     }
   }
