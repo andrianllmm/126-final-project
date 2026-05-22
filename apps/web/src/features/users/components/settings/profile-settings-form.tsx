@@ -57,7 +57,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
     },
   });
 
-  const existingAvatar = profile.avatarUpload ?? null;
+  const existingAvatar = profile.image ?? null;
 
   useEffect(() => {
     reset({
@@ -78,12 +78,10 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
     setSaveMessage(null);
 
     try {
-      // Update profile fields
       await updateUserProfile({
         name: values.name ?? '',
       });
 
-      // Avatar changes
       if (avatarFile) {
         await uploadUserAvatar(avatarFile);
       } else if (shouldRemoveAvatar) {
@@ -151,9 +149,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
 
             <AvatarUpload
               value={avatarFile ? [avatarFile] : []}
-              defaultSrc={
-                shouldRemoveAvatar ? null : (existingAvatar?.url ?? null)
-              }
+              defaultSrc={shouldRemoveAvatar ? null : (existingAvatar ?? null)}
               onValueChange={(files) => {
                 setAvatarTouched(true);
 

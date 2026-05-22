@@ -2,12 +2,8 @@ import type { Message } from '@repo/api';
 import { cva } from 'class-variance-authority';
 import { Check, CheckCheck } from 'lucide-react';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/shared/components/ui/avatar';
 import { cn } from '@/shared/lib/utils';
+import { UserAvatar } from '@/features/users/components/user-avatar';
 
 type Props = {
   message: Message;
@@ -31,15 +27,6 @@ export function ChatBubble({ message, isOwn = false }: Props) {
     minute: '2-digit',
   }).format(new Date(message.createdAt));
 
-  const initials = message.sender.name?.slice(0, 1).toUpperCase() ?? 'U';
-
-  const avatar = (
-    <Avatar size="sm" className="mt-1">
-      <AvatarImage src={message.sender.avatarUpload?.url ?? undefined} />
-      <AvatarFallback>{initials}</AvatarFallback>
-    </Avatar>
-  );
-
   const renderReceipt = () => {
     if (!isOwn) return null;
 
@@ -53,7 +40,9 @@ export function ChatBubble({ message, isOwn = false }: Props) {
   return (
     <div className={cn('flex items-end gap-2', isOwn ? 'justify-end' : '')}>
       {/* Avatar */}
-      {!isOwn && avatar}
+      {!isOwn && (
+        <UserAvatar name={message.sender.name} src={message.sender.image} />
+      )}
 
       <div
         className={cn(

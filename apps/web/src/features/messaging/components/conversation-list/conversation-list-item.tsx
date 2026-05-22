@@ -85,7 +85,7 @@ function ConversationContent({
     >
       <UserAvatar
         name={participant.name}
-        src={participant.avatarUpload?.url}
+        src={participant.image}
         sizeClassName="size-14"
       />
 

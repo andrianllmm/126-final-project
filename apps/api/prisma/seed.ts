@@ -55,6 +55,7 @@ async function main() {
         email: 'seller@up.edu.ph',
         password: 'password123',
         name: 'Seller One',
+        image: 'https://i.pravatar.cc/150?img=12',
       },
     })
     .catch(console.error);
@@ -65,6 +66,7 @@ async function main() {
         email: 'buyer@up.edu.ph',
         password: 'password123',
         name: 'Buyer One',
+        image: 'https://i.pravatar.cc/150?img=32',
       },
     })
     .catch(console.error);
@@ -75,30 +77,6 @@ async function main() {
 
   const buyer = await prisma.user.findUniqueOrThrow({
     where: { email: 'buyer@up.edu.ph' },
-  });
-
-  const sellerAvatar = await createUpload(
-    'https://i.pravatar.cc/150?img=12',
-    `seed-avatar-seller-${Date.now()}`,
-  );
-
-  const buyerAvatar = await createUpload(
-    'https://i.pravatar.cc/150?img=32',
-    `seed-avatar-buyer-${Date.now()}`,
-  );
-
-  await prisma.user.update({
-    where: { id: seller.id },
-    data: {
-      avatarUploadId: sellerAvatar.id,
-    },
-  });
-
-  await prisma.user.update({
-    where: { id: buyer.id },
-    data: {
-      avatarUploadId: buyerAvatar.id,
-    },
   });
 
   // CATEGORIES
@@ -146,7 +124,6 @@ async function main() {
   });
 
   // UPLOADS
-
   const keyboardUpload = await createUpload(
     'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
     `seed-keyboard-${Date.now()}`,
@@ -158,7 +135,6 @@ async function main() {
   );
 
   // LISTING IMAGES
-
   await prisma.listingImage.createMany({
     data: [
       {
@@ -183,7 +159,7 @@ async function main() {
   });
 
   // CONVERSATION + MESSAGES
-  const conversation = await prisma.conversation.create({
+  await prisma.conversation.create({
     data: {
       listingId: keyboard.id,
       buyerId: buyer.id,

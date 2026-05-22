@@ -23,12 +23,7 @@ export class UsersService {
         name: true,
         email: true,
         emailVerified: true,
-        avatarUpload: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
+        image: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -49,12 +44,7 @@ export class UsersService {
         name: true,
         email: true,
         emailVerified: true,
-        avatarUpload: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
+        image: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -64,9 +54,7 @@ export class UsersService {
   async setAvatar(id: string, avatarFile: UploadFile): Promise<UserProfile> {
     const currentUser = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        avatarUploadId: true,
-      },
+      select: { image: true },
     });
 
     const uploaded = await this.uploadsService.upload(avatarFile, id);
@@ -74,26 +62,22 @@ export class UsersService {
     const user = await this.prisma.user.update({
       where: { id },
       data: {
-        avatarUploadId: uploaded.id,
+        image: uploaded.url,
       },
       select: {
         id: true,
         name: true,
         email: true,
         emailVerified: true,
-        avatarUpload: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
+        image: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    if (currentUser?.avatarUploadId) {
-      await this.uploadsService.delete(currentUser.avatarUploadId, id);
+    // cleanup old avatar
+    if (currentUser?.image) {
+      await this.uploadsService.deleteByUrl(currentUser.image, id);
     }
 
     return user;
@@ -102,34 +86,27 @@ export class UsersService {
   async removeAvatar(id: string): Promise<UserProfile> {
     const currentUser = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        avatarUploadId: true,
-      },
+      select: { image: true },
     });
 
     const user = await this.prisma.user.update({
       where: { id },
       data: {
-        avatarUploadId: null,
+        image: null,
       },
       select: {
         id: true,
         name: true,
         email: true,
         emailVerified: true,
-        avatarUpload: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
+        image: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    if (currentUser?.avatarUploadId) {
-      await this.uploadsService.delete(currentUser.avatarUploadId, id);
+    if (currentUser?.image) {
+      await this.uploadsService.deleteByUrl(currentUser.image, id);
     }
 
     return user;

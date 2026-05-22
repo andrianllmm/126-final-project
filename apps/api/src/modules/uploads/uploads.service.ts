@@ -57,4 +57,16 @@ export class UploadsService {
 
     return { success: true };
   }
+
+  async deleteByUrl(url: string, userId: string) {
+    const upload = await this.prisma.upload.findFirst({
+      where: { url },
+    });
+
+    if (!upload) {
+      throw new NotFoundException('Upload not found');
+    }
+
+    return this.delete(upload.id, userId);
+  }
 }
