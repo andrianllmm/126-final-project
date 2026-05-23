@@ -124,6 +124,13 @@ export function ListingDetail() {
           {/* Title and Price */}
           <div>
             <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
+            {listing.category && (
+              <p className="text-sm text-muted-foreground mb-3">
+                {listing.category?.categoryName ??
+                  listing.category?.name ??
+                  listing.category?.slug}
+              </p>
+            )}
             <p className="text-3xl font-bold text-primary">
               ₱{listing.price.toFixed(2)}
             </p>
