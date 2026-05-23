@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Pattern } from '@/features/listings/components/listing-stepper';
@@ -12,6 +10,44 @@ import {
 } from '@/features/listings/lib/listing-schema';
 import { Button } from '@/shared/components/ui/button';
 
+function resolveCategoryValue(category: unknown) {
+  const candidates: unknown[] = [];
+
+  if (typeof category === 'string') {
+    candidates.push(category);
+  } else if (category && typeof category === 'object') {
+    const categoryRecord = category as Record<string, unknown>;
+
+    candidates.push(
+      categoryRecord.slug,
+      categoryRecord.value,
+      categoryRecord.categoryName,
+      categoryRecord.name,
+      categoryRecord.label,
+      categoryRecord.id,
+    );
+  }
+
+  for (const candidate of candidates) {
+    if (typeof candidate !== 'string' || !candidate) {
+      continue;
+    }
+
+    const normalizedCandidate = candidate.toLowerCase();
+    const matchedCategory = CATEGORIES.find(
+      ({ value, label }) =>
+        value.toLowerCase() === normalizedCandidate ||
+        label.toLowerCase() === normalizedCandidate,
+    );
+
+    if (matchedCategory) {
+      return matchedCategory.value;
+    }
+  }
+
+  return '';
+}
+
 export default function Page() {
   const params = useParams();
   const listingId = params.id as string;
@@ -20,34 +56,9 @@ export default function Page() {
   const initialData = useMemo<Partial<ListingFormValues>>(() => {
     if (!listing) return {};
 
-    const rawCategory = listing.category;
-    let categoryId = '';
-
-    if (typeof rawCategory === 'string') {
-      categoryId = rawCategory;
-    } else if (rawCategory) {
-      categoryId =
-        rawCategory.id ??
-        rawCategory.value ??
-        rawCategory.slug ??
-        rawCategory.name ??
-        '';
-    }
-
-    if (
-      categoryId &&
-      !CATEGORIES.some((category) => category.value === categoryId)
-    ) {
-      const matchedCategory = CATEGORIES.find(
-        (category) =>
-          category.label.toLowerCase() === String(categoryId).toLowerCase(),
-      );
-      categoryId = matchedCategory?.value ?? '';
-    }
-
     return {
       title: listing.title,
-      categoryId,
+      categoryId: resolveCategoryValue(listing.category),
       price: listing.price,
       meetupLocation: listing.meetupLocation ?? '',
       description: listing.description,
