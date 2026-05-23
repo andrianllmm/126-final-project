@@ -57,6 +57,7 @@ async function main() {
         password: 'password123',
         name: 'Seller One',
         image: 'https://i.pravatar.cc/150?img=12',
+        bio: "I'm selling stuff.",
       },
     })
     .catch(console.error);
@@ -69,6 +70,7 @@ async function main() {
         password: 'password123',
         name: 'Buyer One',
         image: 'https://i.pravatar.cc/150?img=32',
+        bio: "I'm buying stuff.",
       },
     })
     .catch(console.error);

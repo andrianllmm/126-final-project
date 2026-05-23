@@ -44,6 +44,8 @@ model User {
   avatarUploadId String? @unique
   avatarUpload   Upload? @relation("UserAvatar", fields: [avatarUploadId], references: [id], onDelete: SetNull)
 
+  bio String?
+
   @@map("user")
 }
 

@@ -75,7 +75,12 @@ export function ProfileHeader({ userId }: { userId: string }) {
                 </div>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
+
+            {data.bio && (
+              <p className="text-sm leading-relaxed max-w-xl">{data.bio}</p>
+            )}
+
+            <p className="text-xs text-muted-foreground">
               Member since {createdAt}
             </p>
           </div>
