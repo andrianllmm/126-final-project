@@ -28,6 +28,7 @@ import {
 import { toast } from 'sonner';
 import { CopyText } from '@/shared/components/copy-text';
 import { MessageButton } from '@/features/messaging/components/message-button';
+import { TransactionOffersPanel } from '@/features/transactions/components/transaction-offers-panel';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -131,6 +132,9 @@ export default function TransactionDetailPage() {
                     value={transaction.transactionId}
                     className="text-sm text-muted-foreground"
                   />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Created {format(new Date(transaction.createdAt), 'PPp')}
+                  </p>
                 </div>
 
                 <MessageButton
@@ -150,7 +154,7 @@ export default function TransactionDetailPage() {
             <Separator />
 
             <section className="space-y-6">
-              <h3 className="text-lg font-semibold">Info</h3>
+              <h3 className="text-lg font-semibold">Agreement</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -179,10 +183,10 @@ export default function TransactionDetailPage() {
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm text-muted-foreground">Created</p>
-                <p>{format(new Date(transaction.createdAt), 'PPp')}</p>
-              </div>
+              <TransactionOffersPanel
+                transaction={transaction}
+                currentUserId={user.id}
+              />
             </section>
 
             {transaction.status !== TransactionStatus.COMPLETED && (

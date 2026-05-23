@@ -70,43 +70,40 @@ export function TransactionCard({
               </Link>
             </div>
           </div>
-          <TransactionStatusBadge status={transaction.status} />
+          <div className="flex gap-3">
+            <p className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(transaction.createdAt), {
+                addSuffix: true,
+              })}
+            </p>
+            <TransactionStatusBadge status={transaction.status} />
+          </div>
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="flex justify-between items-end">
-          <div className="flex justify-between items-end gap-4">
-            <div>
-              <p className="text-primary text-2xl font-bold">
-                {currencyFormatter.format(transaction.agreedPrice)}
-              </p>
+        <div className="flex items-end justify-between gap-6">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <p className="text-primary text-2xl font-bold">
+              {currencyFormatter.format(transaction.agreedPrice)}
+            </p>
 
-              <p className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(transaction.createdAt), {
-                  addSuffix: true,
-                })}
-              </p>
-            </div>
+            {transaction.meetupLocation && <span>•</span>}
 
-            {(transaction.meetupLocation || transaction.meetupTime) && (
-              <div className="text-right space-y-1">
-                {transaction.meetupLocation && (
-                  <p className="text-xs text-muted-foreground">
-                    {transaction.meetupLocation}
-                  </p>
-                )}
+            {transaction.meetupLocation && (
+              <span className="truncate">{transaction.meetupLocation}</span>
+            )}
 
-                {transaction.meetupTime && (
-                  <p className="text-xs text-muted-foreground">
-                    {format(new Date(transaction.meetupTime), 'PPp')}
-                  </p>
-                )}
-              </div>
+            {transaction.meetupLocation && transaction.meetupTime && (
+              <span>•</span>
+            )}
+
+            {transaction.meetupTime && (
+              <span>{format(new Date(transaction.meetupTime), 'PPp')}</span>
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-row items-end gap-2 shrink-0">
             {onAction && (
               <TransactionActions
                 transaction={transaction}
@@ -115,6 +112,7 @@ export function TransactionCard({
                 variant="compact"
               />
             )}
+
             <Button variant="ghost" size="sm" asChild>
               <Link href={`/transactions/${transaction.transactionId}`}>
                 View
