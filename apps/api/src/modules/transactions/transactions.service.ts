@@ -60,6 +60,7 @@ export class TransactionsService {
           listing: true,
           buyer: true,
           seller: true,
+          meetupLocation: true,
         },
       });
 
@@ -105,7 +106,12 @@ export class TransactionsService {
       const updatedTransaction = await tx.transaction.update({
         where: { transactionId },
         data: { status: 'ACCEPTED' },
-        include: { listing: true, buyer: true, seller: true },
+        include: {
+          listing: true,
+          buyer: true,
+          seller: true,
+          meetupLocation: true,
+        },
       });
 
       await tx.listing.update({
@@ -147,7 +153,12 @@ export class TransactionsService {
       const updatedTransaction = await tx.transaction.update({
         where: { transactionId },
         data: { status: 'REJECTED' },
-        include: { listing: true, buyer: true, seller: true },
+        include: {
+          listing: true,
+          buyer: true,
+          seller: true,
+          meetupLocation: true,
+        },
       });
 
       await this.syncListingStatus(tx, transaction.listingId, 'REJECTED');
@@ -189,7 +200,12 @@ export class TransactionsService {
           status: 'COMPLETED',
           completedAt: new Date(),
         },
-        include: { listing: true, buyer: true, seller: true },
+        include: {
+          listing: true,
+          buyer: true,
+          seller: true,
+          meetupLocation: true,
+        },
       });
 
       await tx.listing.update({
@@ -244,7 +260,12 @@ export class TransactionsService {
       const updatedTransaction = await tx.transaction.update({
         where: { transactionId },
         data: { status: 'CANCELLED' },
-        include: { listing: true, buyer: true, seller: true },
+        include: {
+          listing: true,
+          buyer: true,
+          seller: true,
+          meetupLocation: true,
+        },
       });
 
       await this.syncListingStatus(tx, transaction.listingId, 'CANCELLED');
@@ -297,6 +318,7 @@ export class TransactionsService {
           },
           buyer: true,
           seller: true,
+          meetupLocation: true,
         },
         orderBy,
         skip: offset,
@@ -327,6 +349,7 @@ export class TransactionsService {
         },
         buyer: true,
         seller: true,
+        meetupLocation: true,
         reviews: true,
       },
     });

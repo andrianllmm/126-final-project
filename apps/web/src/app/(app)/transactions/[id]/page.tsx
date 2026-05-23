@@ -169,7 +169,7 @@ export default function TransactionDetailPage() {
                     Meetup Location
                   </p>
                   <p className="text-base">
-                    {transaction.meetupLocation ?? 'Not set'}
+                    {transaction.meetupLocation?.name ?? 'Not set'}
                   </p>
                 </div>
 

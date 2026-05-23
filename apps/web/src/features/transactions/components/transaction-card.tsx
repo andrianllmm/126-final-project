@@ -91,7 +91,9 @@ export function TransactionCard({
             {transaction.meetupLocation && <span>•</span>}
 
             {transaction.meetupLocation && (
-              <span className="truncate">{transaction.meetupLocation}</span>
+              <span className="truncate">
+                {transaction.meetupLocation.name}
+              </span>
             )}
 
             {transaction.meetupLocation && transaction.meetupTime && (

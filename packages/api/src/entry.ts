@@ -11,3 +11,4 @@ export * from './transactions/transactions.schema.js';
 export * from './transactions/offers.schema.js';
 export * from './messaging/messaging.schema.js';
 export * from './notifications/notifications.schema.js';
+export * from './location/location.schema.js';

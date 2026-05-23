@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ListingStatusSchema, TransactionStatusSchema } from '../enums.js';
 import { stringToDate } from '../codecs.js';
+import { locationSchema } from '../location/location.schema.js';
 
 export const transactionListingSchema = z.object({
   id: z.string(),
@@ -31,7 +32,7 @@ export const transactionSchema = z.object({
   sellerId: z.string(),
   status: TransactionStatusSchema,
   agreedPrice: z.number(),
-  meetupLocation: z.string().optional(),
+  meetupLocation: locationSchema.nullable().optional(),
   meetupTime: stringToDate.optional(),
   createdAt: stringToDate,
   completedAt: stringToDate.nullable().optional(),

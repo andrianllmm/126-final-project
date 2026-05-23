@@ -123,8 +123,8 @@ export function OfferCard({
           <p className="text-sm">Location</p>
           <DiffValue
             changed={locationChanged}
-            oldValue={transaction.meetupLocation ?? 'Not set'}
-            newValue={offer.meetupLocation ?? ''}
+            oldValue={transaction.meetupLocation?.name ?? 'Not set'}
+            newValue={offer.meetupLocation?.name ?? ''}
           />
         </div>
 
