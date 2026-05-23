@@ -53,6 +53,7 @@ async function main() {
     .signUpEmail({
       body: {
         email: 'seller@up.edu.ph',
+        phoneNumber: '+639123456789',
         password: 'password123',
         name: 'Seller One',
         image: 'https://i.pravatar.cc/150?img=12',
@@ -64,6 +65,7 @@ async function main() {
     .signUpEmail({
       body: {
         email: 'buyer@up.edu.ph',
+        phoneNumber: '+63917123456789',
         password: 'password123',
         name: 'Buyer One',
         image: 'https://i.pravatar.cc/150?img=32',

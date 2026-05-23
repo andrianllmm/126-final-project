@@ -7,7 +7,7 @@ import { Field, FieldLabel } from '@/shared/components/ui/field';
 import { toast } from 'sonner';
 import { MailIcon } from 'lucide-react';
 
-export function EmailVerificationField({
+export function VerificationField({
   email,
   emailVerified,
 }: {

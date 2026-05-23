@@ -12,6 +12,8 @@ import { Skeleton } from '@/shared/components/ui/skeleton';
 import { UserAvatar } from './user-avatar';
 import { VerifiedBadge } from './user-verified-badge';
 
+import { Mail, Phone } from 'lucide-react';
+
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
   const session = authClient.useSession();
@@ -46,8 +48,33 @@ export function ProfileHeader({ userId }: { userId: string }) {
               {data.emailVerified && <VerifiedBadge />}
             </h1>
 
-            <p className="text-muted-foreground">{data.email}</p>
+            <div className="flex flex-wrap items-center gap-4">
+              {data.email && (
+                <div className="flex items-center gap-1">
+                  <Mail className="size-4 text-muted-foreground" />
 
+                  <a
+                    href={`mailto:${data.email}`}
+                    className="text-muted-foreground hover:underline"
+                  >
+                    {data.email}
+                  </a>
+                </div>
+              )}
+
+              {data.phoneNumber && (
+                <div className="flex items-center gap-1">
+                  <Phone className="size-4 text-muted-foreground" />
+
+                  <a
+                    href={`tel:${data.phoneNumber}`}
+                    className="text-muted-foreground hover:underline"
+                  >
+                    {data.phoneNumber}
+                  </a>
+                </div>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               Member since {createdAt}
             </p>
