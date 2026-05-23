@@ -149,10 +149,10 @@ export default function TransactionDetailPage() {
 
             <Separator />
 
-            <section className="space-y-3">
+            <section className="space-y-6">
               <h3 className="text-lg font-semibold">Info</h3>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Agreed Price</p>
                   <p className="text-xl font-bold text-primary">
@@ -161,9 +161,27 @@ export default function TransactionDetailPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground">Created</p>
-                  <p>{format(new Date(transaction.createdAt), 'PPp')}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Meetup Location
+                  </p>
+                  <p className="text-base">
+                    {transaction.meetupLocation ?? 'Not set'}
+                  </p>
                 </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground">Meetup Time</p>
+                  <p className="text-base">
+                    {transaction.meetupTime
+                      ? format(new Date(transaction.meetupTime), 'PPp')
+                      : 'Not set'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground">Created</p>
+                <p>{format(new Date(transaction.createdAt), 'PPp')}</p>
               </div>
             </section>
 

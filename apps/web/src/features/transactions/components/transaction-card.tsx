@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { cn } from '@/shared/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
 
 import { Button } from '@/shared/components/ui/button';
@@ -76,15 +76,34 @@ export function TransactionCard({
 
       <CardContent>
         <div className="flex justify-between items-end">
-          <div>
-            <p className="text-primary text-2xl font-bold">
-              {currencyFormatter.format(transaction.agreedPrice)}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(transaction.createdAt), {
-                addSuffix: true,
-              })}
-            </p>
+          <div className="flex justify-between items-end gap-4">
+            <div>
+              <p className="text-primary text-2xl font-bold">
+                {currencyFormatter.format(transaction.agreedPrice)}
+              </p>
+
+              <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(transaction.createdAt), {
+                  addSuffix: true,
+                })}
+              </p>
+            </div>
+
+            {(transaction.meetupLocation || transaction.meetupTime) && (
+              <div className="text-right space-y-1">
+                {transaction.meetupLocation && (
+                  <p className="text-xs text-muted-foreground">
+                    {transaction.meetupLocation}
+                  </p>
+                )}
+
+                {transaction.meetupTime && (
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(transaction.meetupTime), 'PPp')}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2">
