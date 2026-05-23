@@ -57,7 +57,7 @@ export function SignupForm({
       return;
     }
 
-    router.push('/');
+    router.push('/onboarding');
   }
 
   return (

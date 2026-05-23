@@ -28,6 +28,7 @@ import {
   uploadUserAvatar,
   removeUserAvatar,
 } from '../../api/users-api';
+import { Textarea } from '@/shared/components/ui/textarea';
 
 type ProfileSettingsFormProps = {
   profile: UserProfile;
@@ -54,6 +55,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
     resolver: zodResolver(profileSettingsSchema),
     defaultValues: {
       name: profile.name ?? '',
+      bio: profile.bio ?? '',
     },
   });
 
@@ -62,6 +64,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
   useEffect(() => {
     reset({
       name: profile.name ?? '',
+      bio: profile.bio ?? '',
     });
 
     setAvatarFile(null);
@@ -80,6 +83,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
     try {
       await updateUserProfile({
         name: values.name ?? '',
+        bio: values.bio ?? '',
       });
 
       if (avatarFile) {
@@ -94,6 +98,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
 
       reset({
         name: values.name ?? '',
+        bio: values.bio ?? '',
       });
 
       setAvatarFile(null);
@@ -141,6 +146,24 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
               <FieldDescription>
                 This is shown on your profile and in marketplace activity.
               </FieldDescription>
+            )}
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="bio">Bio</FieldLabel>
+
+            <Textarea
+              id="bio"
+              placeholder="Write a short bio..."
+              {...register('bio')}
+            />
+
+            {errors.bio ? (
+              <FieldDescription className="text-destructive">
+                {errors.bio.message}
+              </FieldDescription>
+            ) : (
+              <FieldDescription>Describe yourself.</FieldDescription>
             )}
           </Field>
 

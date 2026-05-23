@@ -1,7 +1,11 @@
 import { createAuthClient } from 'better-auth/react';
-import { inferAdditionalFields } from 'better-auth/client/plugins';
+import {
+  inferAdditionalFields,
+  phoneNumberClient,
+} from 'better-auth/client/plugins';
 
 type AdditionalFields = {
+  phoneNumber?: string;
   avatarUploadId?: string;
 };
 
@@ -11,6 +15,6 @@ export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
     fetchOptions: {
       credentials: 'include',
     },
-    plugins: [inferAdditionalFields<AdditionalFields>()],
+    plugins: [inferAdditionalFields<AdditionalFields>(), phoneNumberClient()],
   },
 );
