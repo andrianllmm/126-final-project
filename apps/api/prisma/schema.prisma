@@ -291,8 +291,11 @@ model Transaction {
   sellerId String
   seller   User   @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
 
-  agreedPrice Decimal           @db.Decimal(10, 2)
-  status      TransactionStatus @default(PENDING)
+  status TransactionStatus @default(PENDING)
+
+  agreedPrice    Decimal   @db.Decimal(10, 2)
+  meetupLocation String?
+  meetupTime     DateTime?
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
