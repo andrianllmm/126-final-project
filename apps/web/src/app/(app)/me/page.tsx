@@ -13,7 +13,7 @@ export default function Page() {
     if (isPending) return;
 
     if (!user?.id) {
-      router.replace('/login');
+      router.replace('/sign-in');
       return;
     }
 
