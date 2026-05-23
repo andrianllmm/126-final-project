@@ -194,8 +194,6 @@ model Listing {
   condition ListingCondition
   status    ListingStatus    @default(DRAFT)
 
-  meetupLocation String?
-
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   soldAt    DateTime?

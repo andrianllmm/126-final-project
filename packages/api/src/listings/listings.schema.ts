@@ -26,8 +26,6 @@ export const listingSchema = z.object({
   condition: ListingConditionSchema,
   status: ListingStatusSchema,
 
-  meetupLocation: z.string().nullable(),
-
   category: z.any(),
 
   images: z.array(listingImageSchema),
@@ -48,7 +46,6 @@ export const createListingSchema = z.object({
   price: z.number().min(0),
   categoryId: z.string(),
   condition: ListingConditionSchema,
-  meetupLocation: z.string().nullable().optional(),
   status: ListingStatusSchema.optional(),
 });
 
@@ -58,7 +55,6 @@ export const updateListingSchema = z.object({
   price: z.number().min(0).optional(),
   categoryId: z.string().optional(),
   condition: ListingConditionSchema.optional(),
-  meetupLocation: z.string().nullable().optional(),
   uploadIds: z
     .array(z.string())
     .refine((arr) => new Set(arr).size === arr.length, {

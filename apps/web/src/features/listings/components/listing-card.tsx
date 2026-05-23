@@ -117,14 +117,6 @@ export function ListingCard({
               {listing.seller.name}
             </button>
           </div>
-
-          {/* Meetup location */}
-          {listing.meetupLocation && (
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 shrink-0" />
-              <span className="line-clamp-1">{listing.meetupLocation}</span>
-            </div>
-          )}
         </div>
       </CardContent>
 
