@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 import { useMessaging } from '../../hooks/use-messaging';
 
@@ -21,7 +21,7 @@ type Props = {
 };
 
 export function ChatThread({ conversationId, showBackButton }: Props) {
-  const session = authClient.useSession();
+  const { user } = useAuth();
 
   const {
     messages,
@@ -34,7 +34,7 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
   } = useMessaging(conversationId);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const currentUserId = session.data?.user?.id;
+  const currentUserId = user?.id;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'auto' });
