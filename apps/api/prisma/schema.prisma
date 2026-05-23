@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+model Location {
+  id       Int                                  @id @default(autoincrement())
+  name     String
+  position Unsupported("geometry(Point, 4326)")
+}
+
 // =====================
 // AUTH
 // =====================
