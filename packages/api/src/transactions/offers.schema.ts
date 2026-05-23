@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { OfferStatusSchema } from '../enums.js';
 import { stringToDate } from '../codecs.js';
+import {
+  createLocationSchema,
+  locationSchema,
+} from '../location/location.schema.js';
 
 export const offerUserSchema = z.object({
   id: z.string(),
@@ -15,7 +19,7 @@ export const offerSchema = z.object({
   proposer: offerUserSchema.optional(),
 
   price: z.number().optional(),
-  meetupLocation: z.string().optional(),
+  meetupLocation: locationSchema.nullable().optional(),
   meetupTime: stringToDate.optional(),
 
   status: OfferStatusSchema,
@@ -29,7 +33,7 @@ export const createOfferSchema = z.object({
   transactionId: z.string(),
 
   price: z.number().optional(),
-  meetupLocation: z.string().optional(),
+  meetupLocation: createLocationSchema.nullable().optional(),
   meetupTime: stringToDate.optional(),
 });
 

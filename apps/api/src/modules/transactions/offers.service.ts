@@ -71,17 +71,42 @@ export class OffersService {
       throw new BadRequestException('Offer must include at least one change');
     }
 
+    let meetupLocationId: number | undefined;
+
+    if (dto.meetupLocation) {
+      const createdLocation = await this.prisma.$queryRaw<
+        Array<{ id: number }>
+      >`
+        INSERT INTO "Location" ("name", "position")
+        VALUES (
+          ${dto.meetupLocation.name},
+          ST_SetSRID(
+            ST_MakePoint(
+              ${dto.meetupLocation.position.coordinates[0]},
+              ${dto.meetupLocation.position.coordinates[1]}
+            ),
+            4326
+          )
+        )
+        RETURNING "id";
+      `;
+
+      meetupLocationId = createdLocation[0]?.id;
+    }
+
     const offer = await this.prisma.offer.create({
       data: {
         transactionId: dto.transactionId,
         proposerId: userId,
         price: dto.price,
-        meetupLocation: dto.meetupLocation,
+        meetupLocationId,
         meetupTime: dto.meetupTime,
+      },
+      include: {
+        meetupLocation: true,
       },
     });
 
-    // notify the other participant
     await this.notificationsService.create(
       this.getCounterpartyId(transaction, userId),
       NotificationType.TRANSACTION,
@@ -111,6 +136,9 @@ export class OffersService {
     return this.prisma.offer.findMany({
       where: { transactionId },
       orderBy: { createdAt: 'desc' },
+      include: {
+        meetupLocation: true,
+      },
     });
   }
 
@@ -150,13 +178,11 @@ export class OffersService {
     const counterpartyId = this.getCounterpartyId(offer.transaction, userId);
 
     return this.prisma.$transaction(async (tx) => {
-      // mark offer accepted
       await tx.offer.update({
         where: { id: offerId },
         data: { status: 'ACCEPTED' },
       });
 
-      // reject others
       await tx.offer.updateMany({
         where: {
           transactionId: offer.transactionId,
@@ -165,23 +191,26 @@ export class OffersService {
         data: { status: 'SUPERSEDED' },
       });
 
-      // update transaction (this is the important bridge)
       const transaction = await tx.transaction.update({
         where: { transactionId: offer.transactionId },
         data: {
           agreedPrice: offer.price ?? offer.transaction.agreedPrice,
-          ...(offer.meetupLocation !== undefined
-            ? { meetupLocation: offer.meetupLocation }
+          ...(offer.meetupLocationId !== null
+            ? { meetupLocationId: offer.meetupLocationId }
             : {}),
           ...(offer.meetupTime !== undefined
             ? { meetupTime: offer.meetupTime }
             : {}),
           status: 'ACCEPTED',
         },
-        include: { listing: true, buyer: true, seller: true },
+        include: {
+          listing: true,
+          buyer: true,
+          seller: true,
+          meetupLocation: true,
+        },
       });
 
-      // reserve listing
       await tx.listing.update({
         where: { id: offer.transaction.listingId },
         data: { status: 'RESERVED' },

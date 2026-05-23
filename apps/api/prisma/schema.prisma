@@ -7,6 +7,15 @@ datasource db {
   provider = "postgresql"
 }
 
+model Location {
+  id           Int                                  @id @default(autoincrement())
+  name         String
+  position     Unsupported("geometry(Point, 4326)")
+
+  transactions Transaction[]
+  offers       Offer[]
+}
+
 // =====================
 // AUTH
 // =====================
@@ -300,9 +309,10 @@ model Transaction {
 
   status TransactionStatus @default(PENDING)
 
-  agreedPrice    Decimal   @db.Decimal(10, 2)
-  meetupLocation String?
-  meetupTime     DateTime?
+  agreedPrice      Decimal   @db.Decimal(10, 2)
+  meetupLocationId Int?
+  meetupLocation   Location? @relation(fields: [meetupLocationId], references: [id], onDelete: SetNull)
+  meetupTime       DateTime?
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
@@ -322,9 +332,10 @@ model Offer {
 
   proposerId String
 
-  price          Decimal?
-  meetupLocation String?
-  meetupTime     DateTime?
+  price            Decimal?
+  meetupLocationId Int?
+  meetupLocation   Location? @relation(fields: [meetupLocationId], references: [id], onDelete: SetNull)
+  meetupTime       DateTime?
 
   status OfferStatus @default(PENDING)
 

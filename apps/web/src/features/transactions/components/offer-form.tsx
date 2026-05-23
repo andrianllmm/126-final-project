@@ -9,7 +9,11 @@ import { MoneyInput } from '@/shared/components/ui/money-input';
 import { DateTimePicker } from '@/shared/components/ui/date-time-picker';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { Field, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
-import { Input } from '@/shared/components/ui/input';
+
+import {
+  LocationField,
+  type LocationValue,
+} from '@/shared/components/ui/location-field';
 
 import { type Transaction } from '@repo/api';
 import { useCreateOfferMutation } from '../hooks/use-transaction-offers';
@@ -36,8 +40,7 @@ function mergeDateTime(date?: Date, time?: string) {
 
 function toTime(value: Date | string | null | undefined) {
   if (!value) return null;
-  const d = new Date(value);
-  const t = d.getTime();
+  const t = new Date(value).getTime();
   return Number.isNaN(t) ? null : t;
 }
 
@@ -52,22 +55,30 @@ export function OfferForm({ transaction, canCreateOffers, onSuccess }: Props) {
 
   const initial = useMemo(() => {
     const { date, time } = splitDateTime(transaction.meetupTime);
+
+    const location: LocationValue = transaction.meetupLocation
+      ? {
+          name: transaction.meetupLocation.name,
+          position: transaction.meetupLocation.position,
+        }
+      : null;
+
     return {
       price: transaction.agreedPrice.toString(),
-      meetupLocation: transaction.meetupLocation ?? '',
+      location,
       date,
       time,
     };
   }, [transaction]);
 
   const [price, setPrice] = useState(initial.price);
-  const [meetupLocation, setMeetupLocation] = useState(initial.meetupLocation);
+  const [location, setLocation] = useState<LocationValue>(initial.location);
   const [date, setDate] = useState<Date | undefined>(initial.date);
   const [time, setTime] = useState(initial.time);
 
   useEffect(() => {
     setPrice(initial.price);
-    setMeetupLocation(initial.meetupLocation);
+    setLocation(initial.location);
     setDate(initial.date);
     setTime(initial.time);
   }, [initial]);
@@ -78,13 +89,23 @@ export function OfferForm({ transaction, canCreateOffers, onSuccess }: Props) {
     const nextPrice = Number(price);
     const nextTime = mergeDateTime(date, time);
 
+    const initialLocation = transaction.meetupLocation
+      ? {
+          name: transaction.meetupLocation.name,
+          position: transaction.meetupLocation.position,
+        }
+      : null;
+
+    const locationChanged =
+      JSON.stringify(location) !== JSON.stringify(initialLocation);
+
     return (
       Number.isFinite(nextPrice) &&
       (nextPrice !== transaction.agreedPrice ||
-        meetupLocation.trim() !== (transaction.meetupLocation ?? '') ||
+        locationChanged ||
         toTime(nextTime) !== toTime(transaction.meetupTime))
     );
-  }, [price, meetupLocation, date, time, transaction, canCreateOffers]);
+  }, [price, location, date, time, transaction, canCreateOffers]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -100,10 +121,16 @@ export function OfferForm({ transaction, canCreateOffers, onSuccess }: Props) {
     createOfferMutation.mutate(
       {
         transactionId: transaction.transactionId,
-        ...(nextPrice !== transaction.agreedPrice && { price: nextPrice }),
-        ...(meetupLocation.trim() !== (transaction.meetupLocation ?? '') && {
-          meetupLocation: meetupLocation.trim(),
+
+        ...(nextPrice !== transaction.agreedPrice && {
+          price: nextPrice,
         }),
+
+        ...(location?.name &&
+          location?.position && {
+            meetupLocation: location,
+          }),
+
         ...(toTime(nextTime) !== toTime(transaction.meetupTime) && {
           meetupTime: nextTime,
         }),
@@ -113,7 +140,10 @@ export function OfferForm({ transaction, canCreateOffers, onSuccess }: Props) {
           toast.success('Offer sent');
           onSuccess?.();
         },
-        onError: () => toast.error('Failed to send offer'),
+        onError: (error) => {
+          console.error(error);
+          toast.error('Failed to send offer');
+        },
       },
     );
   };
@@ -127,24 +157,17 @@ export function OfferForm({ transaction, canCreateOffers, onSuccess }: Props) {
           <FieldLabel>Agreed Price</FieldLabel>
           <MoneyInput
             value={price}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPrice(e.target.value)
-            }
+            onChange={(e) => setPrice(e.target.value)}
           />
         </Field>
       </FieldGroup>
 
-      <FieldGroup className="space-y-2">
-        <Field>
-          <FieldLabel>Meetup Location</FieldLabel>
-          <Input
-            value={meetupLocation}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setMeetupLocation(e.target.value)
-            }
-          />
-        </Field>
-      </FieldGroup>
+      <LocationField
+        value={location}
+        onChange={setLocation}
+        nameLabel="Meetup Location Name"
+        mapLabel="Pick Location on Map"
+      />
 
       <FieldGroup className="space-y-2">
         <Field>
