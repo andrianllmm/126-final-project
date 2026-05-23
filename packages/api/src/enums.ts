@@ -33,6 +33,16 @@ export const TransactionStatusSchema = z.enum([
 export type TransactionStatus = z.infer<typeof TransactionStatusSchema>;
 export const TransactionStatus = TransactionStatusSchema.enum;
 
+export const OfferStatusSchema = z.enum([
+  'PENDING',
+  'ACCEPTED',
+  'REJECTED',
+  'SUPERSEDED',
+]);
+
+export type OfferStatus = z.infer<typeof OfferStatusSchema>;
+export const OfferStatus = OfferStatusSchema.enum;
+
 export const ReviewRoleSchema = z.enum(['BUYER_TO_SELLER', 'SELLER_TO_BUYER']);
 
 export type ReviewRole = z.infer<typeof ReviewRoleSchema>;

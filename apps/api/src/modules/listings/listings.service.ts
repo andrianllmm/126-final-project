@@ -94,7 +94,6 @@ export class ListingsService {
         price: input.price,
         condition: input.condition,
         status: input.status ?? ListingStatus.AVAILABLE,
-        meetupLocation: input.meetupLocation ?? null,
 
         seller: { connect: { id: sellerId } },
         category: { connect: { id: input.categoryId } },
@@ -125,7 +124,6 @@ export class ListingsService {
         description: input.description,
         price: input.price,
         condition: input.condition,
-        meetupLocation: input.meetupLocation ?? undefined,
 
         category: input.categoryId
           ? { connect: { id: input.categoryId } }

@@ -109,7 +109,6 @@ async function main() {
       categoryId: electronics.id,
       condition: ListingCondition.LIKE_NEW,
       status: ListingStatus.AVAILABLE,
-      meetupLocation: 'TLRC',
     },
   });
 
@@ -122,7 +121,6 @@ async function main() {
       categoryId: books.id,
       condition: ListingCondition.GOOD,
       status: ListingStatus.SOLD,
-      meetupLocation: 'UPV Main Gate',
       soldAt: now,
     },
   });

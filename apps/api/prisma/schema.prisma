@@ -154,6 +154,13 @@ enum TransactionStatus {
   CANCELLED
 }
 
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  SUPERSEDED
+}
+
 enum ReviewRole {
   BUYER_TO_SELLER
   SELLER_TO_BUYER
@@ -193,8 +200,6 @@ model Listing {
 
   condition ListingCondition
   status    ListingStatus    @default(DRAFT)
-
-  meetupLocation String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -293,16 +298,37 @@ model Transaction {
   sellerId String
   seller   User   @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
 
-  agreedPrice Decimal           @db.Decimal(10, 2)
-  status      TransactionStatus @default(PENDING)
+  status TransactionStatus @default(PENDING)
+
+  agreedPrice    Decimal   @db.Decimal(10, 2)
+  meetupLocation String?
+  meetupTime     DateTime?
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
 
   reviews Review[]
+  offers  Offer[]
 
   @@index([listingId])
   @@index([status])
+}
+
+model Offer {
+  id String @id @default(cuid())
+
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [transactionId], onDelete: Cascade)
+
+  proposerId String
+
+  price          Decimal?
+  meetupLocation String?
+  meetupTime     DateTime?
+
+  status OfferStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
 }
 
 model Review {
