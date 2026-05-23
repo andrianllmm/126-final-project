@@ -40,6 +40,7 @@ export class UsersService {
       where: { id },
       data: {
         name: input.name,
+        bio: input.bio,
       },
       select: {
         id: true,
