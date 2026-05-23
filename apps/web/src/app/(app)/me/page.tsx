@@ -18,7 +18,7 @@ export default function Page() {
     }
 
     router.replace(`/profile/${user.id}`);
-  }, [user, isPending, router]);
+  }, [user?.id, isPending, router]);
 
   return null;
 }

@@ -21,7 +21,9 @@ export function ProfileHeader({ userId }: { userId: string }) {
   const currentUserId = user?.id;
   const isOwner = currentUserId === userId;
 
-  if (isLoading || authLoading) return <ProfileHeaderLoading />;
+  const showLoading = (authLoading && !data) || (isLoading && !data);
+
+  if (showLoading) return <ProfileHeaderLoading />;
   if (error) return <ProfileHeaderError message={error.message} />;
   if (!data) return <ProfileHeaderError message="Profile not found" />;
 
