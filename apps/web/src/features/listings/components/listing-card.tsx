@@ -10,6 +10,7 @@ import { ListingConditionBadge } from './listing-condition-badge';
 import { ListingStatusBadge } from './listing-status-badge';
 import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
 
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import { MapPin, Package } from 'lucide-react';
 
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 interface ListingCardProps {
   listing: Listing;
@@ -33,18 +35,25 @@ export function ListingCard({
   className,
 }: ListingCardProps) {
   const router = useRouter();
+  const { user } = useAuth();
 
   const primaryImage = [...listing.images].sort(
     (a, b) => a.sortOrder - b.sortOrder,
   )[0];
 
   const isUnavailable = ListingStatus.AVAILABLE != listing.status;
+  const isOwner = Boolean(user?.id === listing.seller.id);
 
   const goToListing = () => router.push(href);
 
   const goToSeller = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/profile/${listing.seller.id}`);
+  };
+
+  const goToEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/listings/${listing.id}/edit`);
   };
 
   return (
@@ -130,7 +139,13 @@ export function ListingCard({
 
       {/* FOOTER */}
       <CardFooter className="px-4 pb-4 pt-4">
-        <TransactionRequestButton listing={listing} />
+        {isOwner ? (
+          <Button size="lg" className="w-full" onClick={goToEdit}>
+            Edit
+          </Button>
+        ) : (
+          <TransactionRequestButton listing={listing} />
+        )}
       </CardFooter>
     </Card>
   );
