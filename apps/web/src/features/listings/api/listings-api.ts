@@ -5,6 +5,8 @@ import {
   type CreateListingInput,
   type UpdateListingInput,
   type UpdateListingStatusInput,
+  type TransactionStatus,
+  type TransactionList,
 } from '@repo/api';
 
 export const getListings = () => apiClient.get<ListingList>('/listings');
@@ -31,3 +33,10 @@ export const deleteListing = (id: string) =>
   apiClient.delete<Listing>(`/listings/${id}`);
 
 export const getListingById = (id: string) => getListing(id);
+export const getListingTransactions = (
+  listingId: string,
+  status?: TransactionStatus | TransactionStatus[],
+) =>
+  apiClient.get<TransactionList>(`/listings/${listingId}/transactions`, {
+    params: status ? { status } : undefined,
+  });

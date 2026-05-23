@@ -1,16 +1,12 @@
 import { z } from 'zod';
 import { stringToDate } from '../codecs.js';
 
-const avatarUploadSchema = z.object({
-  id: z.string(),
-  url: z.url(),
-});
-
 export const userProfileSchema = z.object({
   id: z.string(),
   name: z.string().trim().nullable(),
   email: z.email(),
-  avatarUpload: avatarUploadSchema.nullable(),
+  emailVerified: z.boolean(),
+  image: z.url().nullable(),
   createdAt: stringToDate,
   updatedAt: stringToDate,
 });

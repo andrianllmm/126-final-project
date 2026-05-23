@@ -30,7 +30,6 @@ import {
 } from '../../api/users-api';
 
 type ProfileSettingsFormProps = {
-  userId: string;
   profile: UserProfile;
 };
 
@@ -38,10 +37,7 @@ const profileSettingsSchema = userProfileUpdateSchema;
 
 type ProfileSettingsValues = UserProfileUpdateInput;
 
-export function ProfileSettingsForm({
-  userId,
-  profile,
-}: ProfileSettingsFormProps) {
+export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
   const queryClient = useQueryClient();
 
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -61,7 +57,7 @@ export function ProfileSettingsForm({
     },
   });
 
-  const existingAvatar = profile.avatarUpload ?? null;
+  const existingAvatar = profile.image ?? null;
 
   useEffect(() => {
     reset({
@@ -82,12 +78,10 @@ export function ProfileSettingsForm({
     setSaveMessage(null);
 
     try {
-      // Update profile fields
       await updateUserProfile({
         name: values.name ?? '',
       });
 
-      // Avatar changes
       if (avatarFile) {
         await uploadUserAvatar(avatarFile);
       } else if (shouldRemoveAvatar) {
@@ -120,7 +114,7 @@ export function ProfileSettingsForm({
         </p>
 
         <Link
-          href={`/profile/${userId}`}
+          href={`/profile/${profile.id}`}
           className="text-sm font-medium text-primary hover:underline"
         >
           View profile
@@ -155,9 +149,7 @@ export function ProfileSettingsForm({
 
             <AvatarUpload
               value={avatarFile ? [avatarFile] : []}
-              defaultSrc={
-                shouldRemoveAvatar ? null : (existingAvatar?.url ?? null)
-              }
+              defaultSrc={shouldRemoveAvatar ? null : (existingAvatar ?? null)}
               onValueChange={(files) => {
                 setAvatarTouched(true);
 

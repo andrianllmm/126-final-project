@@ -29,7 +29,7 @@ export function ChatThreadHeader({ conversation, currentUserId }: Props) {
       <Link href={`/profile/${otherParticipant.id}`}>
         <UserAvatar
           name={otherParticipant.name}
-          src={otherParticipant.avatarUpload?.url}
+          src={otherParticipant.image}
           sizeClassName="size-10 border-2 border-primary"
         />
       </Link>

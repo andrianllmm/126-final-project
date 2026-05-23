@@ -9,6 +9,12 @@ import { NotificationsGateway } from '../notifications/notifications.gateway.js'
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { truncateText } from '../../common/truncate-text.js';
 
+const conversationUserSelect = {
+  id: true,
+  name: true,
+  image: true,
+} as const;
+
 @Injectable()
 export class MessagingService {
   constructor(
@@ -17,10 +23,10 @@ export class MessagingService {
     private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
-  async createConversation(userId: string, listingId: string) {
+  async getOrCreateConversation(userId: string, listingId: string) {
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },
-      select: { id: true, sellerId: true, status: true },
+      select: { id: true, sellerId: true, status: true, title: true },
     });
 
     if (!listing) {
@@ -29,6 +35,56 @@ export class MessagingService {
 
     if (listing.sellerId === userId) {
       throw new ForbiddenException('Cannot message your own listing');
+    }
+
+    // Check for existing conversation
+    const existing = await this.prisma.conversation.findUnique({
+      where: {
+        listingId_buyerId: {
+          listingId,
+          buyerId: userId,
+        },
+      },
+      include: {
+        listing: {
+          include: {
+            images: {
+              include: { upload: true },
+              orderBy: { sortOrder: 'asc' },
+            },
+            category: true,
+          },
+        },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: {
+            sender: {
+              select: conversationUserSelect,
+            },
+          },
+        },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                senderId: { not: userId },
+                isRead: false,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (existing) {
+      return existing;
     }
 
     const validStatuses: ListingStatus[] = [
@@ -40,24 +96,7 @@ export class MessagingService {
       throw new ForbiddenException('Listing is not available for messaging');
     }
 
-    const existing = await this.prisma.conversation.findUnique({
-      where: {
-        listingId_buyerId: {
-          listingId,
-          buyerId: userId,
-        },
-      },
-      include: {
-        listing: true,
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
-      },
-    });
-
-    if (existing) {
-      return existing;
-    }
-
+    // Create new conversation
     return this.prisma.conversation.create({
       data: {
         listingId,
@@ -65,9 +104,40 @@ export class MessagingService {
         sellerId: listing.sellerId,
       },
       include: {
-        listing: true,
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        listing: {
+          include: {
+            images: {
+              include: { upload: true },
+              orderBy: { sortOrder: 'asc' },
+            },
+            category: true,
+          },
+        },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: {
+            sender: {
+              select: conversationUserSelect,
+            },
+          },
+        },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                senderId: { not: userId },
+                isRead: false,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -97,7 +167,9 @@ export class MessagingService {
         content,
       },
       include: {
-        sender: { include: { avatarUpload: true } },
+        sender: {
+          select: conversationUserSelect,
+        },
       },
     });
 
@@ -132,9 +204,21 @@ export class MessagingService {
         OR: [{ buyerId: userId }, { sellerId: userId }],
       },
       include: {
-        listing: true,
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        listing: {
+          include: {
+            images: {
+              include: { upload: true },
+              orderBy: { sortOrder: 'asc' },
+              take: 1,
+            },
+          },
+        },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -142,6 +226,17 @@ export class MessagingService {
             content: true,
             createdAt: true,
             isRead: true,
+            senderId: true,
+          },
+        },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                senderId: { not: userId },
+                isRead: false,
+              },
+            },
           },
         },
       },
@@ -153,13 +248,27 @@ export class MessagingService {
     const conversation = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
       include: {
-        listing: true,
-        buyer: { include: { avatarUpload: true } },
-        seller: { include: { avatarUpload: true } },
+        listing: {
+          include: {
+            images: {
+              include: { upload: true },
+              orderBy: { sortOrder: 'asc' },
+            },
+            category: true,
+          },
+        },
+        buyer: {
+          select: conversationUserSelect,
+        },
+        seller: {
+          select: conversationUserSelect,
+        },
         messages: {
           orderBy: { createdAt: 'asc' },
           include: {
-            sender: { include: { avatarUpload: true } },
+            sender: {
+              select: conversationUserSelect,
+            },
           },
         },
       },

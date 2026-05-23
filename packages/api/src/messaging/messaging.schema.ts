@@ -4,11 +4,7 @@ import { stringToDate } from '../codecs.js';
 export const conversationUserSchema = z.object({
   id: z.string(),
   name: z.string().nullable(),
-  avatarUpload: z
-    .object({
-      url: z.url(),
-    })
-    .nullable(),
+  image: z.url().nullable(),
 });
 
 export const conversationListingSchema = z.object({

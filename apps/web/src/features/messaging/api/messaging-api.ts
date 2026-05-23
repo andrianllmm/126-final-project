@@ -1,7 +1,7 @@
 import { apiClient } from '@/shared/lib/api-client';
 import { type Conversation, type ConversationList } from '@repo/api';
 
-export const createConversation = (listingId: string) =>
+export const getOrCreateConversation = (listingId: string) =>
   apiClient.post<Conversation, { listingId: string }>(
     '/messaging/conversations',
     { listingId },
