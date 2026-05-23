@@ -2,23 +2,23 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 export default function Page() {
   const router = useRouter();
 
-  const { data: session, isPending } = authClient.useSession();
+  const { user, isPending } = useAuth();
 
   useEffect(() => {
     if (isPending) return;
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       router.replace('/login');
       return;
     }
 
-    router.replace(`/profile/${session.user.id}`);
-  }, [session, isPending, router]);
+    router.replace(`/profile/${user.id}`);
+  }, [user?.id, isPending, router]);
 
   return null;
 }

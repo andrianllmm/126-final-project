@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { ShareDialog } from '@/shared/components/share-dialog';
 import { useUserProfile } from '../hooks/use-user-profile';
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -16,12 +16,14 @@ import { Mail, Phone } from 'lucide-react';
 
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
-  const session = authClient.useSession();
+  const { user, isPending: authLoading } = useAuth();
 
-  const currentUserId = session.data?.user?.id;
+  const currentUserId = user?.id;
   const isOwner = currentUserId === userId;
 
-  if (isLoading) return <ProfileHeaderLoading />;
+  const showLoading = (authLoading && !data) || (isLoading && !data);
+
+  if (showLoading) return <ProfileHeaderLoading />;
   if (error) return <ProfileHeaderError message={error.message} />;
   if (!data) return <ProfileHeaderError message="Profile not found" />;
 

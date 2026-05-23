@@ -4,26 +4,27 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
+
 import { MessagingView } from '@/features/messaging/components/messaging-view';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const session = authClient.useSession();
+  const { user, isPending } = useAuth();
 
   const { id } = use(params);
 
-  const userId = session.data?.user?.id;
+  const userId = user?.id;
 
   useEffect(() => {
-    if (session.isPending) return;
+    if (isPending) return;
 
     if (!userId) {
       router.replace('/sign-in');
     }
-  }, [router, session.isPending, userId]);
+  }, [router, isPending, userId]);
 
-  if (session.isPending || !userId) {
+  if (isPending || !userId) {
     return null;
   }
 

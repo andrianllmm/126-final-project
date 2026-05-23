@@ -5,6 +5,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { authClient } from '@/shared/lib/auth-client';
 import { disconnectSocket } from '@/shared/lib/socket-client';
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
@@ -25,19 +26,18 @@ import { UserAvatar } from '@/features/users/components/user-avatar';
 export function NavUser() {
   const router = useRouter();
 
-  const session = authClient.useSession();
-  const user = session.data?.user;
+  const { user, isPending, refetch } = useAuth();
   const profileQuery = useUserProfile(user?.id ?? '');
 
   const handleLogout = async () => {
     disconnectSocket();
     await authClient.signOut();
-    session.refetch();
+    refetch();
     router.push('/sign-in');
     router.refresh();
   };
 
-  if (session.isPending) {
+  if (isPending) {
     return <Skeleton className="h-8 w-8 rounded-full" />;
   }
 

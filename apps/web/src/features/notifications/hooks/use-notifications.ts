@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { initializeSocket } from '@/shared/lib/socket-client';
 import type { Notification } from '@repo/api';
 
@@ -37,8 +36,8 @@ function upsertNotificationList(
 
 export function useNotifications() {
   const queryClient = useQueryClient();
-  const session = authClient.useSession();
-  const userId = session.data?.user?.id;
+  const { user } = useAuth();
+  const userId = user?.id;
   const [isConnected, setIsConnected] = useState(false);
 
   const notificationsQuery = useQuery({
