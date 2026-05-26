@@ -37,7 +37,7 @@ async function main() {
   await prisma.review.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.conversation.deleteMany();
-  await prisma.savedListing.deleteMany();
+  await prisma.likedListing.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.listingImage.deleteMany();
   await prisma.upload.deleteMany();
@@ -337,8 +337,8 @@ async function main() {
     })),
   });
 
-  // SAVED LISTING
-  await prisma.savedListing.createMany({
+  // LIKED LISTING
+  await prisma.likedListing.createMany({
     data: listings.slice(0, 5).map((l) => ({
       userId: buyer.id,
       listingId: l.id,
