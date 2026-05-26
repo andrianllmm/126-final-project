@@ -20,6 +20,11 @@ type StatusMultiSelectProps = {
   className?: string;
 };
 
+const excludedStatuses: Set<ListingStatus> = new Set([
+  ListingStatus.DRAFT,
+  ListingStatus.ARCHIVED,
+]);
+
 export function StatusMultiSelect({
   value = [],
   onChange,
@@ -41,15 +46,17 @@ export function StatusMultiSelect({
         }}
       >
         <MultiSelectGroup>
-          {Object.values(ListingStatus).map((status) => (
-            <MultiSelectItem
-              key={status}
-              value={status}
-              badgeLabel={<ListingStatusBadge status={status} />}
-            >
-              <ListingStatusBadge status={status} />
-            </MultiSelectItem>
-          ))}
+          {Object.values(ListingStatus)
+            .filter((status: ListingStatus) => !excludedStatuses.has(status))
+            .map((status) => (
+              <MultiSelectItem
+                key={status}
+                value={status}
+                badgeLabel={<ListingStatusBadge status={status} />}
+              >
+                <ListingStatusBadge status={status} />
+              </MultiSelectItem>
+            ))}
         </MultiSelectGroup>
       </MultiSelectContent>
     </MultiSelect>

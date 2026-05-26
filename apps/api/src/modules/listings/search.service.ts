@@ -60,9 +60,10 @@ function buildOrderBy(
 function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
   const where: Prisma.ListingWhereInput[] = [
     {
-      status: query.status?.length
-        ? { in: query.status }
-        : ListingStatus.AVAILABLE,
+      status: {
+        notIn: [ListingStatus.DRAFT, ListingStatus.ARCHIVED],
+        ...(query.status?.length ? { in: query.status } : {}),
+      },
     },
   ];
 
