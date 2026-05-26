@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 import { cn } from '@/shared/lib/utils';
@@ -23,6 +24,7 @@ import { Button } from '../ui/button';
 import { Logo } from '@/shared/components/brand/logo';
 import { Wordmark } from '@/shared/components/brand/wordmark';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
+import { GlobalSearchBar } from '@/features/listings/components/search/global-search-bar';
 
 import { MessageCircleIcon, PackageIcon } from 'lucide-react';
 
@@ -88,11 +90,14 @@ function NavSectionItem({ section }: { section: (typeof navItems)[number] }) {
 }
 
 export function Navbar({ className }: { className?: string }) {
+  const pathname = usePathname();
+  const hideSearch = pathname.startsWith('/search');
+
   return (
     <header
       className={cn('relative z-50 w-full border-b bg-background', className)}
     >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         {/* Brand */}
         <Link href="/" className="flex items-center">
           <Logo className="text-primary w-8 h-8 md:hidden" />
@@ -100,7 +105,7 @@ export function Navbar({ className }: { className?: string }) {
         </Link>
 
         {/* Nav */}
-        <NavigationMenu>
+        <NavigationMenu className="mx-auto">
           <NavigationMenuList>
             {navItems.map((section) => (
               <NavSectionItem key={section.title} section={section} />
@@ -109,27 +114,28 @@ export function Navbar({ className }: { className?: string }) {
         </NavigationMenu>
 
         <div className="flex items-center gap-1">
-          {/* Theme */}
+          {/* Global search */}
+          {!hideSearch && (
+            <div className="flex-1">
+              <GlobalSearchBar className="max-w-xl" />
+            </div>
+          )}
+
           <ThemeToggle />
 
-          {/* Transactions */}
           <Link href="/transactions">
             <Button variant="ghost" size="icon">
               <PackageIcon />
             </Button>
           </Link>
 
-          {/* Messages */}
           <Link href="/messages">
             <Button variant="ghost" size="icon">
               <MessageCircleIcon />
             </Button>
           </Link>
 
-          {/* Notifications */}
           <NotificationBell />
-
-          {/* User */}
           <NavUser />
         </div>
       </div>

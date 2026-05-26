@@ -34,7 +34,6 @@ import { EmailModule } from './modules/email/email.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { UploadsModule } from './modules/uploads/uploads.module.js';
 import { ListingsModule } from './modules/listings/listings.module.js';
-import { SearchModule } from './modules/search/search.module.js';
 import { MessagingModule } from './modules/messaging/messaging.module.js';
 import { TransactionsModule } from './modules/transactions/transactions.module.js';
 import { OffersModule } from './modules/transactions/offers.module.js';
@@ -87,7 +86,6 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     }),
     UploadsModule,
     ListingsModule,
-    SearchModule,
     MessagingModule,
     TransactionsModule,
     OffersModule,
