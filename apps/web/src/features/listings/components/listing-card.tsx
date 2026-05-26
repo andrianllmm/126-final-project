@@ -24,7 +24,6 @@ import { toast } from 'sonner';
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
-import { Button } from '@/shared/components/ui/button';
 
 interface ListingCardProps {
   listing: Listing;
@@ -155,6 +154,7 @@ export function ListingCard({
           </div>
           <div></div>
         </div>
+      </CardFooter>
 
       {/* FOOTER */}
       <CardFooter className="px-4 pb-4 pt-4 w-full">
