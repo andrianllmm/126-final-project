@@ -6,13 +6,21 @@ export const userProfileSchema = z.object({
   name: z.string().trim().nullable(),
   email: z.email(),
   emailVerified: z.boolean(),
+  phoneNumber: z.e164().nullable(),
   image: z.url().nullable(),
+  bio: z.string().nullable(),
   createdAt: stringToDate,
   updatedAt: stringToDate,
 });
 
 export const userProfileUpdateSchema = z.object({
   name: z.string().trim().min(2, 'Name is too short').optional(),
+  bio: z
+    .string()
+    .trim()
+    .min(4, 'Bio is too short')
+    .max(300, 'Bio is too long')
+    .optional(),
 });
 
 export const userProfileStatsSchema = z.object({

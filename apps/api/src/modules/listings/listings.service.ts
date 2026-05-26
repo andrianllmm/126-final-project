@@ -4,12 +4,15 @@ import { PrismaService } from '../../database/prisma.service.js';
 
 import {
   CreateListingInput,
+  ListingPage,
+  ListingPaginationQuery,
   UpdateListingInput,
   ListingStatus,
   Listing,
   ListingList,
   Transaction,
   TransactionStatus,
+  ListingCategoryList,
 } from '@repo/api';
 
 import { ListingPolicy } from './listing.policy.js';
@@ -55,6 +58,8 @@ const mapTransaction = (t: any) => ({
   },
 });
 
+const mapCategory = (category: any) => category;
+
 @Injectable()
 export class ListingsService {
   constructor(
@@ -62,16 +67,36 @@ export class ListingsService {
     private readonly policy: ListingPolicy,
   ) {}
 
-  async findAll(): Promise<ListingList> {
-    const listings = await this.prisma.listing.findMany({
-      where: {
-        status: ListingStatus.AVAILABLE,
-      },
-      orderBy: { createdAt: 'desc' },
-      include: LISTING_INCLUDE,
-    });
+  async findAll(query: ListingPaginationQuery): Promise<ListingPage> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
 
-    return listings.map(mapListing);
+    const where = {
+      status:
+        ListingStatus.AVAILABLE || ListingStatus.RESERVED || ListingStatus.SOLD,
+    };
+
+    const [listings, total] = await Promise.all([
+      this.prisma.listing.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: LISTING_INCLUDE,
+      }),
+      this.prisma.listing.count({ where }),
+    ]);
+
+    return {
+      data: listings.map(mapListing),
+      meta: {
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        page,
+        limit,
+      },
+    };
   }
 
   async findOne(listingId: string): Promise<Listing> {
@@ -94,7 +119,6 @@ export class ListingsService {
         price: input.price,
         condition: input.condition,
         status: input.status ?? ListingStatus.AVAILABLE,
-        meetupLocation: input.meetupLocation ?? null,
 
         seller: { connect: { id: sellerId } },
         category: { connect: { id: categoryId } },
@@ -126,7 +150,6 @@ export class ListingsService {
         description: input.description,
         price: input.price,
         condition: input.condition,
-        meetupLocation: input.meetupLocation ?? undefined,
 
         category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
@@ -221,5 +244,18 @@ export class ListingsService {
     });
 
     return transactions.map(mapTransaction);
+  }
+
+  async listCategories(): Promise<ListingCategoryList> {
+    const categories = await this.prisma.listingCategory.findMany({
+      orderBy: { categoryName: 'asc' },
+      select: {
+        id: true,
+        categoryName: true,
+        slug: true,
+      },
+    });
+
+    return categories.map(mapCategory);
   }
 }

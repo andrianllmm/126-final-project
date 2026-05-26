@@ -1,38 +1,41 @@
 'use client';
 
+import { usePathname, useSearchParams } from 'next/navigation';
+
 import { ListingGrid } from '@/features/listings/components/listing-grid';
+import { ListingPagination } from '@/features/listings/components/listing-pagination';
 import { useListings } from '@/features/listings/hooks/use-listings';
+import {
+  buildListingPaginationQuery,
+  setQueryParams,
+} from '@/features/listings/lib/search-query';
 
 export default function Page() {
-  const { data, isLoading, isError } = useListings();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  if (isLoading) {
-    return (
-      <div className="p-6 text-sm text-muted-foreground">
-        Loading listings...
-      </div>
-    );
-  }
+  const paginationQuery = buildListingPaginationQuery(searchParams);
+  const { data, isLoading, isError } = useListings(paginationQuery);
 
-  if (isError) {
-    return (
-      <div className="p-6 text-sm text-destructive">
-        Failed to load listings.
-      </div>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="p-6 text-sm text-muted-foreground">
-        No listings available.
-      </div>
-    );
-  }
+  const buildPageHref = (page: number) =>
+    setQueryParams(pathname, searchParams, { page: String(page) });
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <ListingGrid listings={data} />
+    <div className="w-full p-4">
+      <ListingGrid
+        listings={data?.data}
+        isLoading={isLoading}
+        isError={isError}
+      />
+
+      {data && data.meta.totalPages > 1 ? (
+        <ListingPagination
+          page={data.meta.page}
+          totalPages={data.meta.totalPages}
+          getPageHref={buildPageHref}
+          className="mt-6"
+        />
+      ) : null}
     </div>
   );
 }

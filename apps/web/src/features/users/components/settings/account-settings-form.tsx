@@ -2,10 +2,12 @@
 
 import { FieldGroup } from '@/shared/components/ui/field';
 
+import { ContactsField } from './contacts-field';
+import { VerificationField } from './verification-field';
 import { AccountLinkingField } from './account-linking-field';
 import { PasswordField } from './password-field';
 import { DeleteAccountField } from './delete-account-field';
-import { EmailVerificationField } from './email-verification-field';
+
 import { UserProfile } from '@repo/api';
 
 interface AccountSettingsFormProps {
@@ -16,7 +18,11 @@ export function AccountSettingsForm({ profile }: AccountSettingsFormProps) {
   return (
     <div>
       <FieldGroup>
-        <EmailVerificationField
+        <ContactsField
+          email={profile.email}
+          phoneNumber={profile.phoneNumber}
+        />
+        <VerificationField
           email={profile.email}
           emailVerified={profile.emailVerified}
         />

@@ -1,4 +1,5 @@
-import { APIError, betterAuth } from 'better-auth';
+import { betterAuth, APIError } from 'better-auth';
+import { phoneNumber } from 'better-auth/plugins';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -82,6 +83,11 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
+      bio: {
+        type: 'string',
+        required: false,
+        input: true,
+      },
     },
   },
 
@@ -117,6 +123,13 @@ export const auth = betterAuth({
     },
   },
 
+  plugins: [
+    phoneNumber({
+      sendOTP: ({ phoneNumber, code }, ctx) => {
+        // Implement sending OTP code via SMS
+      },
+    }),
+  ],
   advanced: {
     cookies: {
       session_token: {

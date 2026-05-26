@@ -20,7 +20,7 @@ export const navItems: NavSection[] = [
       },
       {
         label: 'Categories',
-        href: '/search?sort=category',
+        href: '/search?sortBy=category&sortOrder=asc',
         description: 'Browse by item type',
       },
     ],

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { ShareDialog } from '@/shared/components/share-dialog';
 import { useUserProfile } from '../hooks/use-user-profile';
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -12,14 +12,18 @@ import { Skeleton } from '@/shared/components/ui/skeleton';
 import { UserAvatar } from './user-avatar';
 import { VerifiedBadge } from './user-verified-badge';
 
+import { Mail, Phone } from 'lucide-react';
+
 export function ProfileHeader({ userId }: { userId: string }) {
   const { data, isLoading, error } = useUserProfile(userId);
-  const session = authClient.useSession();
+  const { user, isPending: authLoading } = useAuth();
 
-  const currentUserId = session.data?.user?.id;
+  const currentUserId = user?.id;
   const isOwner = currentUserId === userId;
 
-  if (isLoading) return <ProfileHeaderLoading />;
+  const showLoading = (authLoading && !data) || (isLoading && !data);
+
+  if (showLoading) return <ProfileHeaderLoading />;
   if (error) return <ProfileHeaderError message={error.message} />;
   if (!data) return <ProfileHeaderError message="Profile not found" />;
 
@@ -46,9 +50,39 @@ export function ProfileHeader({ userId }: { userId: string }) {
               {data.emailVerified && <VerifiedBadge />}
             </h1>
 
-            <p className="text-muted-foreground">{data.email}</p>
+            <div className="flex flex-wrap items-center gap-4">
+              {data.email && (
+                <div className="flex items-center gap-1">
+                  <Mail className="size-4 text-muted-foreground" />
 
-            <p className="text-sm text-muted-foreground">
+                  <a
+                    href={`mailto:${data.email}`}
+                    className="text-muted-foreground hover:underline"
+                  >
+                    {data.email}
+                  </a>
+                </div>
+              )}
+
+              {data.phoneNumber && (
+                <div className="flex items-center gap-1">
+                  <Phone className="size-4 text-muted-foreground" />
+
+                  <a
+                    href={`tel:${data.phoneNumber}`}
+                    className="text-muted-foreground hover:underline"
+                  >
+                    {data.phoneNumber}
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {data.bio && (
+              <p className="text-sm leading-relaxed max-w-xl">{data.bio}</p>
+            )}
+
+            <p className="text-xs text-muted-foreground">
               Member since {createdAt}
             </p>
           </div>

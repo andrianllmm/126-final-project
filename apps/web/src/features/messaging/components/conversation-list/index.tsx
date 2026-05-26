@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 import { useConversations } from '../../hooks/use-conversations';
 import { ConversationListItem } from './conversation-list-item';
@@ -16,7 +16,7 @@ import { ArrowLeftIcon } from 'lucide-react';
 export function ConversationList() {
   const pathname = usePathname();
 
-  const { data: session, isPending } = authClient.useSession();
+  const { user, isPending } = useAuth();
   const { data, isLoading, error } = useConversations();
 
   const loading = isPending || isLoading;
@@ -61,7 +61,7 @@ export function ConversationList() {
                 <ConversationListItem
                   key={conversation.id}
                   conversation={conversation}
-                  userId={session?.user?.id ?? ''}
+                  userId={user?.id ?? ''}
                   isActive={pathname === `/messages/${conversation.id}`}
                 />
               ))}

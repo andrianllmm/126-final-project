@@ -2,7 +2,7 @@
 
 import { BellIcon } from 'lucide-react';
 
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -16,15 +16,15 @@ import { NotificationList } from './notification-list';
 import { useNotifications } from '../hooks/use-notifications';
 
 export function NotificationBell() {
-  const session = authClient.useSession();
+  const { user, isPending } = useAuth();
   const { notifications, unreadCount, markAllAsRead, isMarkingAllAsRead } =
     useNotifications();
 
-  if (session.isPending) {
+  if (isPending) {
     return <Skeleton className="h-9 w-9 rounded-md" />;
   }
 
-  if (!session.data?.user) {
+  if (!user) {
     return null;
   }
 

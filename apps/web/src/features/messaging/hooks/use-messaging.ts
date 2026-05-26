@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { authClient } from '@/shared/lib/auth-client';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { getSocket, initializeSocket } from '@/shared/lib/socket-client';
 import type { Conversation, Message } from '@repo/api';
 import { useConversation } from './use-conversations';
@@ -11,7 +11,7 @@ export const useMessaging = (conversationId?: string) => {
   const [isPeerTyping, setIsPeerTyping] = useState(false);
   const conversationQuery = useConversation(conversationId);
   const queryClient = useQueryClient();
-  const session = authClient.useSession();
+  const { user } = useAuth();
 
   const hydratedConversationIdRef = useRef<string | undefined>(undefined);
   const activeConversationIdRef = useRef<string | undefined>(conversationId);
@@ -93,7 +93,7 @@ export const useMessaging = (conversationId?: string) => {
 
   useEffect(() => {
     const socket = initializeSocket('/messaging');
-    const currentUserId = session.data?.user?.id;
+    const currentUserId = user?.id;
 
     if (!conversationId || !currentUserId) return;
 
@@ -104,11 +104,11 @@ export const useMessaging = (conversationId?: string) => {
     if (!hasUnreadIncomingMessages) return;
 
     socket.emit('markAsRead', conversationId);
-  }, [conversationId, messages, session.data?.user?.id]);
+  }, [conversationId, messages, user?.id]);
 
   useEffect(() => {
     const socket = initializeSocket('/messaging');
-    const currentUserId = session.data?.user?.id;
+    const currentUserId = user?.id;
 
     const handleConnect = () => {
       setIsConnected(true);
@@ -254,7 +254,7 @@ export const useMessaging = (conversationId?: string) => {
         peerTypingTimeoutRef.current = null;
       }
     };
-  }, [conversationId, queryClient, session.data?.user?.id]);
+  }, [conversationId, queryClient, user?.id]);
 
   const sendMessage = (content: string) => {
     const socket = getSocket('/messaging');

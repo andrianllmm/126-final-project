@@ -17,13 +17,14 @@ import {
   CardFooter,
   CardHeader,
 } from '@/shared/components/ui/card';
-import { MapPin, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 import { useDeleteListing } from '@/features/listings/hooks/use-delete-listing';
 import { toast } from 'sonner';
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { Button } from '@/shared/components/ui/button';
 
 interface ListingCardProps {
   listing: Listing;
@@ -128,10 +129,13 @@ export function ListingCard({
         <p className="line-clamp-2 text-sm text-muted-foreground">
           {listing.description}
         </p>
+      </CardContent>
 
-        <div className="flex items-center justify-between">
+      {/* FOOTER */}
+      <CardFooter className="flex flex-col gap-2 px-4 pb-4 mt-auto">
+        <div className="w-full flex items-center justify-between">
           {/* Seller + Message */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0">
             <MessageButton
               listingId={listing.id}
               disabled={listing.status === ListingStatus.SOLD}
@@ -140,23 +144,17 @@ export function ListingCard({
               className="size-6 hover:text-primary"
             />
 
-            <button
+            <Button
               className="truncate text-sm font-medium hover:text-primary"
+              size="xs"
+              variant="ghost"
               onClick={goToSeller}
             >
               {listing.seller.name}
-            </button>
+            </Button>
           </div>
-
-          {/* Meetup location */}
-          {listing.meetupLocation && (
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 shrink-0" />
-              <span className="line-clamp-1">{listing.meetupLocation}</span>
-            </div>
-          )}
+          <div></div>
         </div>
-      </CardContent>
 
       {/* FOOTER */}
       <CardFooter className="px-4 pb-4 pt-4 w-full">

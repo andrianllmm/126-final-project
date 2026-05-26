@@ -7,19 +7,30 @@ datasource db {
   provider = "postgresql"
 }
 
+model Location {
+  id           Int                                  @id @default(autoincrement())
+  name         String
+  position     Unsupported("geometry(Point, 4326)")
+
+  transactions Transaction[]
+  offers       Offer[]
+}
+
 // =====================
 // AUTH
 // =====================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  emailVerified Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id                  String    @id @default(cuid())
+  name                String?
+  email               String    @unique
+  emailVerified       Boolean   @default(false)
+  phoneNumber         String?   @unique
+  phoneNumberVerified Boolean?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  sessions            Session[]
+  accounts            Account[]
 
   uploads Upload[] @relation("UserUploads")
 
@@ -41,6 +52,8 @@ model User {
   image          String?
   avatarUploadId String? @unique
   avatarUpload   Upload? @relation("UserAvatar", fields: [avatarUploadId], references: [id], onDelete: SetNull)
+
+  bio String?
 
   @@map("user")
 }
@@ -150,6 +163,13 @@ enum TransactionStatus {
   CANCELLED
 }
 
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  SUPERSEDED
+}
+
 enum ReviewRole {
   BUYER_TO_SELLER
   SELLER_TO_BUYER
@@ -189,8 +209,6 @@ model Listing {
 
   condition ListingCondition
   status    ListingStatus    @default(DRAFT)
-
-  meetupLocation String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -289,16 +307,39 @@ model Transaction {
   sellerId String
   seller   User   @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
 
-  agreedPrice Decimal           @db.Decimal(10, 2)
-  status      TransactionStatus @default(PENDING)
+  status TransactionStatus @default(PENDING)
+
+  agreedPrice      Decimal   @db.Decimal(10, 2)
+  meetupLocationId Int?
+  meetupLocation   Location? @relation(fields: [meetupLocationId], references: [id], onDelete: SetNull)
+  meetupTime       DateTime?
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
 
   reviews Review[]
+  offers  Offer[]
 
   @@index([listingId])
   @@index([status])
+}
+
+model Offer {
+  id String @id @default(cuid())
+
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [transactionId], onDelete: Cascade)
+
+  proposerId String
+
+  price            Decimal?
+  meetupLocationId Int?
+  meetupLocation   Location? @relation(fields: [meetupLocationId], references: [id], onDelete: SetNull)
+  meetupTime       DateTime?
+
+  status OfferStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
 }
 
 model Review {
