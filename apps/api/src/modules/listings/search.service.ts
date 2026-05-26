@@ -4,7 +4,7 @@ import { PrismaService } from '../../database/prisma.service.js';
 
 import {
   ListingStatus,
-  type ListingList,
+  type ListingPage,
   type ListingSearchQuery,
 } from '@repo/api';
 
@@ -154,16 +154,34 @@ function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
 export class SearchService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(query: ListingSearchQuery): Promise<ListingList> {
-    const listings = await this.prisma.listing.findMany({
-      where: buildWhere(query),
-      orderBy: buildOrderBy(
-        query.sortBy ?? 'createdAt',
-        query.sortOrder ?? 'desc',
-      ),
-      include: LISTING_INCLUDE,
-    });
+  async search(query: ListingSearchQuery): Promise<ListingPage> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
+    const where = buildWhere(query);
 
-    return listings.map(mapListing);
+    const [listings, total] = await Promise.all([
+      this.prisma.listing.findMany({
+        where,
+        orderBy: buildOrderBy(
+          query.sortBy ?? 'createdAt',
+          query.sortOrder ?? 'desc',
+        ),
+        skip,
+        take: limit,
+        include: LISTING_INCLUDE,
+      }),
+      this.prisma.listing.count({ where }),
+    ]);
+
+    return {
+      data: listings.map(mapListing),
+      meta: {
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        page,
+        limit,
+      },
+    };
   }
 }

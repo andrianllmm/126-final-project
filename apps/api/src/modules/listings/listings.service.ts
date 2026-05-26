@@ -4,6 +4,8 @@ import { PrismaService } from '../../database/prisma.service.js';
 
 import {
   CreateListingInput,
+  ListingPage,
+  ListingPaginationQuery,
   UpdateListingInput,
   ListingStatus,
   Listing,
@@ -65,16 +67,35 @@ export class ListingsService {
     private readonly policy: ListingPolicy,
   ) {}
 
-  async findAll(): Promise<ListingList> {
-    const listings = await this.prisma.listing.findMany({
-      where: {
-        status: ListingStatus.AVAILABLE,
-      },
-      orderBy: { createdAt: 'desc' },
-      include: LISTING_INCLUDE,
-    });
+  async findAll(query: ListingPaginationQuery): Promise<ListingPage> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
 
-    return listings.map(mapListing);
+    const where = {
+      status: ListingStatus.AVAILABLE,
+    };
+
+    const [listings, total] = await Promise.all([
+      this.prisma.listing.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: LISTING_INCLUDE,
+      }),
+      this.prisma.listing.count({ where }),
+    ]);
+
+    return {
+      data: listings.map(mapListing),
+      meta: {
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        page,
+        limit,
+      },
+    };
   }
 
   async findOne(listingId: string): Promise<Listing> {

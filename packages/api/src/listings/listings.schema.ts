@@ -59,7 +59,20 @@ const optionalNonNegativeNumberSchema = z.preprocess((value) => {
   }
 
   return value;
-}, z.number().finite().nonnegative().optional());
+}, z.number().nonnegative().optional());
+
+const optionalPositiveIntegerSchema = z.preprocess((value) => {
+  if (value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : value;
+  }
+
+  return value;
+}, z.number().int().positive().optional());
 
 export const listingImageSchema = z.object({
   id: z.string(),
@@ -100,15 +113,34 @@ export const listingSchema = z.object({
 export const listingListSchema = z.array(listingSchema);
 export const listingCategoryListSchema = z.array(listingCategorySchema);
 
-export const listingSearchQuerySchema = z.object({
-  q: optionalSearchStringSchema,
-  sortBy: listingSearchSortBySchema.optional(),
-  sortOrder: listingSearchSortOrderSchema.optional(),
-  category: optionalQueryStringArraySchema,
-  condition: optionalListingConditionArraySchema,
-  status: optionalListingStatusArraySchema,
-  minPrice: optionalNonNegativeNumberSchema,
-  maxPrice: optionalNonNegativeNumberSchema,
+export const listingPaginationQuerySchema = z.object({
+  page: optionalPositiveIntegerSchema,
+  limit: optionalPositiveIntegerSchema,
+});
+
+export const listingSearchQuerySchema = z
+  .object({
+    q: optionalSearchStringSchema,
+    sortBy: listingSearchSortBySchema.optional(),
+    sortOrder: listingSearchSortOrderSchema.optional(),
+    category: optionalQueryStringArraySchema,
+    condition: optionalListingConditionArraySchema,
+    status: optionalListingStatusArraySchema,
+    minPrice: optionalNonNegativeNumberSchema,
+    maxPrice: optionalNonNegativeNumberSchema,
+  })
+  .merge(listingPaginationQuerySchema);
+
+export const listingPageMetaSchema = z.object({
+  total: z.number().int().nonnegative(),
+  totalPages: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  limit: z.number().int().positive(),
+});
+
+export const listingPageSchema = z.object({
+  data: listingListSchema,
+  meta: listingPageMetaSchema,
 });
 
 export const createListingSchema = z.object({
@@ -145,7 +177,12 @@ export type ListingCategory = z.infer<typeof listingCategorySchema>;
 export type ListingCategoryList = z.infer<typeof listingCategoryListSchema>;
 export type Listing = z.infer<typeof listingSchema>;
 export type ListingList = z.infer<typeof listingListSchema>;
+export type ListingPaginationQuery = z.infer<
+  typeof listingPaginationQuerySchema
+>;
 export type ListingSearchQuery = z.infer<typeof listingSearchQuerySchema>;
+export type ListingPageMeta = z.infer<typeof listingPageMetaSchema>;
+export type ListingPage = z.infer<typeof listingPageSchema>;
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 export type UpdateListingInput = z.infer<typeof updateListingSchema>;
 export type UpdateListingStatusInput = z.infer<

@@ -20,7 +20,8 @@ import { ListingsService } from './listings.service.js';
 import {
   CreateListingDto,
   ListingDto,
-  ListingListDto,
+  ListingPageDto,
+  ListingPageQueryDto,
   SearchListingCategoriesDto,
   UpdateListingDto,
   UpdateListingStatusDto,
@@ -33,9 +34,9 @@ export class ListingsController {
 
   @Get()
   @AllowAnonymous()
-  @ZodResponse({ type: ListingListDto })
-  findAll() {
-    return this.listingsService.findAll();
+  @ZodResponse({ type: ListingPageDto })
+  findAll(@Query() query: ListingPageQueryDto) {
+    return this.listingsService.findAll(query);
   }
 
   @Get(':id')

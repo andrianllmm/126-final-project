@@ -2,7 +2,17 @@ import {
   ListingCondition,
   ListingStatus,
   type ListingSearchQuery,
+  type ListingPaginationQuery,
 } from '@repo/api';
+
+const DEFAULT_LISTINGS_LIMIT = 12;
+
+function parsePositiveInteger(value: string | null, fallback: number) {
+  if (!value) return fallback;
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
 
 export function setQueryParams(
   pathname: string,
@@ -35,6 +45,8 @@ export function setQueryParams(
 export function buildListingSearchQuery(
   searchParams: URLSearchParams,
 ): ListingSearchQuery {
+  const pagination = buildListingPaginationQuery(searchParams);
+
   const query = {
     q: searchParams.get('q') ?? '',
     sortBy: searchParams.get('sortBy') ?? 'createdAt',
@@ -60,6 +72,8 @@ export function buildListingSearchQuery(
     q: query.q || undefined,
     sortBy: query.sortBy as ListingSearchQuery['sortBy'],
     sortOrder: query.sortOrder as ListingSearchQuery['sortOrder'],
+    page: pagination.page,
+    limit: pagination.limit,
 
     category: query.category.length ? query.category : undefined,
 
@@ -68,5 +82,17 @@ export function buildListingSearchQuery(
 
     minPrice: query.minPrice ? Number(query.minPrice) : undefined,
     maxPrice: query.maxPrice ? Number(query.maxPrice) : undefined,
+  };
+}
+
+export function buildListingPaginationQuery(
+  searchParams: URLSearchParams,
+): ListingPaginationQuery {
+  return {
+    page: parsePositiveInteger(searchParams.get('page'), 1),
+    limit: parsePositiveInteger(
+      searchParams.get('limit'),
+      DEFAULT_LISTINGS_LIMIT,
+    ),
   };
 }

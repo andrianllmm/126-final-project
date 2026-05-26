@@ -2,6 +2,8 @@ import { createZodDto } from 'nestjs-zod';
 import {
   createListingSchema,
   listingCategoryListSchema,
+  listingPageSchema,
+  listingPaginationQuerySchema,
   listingListSchema,
   listingSchema,
   updateListingSchema,
@@ -16,6 +18,10 @@ export class ListingListDto extends createZodDto(listingListSchema, {
   codec: true,
 }) {}
 
+export class ListingPageDto extends createZodDto(listingPageSchema, {
+  codec: true,
+}) {}
+
 export class CreateListingDto extends createZodDto(createListingSchema) {}
 
 export class UpdateListingDto extends createZodDto(updateListingSchema) {}
@@ -26,4 +32,8 @@ export class UpdateListingStatusDto extends createZodDto(
 
 export class SearchListingCategoriesDto extends createZodDto(
   listingCategoryListSchema,
+) {}
+
+export class ListingPageQueryDto extends createZodDto(
+  listingPaginationQuerySchema,
 ) {}

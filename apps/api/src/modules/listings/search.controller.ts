@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { ZodResponse } from 'nestjs-zod';
 
-import { ListingListDto } from './listings.dto.js';
+import { ListingPageDto } from './listings.dto.js';
 import { SearchListingsQueryDto } from './search.dto.js';
 import { SearchService } from './search.service.js';
 
@@ -12,7 +12,7 @@ export class SearchController {
 
   @Get()
   @AllowAnonymous()
-  @ZodResponse({ type: ListingListDto })
+  @ZodResponse({ type: ListingPageDto })
   search(@Query() query: SearchListingsQueryDto) {
     return this.searchService.search(query);
   }
