@@ -22,7 +22,7 @@ import {
   ListingDto,
   ListingPageDto,
   ListingPageQueryDto,
-  SearchListingCategoriesDto,
+  ListingCategoriesListDto,
   UpdateListingDto,
   UpdateListingStatusDto,
 } from './listings.dto.js';
@@ -41,7 +41,7 @@ export class ListingsController {
 
   @Get('categories')
   @AllowAnonymous()
-  @ZodResponse({ type: SearchListingCategoriesDto })
+  @ZodResponse({ type: ListingCategoriesListDto })
   categories() {
     return this.listingsService.listCategories();
   }

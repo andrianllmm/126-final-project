@@ -45,5 +45,5 @@ export const getListingTransactions = (
     params: status ? { status } : undefined,
   });
 
-export const getSearchCategories = () =>
+export const getCategories = () =>
   apiClient.get<ListingCategoryList>('/listings/categories');

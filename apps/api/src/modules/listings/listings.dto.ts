@@ -30,7 +30,7 @@ export class UpdateListingStatusDto extends createZodDto(
   updateListingStatusSchema,
 ) {}
 
-export class SearchListingCategoriesDto extends createZodDto(
+export class ListingCategoriesListDto extends createZodDto(
   listingCategoryListSchema,
 ) {}
 
