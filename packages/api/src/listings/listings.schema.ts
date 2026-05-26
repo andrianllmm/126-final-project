@@ -2,6 +2,65 @@ import { z } from 'zod';
 import { ListingConditionSchema, ListingStatusSchema } from '../enums.js';
 import { stringToDate } from '../codecs.js';
 
+export const listingCategorySchema = z.object({
+  id: z.string(),
+  categoryName: z.string(),
+  slug: z.string(),
+});
+
+export const listingSearchSortBySchema = z.enum([
+  'createdAt',
+  'price',
+  'title',
+  'category',
+  'condition',
+]);
+
+export const listingSearchSortOrderSchema = z.enum(['asc', 'desc']);
+
+const emptyStringToUndefined = (value: unknown) => {
+  if (typeof value !== 'string') return value;
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const optionalSearchStringSchema = z.preprocess(
+  emptyStringToUndefined,
+  z.string().min(1).optional(),
+);
+
+const optionalQueryStringArraySchema = z.preprocess(
+  (value) => {
+    if (value === undefined || value === null) return undefined;
+    return Array.isArray(value) ? value : [value];
+  },
+  z.array(z.string().min(1)).optional(),
+);
+
+const optionalListingConditionArraySchema = z.preprocess((value) => {
+  if (value === undefined || value === null) return undefined;
+  return Array.isArray(value) ? value : [value];
+}, z.array(ListingConditionSchema).optional());
+
+const optionalListingStatusArraySchema = z.preprocess((value) => {
+  if (value === undefined || value === null) return undefined;
+  return Array.isArray(value) ? value : [value];
+}, z.array(ListingStatusSchema).optional());
+
+const optionalNonNegativeNumberSchema = z.preprocess((value) => {
+  if (value === '' || value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : value;
+  }
+
+  return value;
+}, z.number().finite().nonnegative().optional());
+
 export const listingImageSchema = z.object({
   id: z.string(),
   sortOrder: z.number(),
@@ -26,7 +85,7 @@ export const listingSchema = z.object({
   condition: ListingConditionSchema,
   status: ListingStatusSchema,
 
-  category: z.any(),
+  category: listingCategorySchema,
 
   images: z.array(listingImageSchema),
 
@@ -39,6 +98,18 @@ export const listingSchema = z.object({
 });
 
 export const listingListSchema = z.array(listingSchema);
+export const listingCategoryListSchema = z.array(listingCategorySchema);
+
+export const listingSearchQuerySchema = z.object({
+  q: optionalSearchStringSchema,
+  sortBy: listingSearchSortBySchema.optional(),
+  sortOrder: listingSearchSortOrderSchema.optional(),
+  category: optionalQueryStringArraySchema,
+  condition: optionalListingConditionArraySchema,
+  status: optionalListingStatusArraySchema,
+  minPrice: optionalNonNegativeNumberSchema,
+  maxPrice: optionalNonNegativeNumberSchema,
+});
 
 export const createListingSchema = z.object({
   title: z.string(),
@@ -70,8 +141,11 @@ export const updateListingStatusSchema = z.object({
 
 export type ListingImage = z.infer<typeof listingImageSchema>;
 export type ListingSeller = z.infer<typeof listingSellerSchema>;
+export type ListingCategory = z.infer<typeof listingCategorySchema>;
+export type ListingCategoryList = z.infer<typeof listingCategoryListSchema>;
 export type Listing = z.infer<typeof listingSchema>;
 export type ListingList = z.infer<typeof listingListSchema>;
+export type ListingSearchQuery = z.infer<typeof listingSearchQuerySchema>;
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 export type UpdateListingInput = z.infer<typeof updateListingSchema>;
 export type UpdateListingStatusInput = z.infer<
