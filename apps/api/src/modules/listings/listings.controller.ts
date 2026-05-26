@@ -39,6 +39,13 @@ export class ListingsController {
     return this.listingsService.findAll(query);
   }
 
+  @Get('categories')
+  @AllowAnonymous()
+  @ZodResponse({ type: SearchListingCategoriesDto })
+  categories() {
+    return this.listingsService.listCategories();
+  }
+
   @Get(':id')
   @OptionalAuth()
   @ZodResponse({ type: ListingDto })
@@ -84,12 +91,5 @@ export class ListingsController {
     @Query('status') status?: TransactionStatus | TransactionStatus[],
   ) {
     return this.listingsService.getListingTransactions(listingId, status);
-  }
-
-  @Get('categories')
-  @AllowAnonymous()
-  @ZodResponse({ type: SearchListingCategoriesDto })
-  categories() {
-    return this.listingsService.listCategories();
   }
 }
