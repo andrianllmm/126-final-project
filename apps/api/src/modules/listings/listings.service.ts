@@ -10,6 +10,7 @@ import {
   ListingList,
   Transaction,
   TransactionStatus,
+  ListingCategoryList,
 } from '@repo/api';
 
 import { ListingPolicy } from './listing.policy.js';
@@ -54,6 +55,8 @@ const mapTransaction = (t: any) => ({
     price: Number(t.listing.price),
   },
 });
+
+const mapCategory = (category: any) => category;
 
 @Injectable()
 export class ListingsService {
@@ -220,5 +223,18 @@ export class ListingsService {
     });
 
     return transactions.map(mapTransaction);
+  }
+
+  async listCategories(): Promise<ListingCategoryList> {
+    const categories = await this.prisma.listingCategory.findMany({
+      orderBy: { categoryName: 'asc' },
+      select: {
+        id: true,
+        categoryName: true,
+        slug: true,
+      },
+    });
+
+    return categories.map(mapCategory);
   }
 }

@@ -7,6 +7,7 @@ import {
   type UpdateListingStatusInput,
   type TransactionStatus,
   type TransactionList,
+  ListingCategoryList,
 } from '@repo/api';
 
 export const getListings = () => apiClient.get<ListingList>('/listings');
@@ -39,3 +40,6 @@ export const getListingTransactions = (
   apiClient.get<TransactionList>(`/listings/${listingId}/transactions`, {
     params: status ? { status } : undefined,
   });
+
+export const getSearchCategories = () =>
+  apiClient.get<ListingCategoryList>('/listings/categories');

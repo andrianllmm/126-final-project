@@ -21,6 +21,7 @@ import {
   CreateListingDto,
   ListingDto,
   ListingListDto,
+  SearchListingCategoriesDto,
   UpdateListingDto,
   UpdateListingStatusDto,
 } from './listings.dto.js';
@@ -82,5 +83,12 @@ export class ListingsController {
     @Query('status') status?: TransactionStatus | TransactionStatus[],
   ) {
     return this.listingsService.getListingTransactions(listingId, status);
+  }
+
+  @Get('categories')
+  @AllowAnonymous()
+  @ZodResponse({ type: SearchListingCategoriesDto })
+  categories() {
+    return this.listingsService.listCategories();
   }
 }
