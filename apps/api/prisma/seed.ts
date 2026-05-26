@@ -85,85 +85,270 @@ async function main() {
 
   // CATEGORIES
   const electronics = await prisma.listingCategory.create({
-    data: {
-      categoryName: 'Electronics',
-      slug: 'electronics',
-    },
+    data: { categoryName: 'Electronics', slug: 'electronics' },
   });
 
   const books = await prisma.listingCategory.create({
-    data: {
-      categoryName: 'Books',
-      slug: 'books',
-    },
+    data: { categoryName: 'Books', slug: 'books' },
+  });
+
+  const furniture = await prisma.listingCategory.create({
+    data: { categoryName: 'Furniture', slug: 'furniture' },
+  });
+
+  const accessories = await prisma.listingCategory.create({
+    data: { categoryName: 'Accessories', slug: 'accessories' },
+  });
+
+  const clothing = await prisma.listingCategory.create({
+    data: { categoryName: 'Clothing', slug: 'clothing' },
   });
 
   // LISTINGS
-  const keyboard = await prisma.listing.create({
-    data: {
-      sellerId: seller.id,
-      title: 'Mechanical Keyboard',
-      description:
-        'Barely used 75% mechanical keyboard with hot-swappable switches.',
-      price: '2500.00',
-      categoryId: electronics.id,
-      condition: ListingCondition.LIKE_NEW,
-      status: ListingStatus.AVAILABLE,
-    },
-  });
-
-  const textbook = await prisma.listing.create({
-    data: {
-      sellerId: seller.id,
-      title: 'C Programming Language',
-      description: 'Clean copy with minimal markings.',
-      price: '1799.00',
-      categoryId: books.id,
-      condition: ListingCondition.GOOD,
-      status: ListingStatus.SOLD,
-      soldAt: now,
-    },
-  });
+  const listings = await Promise.all([
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Mechanical Keyboard',
+        description:
+          'Barely used 75% mechanical keyboard with hot-swappable switches.',
+        price: '2500.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'C Programming Language',
+        description: 'Clean copy with minimal markings.',
+        price: '1799.00',
+        categoryId: books.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.SOLD,
+        soldAt: now,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Study Desk',
+        description: 'Wooden study desk, sturdy and minimal scratches.',
+        price: '3200.00',
+        categoryId: furniture.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Wireless Headphones',
+        description: 'Noise cancelling, good battery health.',
+        price: '1800.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.FAIR,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Laptop Backpack',
+        description: 'Water-resistant backpack with laptop compartment.',
+        price: '900.00',
+        categoryId: accessories.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Arduino Uno Kit',
+        description: 'Complete starter kit for embedded projects.',
+        price: '1200.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Python Crash Course Book',
+        description: 'Beginner-friendly Python programming book.',
+        price: '850.00',
+        categoryId: books.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Office Chair',
+        description: 'Ergonomic chair with lumbar support.',
+        price: '4500.00',
+        categoryId: furniture.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Gaming Mouse',
+        description: 'RGB gaming mouse with adjustable DPI.',
+        price: '950.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'USB-C Hub',
+        description: 'Multiport adapter with HDMI and USB 3.0.',
+        price: '1100.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Discrete Math Notes Compilation',
+        description: 'Printed reviewer set for exams.',
+        price: '300.00',
+        categoryId: books.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Graphic Hoodie',
+        description: 'Cotton hoodie, slightly oversized.',
+        price: '650.00',
+        categoryId: clothing.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Mechanical Pencil Set',
+        description: '0.5mm drafting pencils with refills.',
+        price: '250.00',
+        categoryId: accessories.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'LED Desk Lamp',
+        description: 'Adjustable brightness with touch control.',
+        price: '700.00',
+        categoryId: furniture.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'External SSD 512GB',
+        description: 'Fast portable storage drive.',
+        price: '2800.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Data Structures Book',
+        description: 'Classic DS&A textbook.',
+        price: '1500.00',
+        categoryId: books.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Whiteboard Set',
+        description: 'Mini whiteboard with markers.',
+        price: '400.00',
+        categoryId: accessories.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Monitor Stand',
+        description: 'Metal adjustable monitor riser.',
+        price: '950.00',
+        categoryId: furniture.id,
+        condition: ListingCondition.LIKE_NEW,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+    prisma.listing.create({
+      data: {
+        sellerId: seller.id,
+        title: 'Smartphone Tripod',
+        description: 'Flexible tripod for mobile photography.',
+        price: '500.00',
+        categoryId: electronics.id,
+        condition: ListingCondition.GOOD,
+        status: ListingStatus.AVAILABLE,
+      },
+    }),
+  ]);
 
   // UPLOADS
-  const keyboardUpload = await createUpload(
-    'https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg',
-    `seed-keyboard-${Date.now()}`,
+  const uploads = await Promise.all(
+    listings.map((_, i) =>
+      createUpload(
+        `https://picsum.photos/seed/listing-${i}/600/400`,
+        `seed-listing-${i}-${Date.now()}`,
+      ),
+    ),
   );
 
-  const textbookUpload = await createUpload(
-    'https://upload.wikimedia.org/wikipedia/commons/c/c7/Americanstudbookvolume2open.jpg',
-    `seed-textbook-${Date.now()}`,
-  );
-
-  // LISTING IMAGES
   await prisma.listingImage.createMany({
-    data: [
-      {
-        listingId: keyboard.id,
-        uploadId: keyboardUpload.id,
-        sortOrder: 0,
-      },
-      {
-        listingId: textbook.id,
-        uploadId: textbookUpload.id,
-        sortOrder: 0,
-      },
-    ],
+    data: listings.map((l, i) => ({
+      listingId: l.id,
+      uploadId: uploads[i]!.id,
+      sortOrder: 0,
+    })),
   });
 
   // SAVED LISTING
-  await prisma.savedListing.create({
-    data: {
+  await prisma.savedListing.createMany({
+    data: listings.slice(0, 5).map((l) => ({
       userId: buyer.id,
-      listingId: keyboard.id,
-    },
+      listingId: l.id,
+    })),
   });
 
   // CONVERSATION + MESSAGES
   await prisma.conversation.create({
     data: {
-      listingId: keyboard.id,
+      listingId: listings[0].id,
       buyerId: buyer.id,
       sellerId: seller.id,
       lastMessageAt: now,
@@ -184,10 +369,9 @@ async function main() {
     },
   });
 
-  // TRANSACTION
   const transaction = await prisma.transaction.create({
     data: {
-      listingId: textbook.id,
+      listingId: listings[1].id,
       buyerId: buyer.id,
       sellerId: seller.id,
       agreedPrice: '1700.00',
@@ -196,13 +380,12 @@ async function main() {
     },
   });
 
-  // REVIEWS
   await prisma.review.createMany({
     data: [
       {
         reviewerId: buyer.id,
         revieweeId: seller.id,
-        listingId: textbook.id,
+        listingId: listings[1].id,
         transactionId: transaction.transactionId,
         rating: 5,
         comment: 'Smooth transaction and accurate listing.',
@@ -211,7 +394,7 @@ async function main() {
       {
         reviewerId: seller.id,
         revieweeId: buyer.id,
-        listingId: textbook.id,
+        listingId: listings[1].id,
         transactionId: transaction.transactionId,
         rating: 5,
         comment: 'Fast payment and easy to deal with.',
@@ -220,7 +403,6 @@ async function main() {
     ],
   });
 
-  // NOTIFICATIONS
   await prisma.notification.createMany({
     data: [
       {
@@ -231,31 +413,16 @@ async function main() {
       },
       {
         userId: buyer.id,
-        type: NotificationType.TRANSACTION,
-        title: 'Transaction completed',
-        message:
-          'Your transaction for Discrete Mathematics Textbook was completed.',
-      },
-      {
-        userId: seller.id,
-        type: NotificationType.RATING,
-        title: 'New review',
-        message: 'You received a new seller review.',
-      },
-      {
-        userId: buyer.id,
         type: NotificationType.SYSTEM,
-        title: 'Welcome',
-        message: 'Demo data has been loaded successfully.',
+        title: 'Seed loaded',
+        message: 'Demo data expanded with additional listings.',
       },
     ],
   });
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
+  .then(async () => prisma.$disconnect())
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
