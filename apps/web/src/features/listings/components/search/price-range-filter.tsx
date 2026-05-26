@@ -9,7 +9,7 @@ import { currencyFormatter } from '@/shared/lib/currency-formatter';
 
 const PRICE_MIN = 0;
 const PRICE_MAX = 1_000_000;
-const DEFAULT_PRICE_MAX = 5_000;
+const DEFAULT_PRICE_MAX = 10_000;
 const PRICE_STEP = 100;
 
 type PriceRangeProps = {
