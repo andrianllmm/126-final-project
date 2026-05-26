@@ -25,7 +25,7 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <InputGroup className="w-full">
-      <SearchIcon className="mary ml-3 size-4" />
+      <SearchIcon className="ml-3 size-4" />
 
       <InputGroupInput
         value={value}
