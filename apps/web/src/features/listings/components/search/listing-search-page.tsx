@@ -53,21 +53,7 @@ export function ListingSearchPage() {
         </p>
       </div>
 
-      {isError ? (
-        <div className="p-6 text-sm text-destructive">
-          Failed to load listings.
-        </div>
-      ) : isLoading ? (
-        <div className="p-6 text-sm text-muted-foreground">
-          Loading search results...
-        </div>
-      ) : !data || data.length === 0 ? (
-        <div className="p-6 text-sm text-muted-foreground">
-          No listings match the current filters.
-        </div>
-      ) : (
-        <ListingGrid listings={data} />
-      )}
+      <ListingGrid listings={data} isLoading={isLoading} isError={isError} />
     </div>
   );
 }

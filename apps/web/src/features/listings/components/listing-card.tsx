@@ -16,7 +16,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/shared/components/ui/card';
-import { MapPin, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
