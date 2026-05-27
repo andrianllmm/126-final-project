@@ -116,7 +116,7 @@ export default function TransactionDetailPage() {
           className="mb-2"
           onClick={() => router.push('/transactions')}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="size-4 mr-1" />
           Back
         </Button>
 

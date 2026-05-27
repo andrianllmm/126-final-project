@@ -47,8 +47,8 @@ export function ListingStatusBadge({
       className={cn(listingStatusBadgeVariants({ status }), className)}
       {...props}
     >
-      {status === 'SOLD' && <CheckCircle2 className="mr-1 h-3 w-3" />}
-      {status === 'RESERVED' && <Clock3 className="mr-1 h-3 w-3" />}
+      {status === 'SOLD' && <CheckCircle2 className="mr-1 size-3" />}
+      {status === 'RESERVED' && <Clock3 className="mr-1 size-3" />}
       {formatStatus(status)}
     </Badge>
   );

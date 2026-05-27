@@ -135,7 +135,7 @@ export function TransactionStatusMessage({
 
   return (
     <Alert className={cn(alertVariants({ status }), className)}>
-      <Icon className="h-4 w-4" />
+      <Icon className="size-4" />
       <div className="flex flex-col gap-1">
         <AlertTitle>{title}</AlertTitle>
         <AlertDescription>

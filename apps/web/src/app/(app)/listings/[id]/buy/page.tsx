@@ -95,7 +95,7 @@ export default function BuyListingPage() {
             variant="ghost"
             onClick={() => router.push(`/listings/${listingId}`)}
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="size-4 mr-1" />
             Back
           </Button>
 

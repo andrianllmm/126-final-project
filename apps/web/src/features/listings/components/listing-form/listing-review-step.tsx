@@ -60,7 +60,7 @@ export function ListingReviewStep({
           onClick={onBack}
           disabled={isSubmitting}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="size-4 mr-1" />
           <span>Back</span>
         </Button>
 
@@ -78,7 +78,7 @@ export function ListingReviewStep({
               : mode === 'edit'
                 ? 'Save Changes'
                 : 'Publish Listing'}
-            <Rocket className="h-4 w-4" />
+            <Rocket className="size-4" />
           </Button>
         </div>
       </div>

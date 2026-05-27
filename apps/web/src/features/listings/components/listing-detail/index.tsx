@@ -73,7 +73,7 @@ export function ListingDetail() {
         onClick={() => router.back()}
         className="mb-6 gap-2"
       >
-        <ArrowLeft className="h-4 w-4 mr-1" />
+        <ArrowLeft className="size-4 mr-1" />
         Back
       </Button>
 

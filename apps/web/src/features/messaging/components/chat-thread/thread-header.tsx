@@ -43,7 +43,7 @@ export function ChatThreadHeader({
 
           <span
             className={cn(
-              'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background',
+              'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
               isConnected ? 'bg-primary' : 'bg-muted-foreground',
             )}
           />

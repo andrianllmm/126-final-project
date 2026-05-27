@@ -26,10 +26,7 @@ export function TypingIndicator({
 function Dot({ delay, className }: { delay: number; className?: string }) {
   return (
     <span
-      className={cn(
-        'h-2 w-2 rounded-full bg-current animate-bounce',
-        className,
-      )}
+      className={cn('size-2 rounded-full bg-current animate-bounce', className)}
       style={{
         animationDelay: `${delay}ms`,
         animationDuration: '1s',

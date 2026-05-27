@@ -37,7 +37,7 @@ export function NotificationItem({
     >
       <div className="flex gap-3">
         {unread && (
-          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
+          <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" />
         )}
 
         <div className="min-w-0 flex-1">

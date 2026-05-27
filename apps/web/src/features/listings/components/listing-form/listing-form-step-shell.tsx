@@ -32,7 +32,7 @@ export function ListingFormStepShell({
 
         <div className="flex justify-between pt-6">
           <Button type="button" variant="outline" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
+            <ArrowLeft className="size-4 mr-1" />
             Back
           </Button>
           <Button
@@ -42,7 +42,7 @@ export function ListingFormStepShell({
             disabled={nextDisabled}
           >
             {nextDisabled && busyLabel ? busyLabel : nextLabel}
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>
