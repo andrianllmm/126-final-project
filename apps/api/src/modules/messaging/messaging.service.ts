@@ -257,7 +257,12 @@ export class MessagingService {
           },
         },
       },
-      orderBy: { lastMessageAt: 'desc' },
+      orderBy: {
+        lastMessageAt: {
+          sort: 'desc',
+          nulls: 'last',
+        },
+      },
     });
   }
 
