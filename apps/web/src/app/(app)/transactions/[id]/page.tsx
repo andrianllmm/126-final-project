@@ -20,6 +20,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import {
   TransactionAction,
   TransactionStatus,
@@ -186,6 +187,18 @@ export default function TransactionDetailPage() {
               transaction={transaction}
               userRole={userRole}
             />
+
+            {transaction.status === TransactionStatus.COMPLETED && (
+              <div className="flex justify-end">
+                <Button asChild size="sm" variant="outline">
+                  <Link
+                    href={`/transactions/${transaction.transactionId}/review`}
+                  >
+                    Leave review
+                  </Link>
+                </Button>
+              </div>
+            )}
 
             <Separator />
 
