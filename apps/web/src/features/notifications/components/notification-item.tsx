@@ -24,7 +24,7 @@ export function NotificationItem({
     if (notification.actionLink) {
       router.push(notification.actionLink);
     }
-  }, [onClick, notification, router]);
+  }, [onClick, notification.id, notification.actionLink, router]);
 
   return (
     <div
