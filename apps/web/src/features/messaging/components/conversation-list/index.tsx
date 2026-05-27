@@ -39,7 +39,7 @@ export function ConversationList({ mode = 'default' }: ConversationListProps) {
     <div className="flex h-full flex-col bg-background">
       <div
         className={[
-          'flex items-center justify-between gap-3 border-b',
+          'flex items-center justify-between gap-3',
           isPopover ? 'px-3 py-3' : 'px-4 py-4',
         ].join(' ')}
       >

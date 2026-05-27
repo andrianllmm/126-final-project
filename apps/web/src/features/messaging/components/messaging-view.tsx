@@ -11,8 +11,9 @@ import {
 
 export function MessagingView({ conversationId }: { conversationId?: string }) {
   return (
-    <>
-      <div className="h-full min-h-0 bg-background md:hidden">
+    <div className="h-full min-h-0 overflow-hidden">
+      {/* mobile */}
+      <div className="h-full min-h-0 overflow-hidden bg-background md:hidden">
         {conversationId ? (
           <ChatThread conversationId={conversationId} showBackButton />
         ) : (
@@ -20,7 +21,8 @@ export function MessagingView({ conversationId }: { conversationId?: string }) {
         )}
       </div>
 
-      <div className="hidden h-full min-h-0 bg-muted/20 md:flex">
+      {/* desktop */}
+      <div className="hidden h-full min-h-0 overflow-hidden bg-muted/20 md:flex">
         <ResizablePanelGroup
           orientation="horizontal"
           className="h-full min-h-0"
@@ -51,6 +53,6 @@ export function MessagingView({ conversationId }: { conversationId?: string }) {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </>
+    </div>
   );
 }
