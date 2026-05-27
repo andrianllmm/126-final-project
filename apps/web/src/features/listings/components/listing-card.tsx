@@ -11,6 +11,7 @@ import { ListingStatusBadge } from './listing-status-badge';
 import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
 import { ListingLikeButton } from './listing-like-button';
 
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
@@ -21,7 +22,8 @@ import { Package } from 'lucide-react';
 
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
-import { Button } from '@/shared/components/ui/button';
+import { useAuth } from '@/features/auth/hooks/use-auth';
+import { DeleteListingDialog } from './delete-listing-dialog';
 
 interface ListingCardProps {
   listing: Listing;
@@ -35,18 +37,25 @@ export function ListingCard({
   className,
 }: ListingCardProps) {
   const router = useRouter();
+  const { user } = useAuth();
 
   const primaryImage = [...listing.images].sort(
     (a, b) => a.sortOrder - b.sortOrder,
   )[0];
 
   const isUnavailable = ListingStatus.AVAILABLE != listing.status;
+  const isOwner = Boolean(user?.id === listing.seller.id);
 
   const goToListing = () => router.push(href);
 
   const goToSeller = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/profile/${listing.seller.id}`);
+  };
+
+  const goToEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/listings/${listing.id}/edit`);
   };
 
   return (
@@ -131,8 +140,24 @@ export function ListingCard({
             isLikedByUser={listing.isLikedByUser}
           />
         </div>
+      </CardFooter>
 
-        <TransactionRequestButton listing={listing} />
+      {/* FOOTER */}
+      <CardFooter className="px-4 pb-4 pt-4 w-full">
+        {isOwner ? (
+          <div className="grid w-full grid-cols-2 gap-2">
+            <Button size="lg" className="w-full" onClick={goToEdit}>
+              Edit
+            </Button>
+            <DeleteListingDialog
+              listingId={listing.id}
+              listingTitle={listing.title}
+              onDeleted={() => router.push('/')}
+            />
+          </div>
+        ) : (
+          <TransactionRequestButton listing={listing} />
+        )}
       </CardFooter>
     </Card>
   );

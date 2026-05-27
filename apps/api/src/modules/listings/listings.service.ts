@@ -90,7 +90,7 @@ export class ListingsService {
   }
 
   async create(sellerId: string, input: CreateListingInput): Promise<Listing> {
-    await this.policy.assertValidCategory(input.categoryId);
+    const categoryId = await this.policy.getCategoryIdOrThrow(input.categoryId);
 
     const listing = await this.prisma.listing.create({
       data: {
@@ -101,7 +101,7 @@ export class ListingsService {
         status: input.status ?? ListingStatus.AVAILABLE,
 
         seller: { connect: { id: sellerId } },
-        category: { connect: { id: input.categoryId } },
+        category: { connect: { id: categoryId } },
       },
       include: LISTING_INCLUDE,
     });
@@ -118,8 +118,9 @@ export class ListingsService {
 
     this.policy.assertOwner(listing, userId);
 
+    let categoryId: string | undefined;
     if (input.categoryId) {
-      await this.policy.assertValidCategory(input.categoryId);
+      categoryId = await this.policy.getCategoryIdOrThrow(input.categoryId);
     }
 
     const updated = await this.prisma.listing.update({
@@ -130,9 +131,7 @@ export class ListingsService {
         price: input.price,
         condition: input.condition,
 
-        category: input.categoryId
-          ? { connect: { id: input.categoryId } }
-          : undefined,
+        category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
       include: LISTING_INCLUDE,
     });

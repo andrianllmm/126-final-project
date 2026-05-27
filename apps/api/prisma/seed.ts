@@ -17,6 +17,14 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
+const LISTING_CATEGORIES = [
+  { categoryName: 'Electronics', slug: 'electronics' },
+  { categoryName: 'Books', slug: 'books' },
+  { categoryName: 'Furniture', slug: 'furniture' },
+  { categoryName: 'Clothing', slug: 'clothing' },
+  { categoryName: 'Other', slug: 'other' },
+];
+
 // Helper to simulate upload records
 async function createUpload(url: string, key: string) {
   return prisma.upload.create({
