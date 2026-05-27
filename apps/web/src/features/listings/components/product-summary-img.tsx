@@ -83,14 +83,16 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
 
         {/* Main Image */}
         <div className="w-full sm:w-90 md:w-105 lg:w-115 relative aspect-4/5 bg-muted rounded-xl overflow-hidden">
-          <Image
-            src={displayImages[currentImageIndex]}
-            alt="Product"
-            fill
-            priority
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 768px) 360px, (max-width: 1024px) 420px, 460px"
-          />
+          {displayImages.length > 0 && displayImages[currentImageIndex] && (
+            <Image
+              src={displayImages[currentImageIndex]}
+              alt="Product"
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 360px, (max-width: 1024px) 420px, 460px"
+            />
+          )}
 
           {/* Navigation */}
           <Button
