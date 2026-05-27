@@ -21,7 +21,7 @@ export function NotificationList({
   const hasUnread = notifications.some((n) => !n.isRead);
 
   return (
-    <div className="flex max-h-96 flex-col gap-3">
+    <div className="flex max-h-96 flex-col gap-3 p-3">
       {/* header */}
       <div className="flex items-center justify-between gap-3 px-3">
         <div className="flex items-center gap-2">

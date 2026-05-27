@@ -25,7 +25,7 @@ export function NotificationBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon-sm" className="relative">
           <BellIcon />
           {unreadCount > 0 ? (
             <Badge className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full px-1 text-[10px]">
@@ -35,7 +35,11 @@ export function NotificationBell() {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-88">
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        className="overflow-hidden rounded-lg p-0 w-screen max-w-none md:w-88 md:max-w-sm"
+      >
         <NotificationList
           notifications={notifications}
           onMarkAllAsRead={() => markAllAsRead()}
