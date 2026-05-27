@@ -8,6 +8,7 @@ import { ListingStatus, NotificationType } from '@repo/api';
 import { NotificationsGateway } from '../notifications/notifications.gateway.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { truncateText } from '../../common/truncate-text.js';
+import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
 
 const conversationUserSelect = {
   id: true,
@@ -211,7 +212,7 @@ export class MessagingService {
       `/messages/${conversation.id}`,
     );
 
-    this.notificationsGateway.emitNotificationCreated(notification);
+    this.notificationsService.emitCreated(notification as NotificationRecord);
 
     return message;
   }
