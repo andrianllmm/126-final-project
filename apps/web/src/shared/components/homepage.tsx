@@ -4,18 +4,26 @@ import { usePathname, useSearchParams } from 'next/navigation';
 
 import { ListingGrid } from '@/features/listings/components/listing-grid';
 import { ListingPagination } from '@/features/listings/components/listing-pagination';
-import { useListings } from '@/features/listings/hooks/use-listings';
+import { useSearchListings } from '@/features/listings/hooks/use-search';
 import {
   buildListingPaginationQuery,
   setQueryParams,
 } from '@/features/listings/lib/search-query';
+import { ListingStatus, type ListingSearchQuery } from '@repo/api';
 
 export default function HomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const paginationQuery = buildListingPaginationQuery(searchParams);
-  const { data, isLoading, isError } = useListings(paginationQuery);
+  const listingsQuery: ListingSearchQuery = {
+    ...paginationQuery,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    status: [ListingStatus.AVAILABLE, ListingStatus.RESERVED],
+  };
+
+  const { data, isLoading, isError } = useSearchListings(listingsQuery);
 
   const buildPageHref = (page: number) =>
     setQueryParams(pathname, searchParams, { page: String(page) });
