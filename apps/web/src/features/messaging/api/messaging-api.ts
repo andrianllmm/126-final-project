@@ -7,6 +7,18 @@ export const getOrCreateConversation = (listingId: string) =>
     { listingId },
   );
 
+export const getOrCreateConversationWithBuyer = ({
+  listingId,
+  buyerId,
+}: {
+  listingId: string;
+  buyerId: string;
+}) =>
+  apiClient.post<Conversation, { listingId: string; buyerId: string }>(
+    '/messaging/conversations/with-buyer',
+    { listingId, buyerId },
+  );
+
 export const getConversations = () =>
   apiClient.get<ConversationList>('/messaging/conversations');
 
