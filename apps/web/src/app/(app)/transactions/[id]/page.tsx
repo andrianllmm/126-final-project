@@ -19,7 +19,7 @@ import { UserCardCompact } from '@/features/users/components/user-card-compact';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { Spinner } from '@/shared/components/ui/spinner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 import {
   TransactionAction,
@@ -55,6 +55,12 @@ export default function TransactionDetailPage() {
       : ReviewRole.SELLER_TO_BUYER;
 
   const hasReviewedThisTransaction = myReviews?.some(
+    (review) =>
+      review.transactionId === transaction?.transactionId &&
+      review.role === reviewRole,
+  );
+
+  const existingReview = myReviews?.find(
     (review) =>
       review.transactionId === transaction?.transactionId &&
       review.role === reviewRole,
@@ -190,13 +196,28 @@ export default function TransactionDetailPage() {
 
             {transaction.status === TransactionStatus.COMPLETED && (
               <div className="flex justify-end">
-                <Button asChild size="sm" variant="outline">
-                  <Link
-                    href={`/transactions/${transaction.transactionId}/review`}
-                  >
-                    Leave review
-                  </Link>
-                </Button>
+                {existingReview ? (
+                  <div className="flex items-center gap-1 rounded-md border px-3 py-2">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <Star
+                        key={value}
+                        className={
+                          value <= existingReview.rating
+                            ? 'size-4 fill-primary text-primary'
+                            : 'size-4 fill-transparent text-muted-foreground/25'
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={`/transactions/${transaction.transactionId}/review`}
+                    >
+                      Leave review
+                    </Link>
+                  </Button>
+                )}
               </div>
             )}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowLeft, MessageSquare, Star } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { Textarea } from '@/shared/components/ui/textarea';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { cn } from '@/shared/lib/utils';
 
+import type { Review } from '@repo/api';
 import { useCreateReviewMutation } from '../hooks/use-create-review';
 
 type Props = {
@@ -20,6 +21,7 @@ type Props = {
   targetName: string;
   title: string;
   description: string;
+  existingReview?: Review | null;
   backHref?: string;
 };
 
@@ -29,24 +31,36 @@ export function ReviewForm({
   targetName,
   title,
   description,
+  existingReview,
   backHref = '/transactions',
 }: Props) {
   const router = useRouter();
   const createReviewMutation = useCreateReviewMutation();
+  const isReadOnly = Boolean(existingReview);
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (!existingReview) return;
+
+    setRating(existingReview.rating);
+    setComment(existingReview.comment ?? '');
+    setHoveredRating(null);
+  }, [existingReview]);
+
   const activeRating = hoveredRating ?? rating;
 
-  const submitLabel = useMemo(
-    () => (createReviewMutation.isPending ? 'Submitting...' : 'Submit review'),
-    [createReviewMutation.isPending],
-  );
+  const submitLabel = useMemo(() => {
+    if (isReadOnly) return 'Reviewed';
+    return createReviewMutation.isPending ? 'Submitting...' : 'Submit review';
+  }, [createReviewMutation.isPending, isReadOnly]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isReadOnly) return;
 
     createReviewMutation.mutate(
       {
@@ -82,7 +96,9 @@ export function ReviewForm({
             <div className="space-y-1">
               <Label className="text-base font-medium">Your rating</Label>
               <p className="text-xs text-muted-foreground">
-                Tap a star to set your rating.
+                {isReadOnly
+                  ? 'Your submitted rating.'
+                  : 'Tap a star to set your rating.'}
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -94,6 +110,7 @@ export function ReviewForm({
                   onClick={() => setRating(value)}
                   onMouseEnter={() => setHoveredRating(value)}
                   onMouseLeave={() => setHoveredRating(null)}
+                  disabled={isReadOnly}
                   aria-label={`Rate ${value} star${value === 1 ? '' : 's'}`}
                 >
                   <Star
@@ -130,6 +147,7 @@ export function ReviewForm({
               onChange={(e) => setComment(e.target.value)}
               placeholder="e.g. Great communication, fast shipping, item was exactly as described..."
               className="min-h-44 resize-y text-sm leading-relaxed"
+              disabled={isReadOnly}
               maxLength={500}
             />
           </div>
@@ -148,9 +166,11 @@ export function ReviewForm({
               type="submit"
               size="lg"
               className="min-w-36"
-              disabled={createReviewMutation.isPending}
+              disabled={isReadOnly || createReviewMutation.isPending}
             >
-              {createReviewMutation.isPending ? (
+              {isReadOnly ? (
+                'Reviewed'
+              ) : createReviewMutation.isPending ? (
                 <span className="inline-flex items-center gap-2">
                   <Spinner className="size-4" />
                   Submitting...
