@@ -219,24 +219,6 @@ export class ListingsService {
     return decorateListing(this.prisma, listing, userId);
   }
 
-  async getLikedListings(userId: string): Promise<Listing[]> {
-    const likedListings = await this.prisma.likedListing.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        listing: {
-          include: LISTING_INCLUDE,
-        },
-      },
-    });
-
-    return decorateListings(
-      this.prisma,
-      likedListings.map((entry) => entry.listing),
-      userId,
-    );
-  }
-
   async getListingTransactions(
     listingId: string,
     status?: TransactionStatus | TransactionStatus[],
