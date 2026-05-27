@@ -58,26 +58,29 @@ export class ReviewsService {
 
     const revieweeId = isBuyer ? transaction.sellerId : transaction.buyerId;
 
-    const review = await this.prisma.review.create({
-      data: {
-        reviewerId,
-        revieweeId,
-        listingId,
-        transactionId,
-        rating,
-        comment,
-        role,
-      },
-    });
+    const review = await this.prisma.$transaction(async (tx) => {
+      const createdReview = await tx.review.create({
+        data: {
+          reviewerId,
+          revieweeId,
+          listingId,
+          transactionId,
+          rating,
+          comment,
+          role,
+        },
+      });
 
-    // create a notification for the reviewee
-    await this.prisma.notification.create({
-      data: {
-        userId: revieweeId,
-        type: 'RATING',
-        title: 'You received a new rating',
-        message: `You received a ${rating} star rating`,
-      },
+      await tx.notification.create({
+        data: {
+          userId: revieweeId,
+          type: 'RATING',
+          title: 'You received a new rating',
+          message: `You received a ${rating} star rating`,
+        },
+      });
+
+      return createdReview;
     });
 
     return review;
