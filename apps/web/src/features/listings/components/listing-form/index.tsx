@@ -32,8 +32,9 @@ import type { ListingFormHandle } from './listing-details-form';
 import type { ListingFormValues, CreateListingInput } from '@repo/api';
 import type { UploadedPhoto } from './photo-upload-types';
 import { ListingCondition } from '@repo/api';
+import { autofillListingFormFromImage } from '../../actions/autofill-listing-form';
 
-const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
+const steps = [{ title: 'Photos' }, { title: 'Details' }, { title: 'Review' }];
 
 interface ListingStepperProps {
   mode?: 'create' | 'edit';
@@ -64,7 +65,8 @@ export function ListingForm({
     removeListingImageMutation.isPending;
 
   const [publishError, setPublishError] = useState<string | null>(null);
-  const [validatingStep1, setValidatingStep1] = useState(false);
+  const [analyzingPhoto, setAnalyzingPhoto] = useState(false);
+  const [validatingDetails, setValidatingDetails] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const listingFormRef = useRef<ListingFormHandle>(null);
 
@@ -103,37 +105,57 @@ export function ListingForm({
     window.scrollTo(0, 0);
   }, [currentStep]);
 
-  const handleNextFromStep1 = async () => {
-    setValidatingStep1(true);
+  const handleNextFromPhotos = async () => {
+    setAnalyzingPhoto(true);
     setPhotoError(null);
     try {
-      const isValid = await listingFormRef.current?.triggerValidation();
-      if (isValid) {
-        const latestValues = listingFormRef.current?.getValues();
-        if (latestValues) {
-          setFormData(latestValues);
-        }
-        setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+      if (photos.length === 0) {
+        setPhotoError('Please upload at least one photo before proceeding.');
+        return;
       }
+
+      if (mode === 'create' && photos[0]) {
+        const autofillValues = await autofillListingFormFromImage({
+          mainImage: photos[0].preview,
+          categories: categories ?? [],
+        });
+
+        if (autofillValues) {
+          setFormData((current) => ({
+            ...current,
+            ...autofillValues,
+          }));
+        }
+      }
+
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     } finally {
-      setValidatingStep1(false);
+      setAnalyzingPhoto(false);
     }
   };
 
-  const handleNextFromStep2 = () => {
-    if (photos.length === 0) {
-      setPhotoError('Please upload at least one photo before proceeding.');
-      return;
+  const handleNextFromDetails = async () => {
+    setValidatingDetails(true);
+    try {
+      const isValid = await listingFormRef.current?.triggerValidation();
+      if (!isValid) return;
+
+      const latestValues = listingFormRef.current?.getValues();
+      if (latestValues) {
+        setFormData(latestValues);
+      }
+
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+    } finally {
+      setValidatingDetails(false);
     }
-    setPhotoError(null);
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
 
   const handleNext = () => {
     if (currentStep === 1) {
-      handleNextFromStep1();
+      void handleNextFromPhotos();
     } else if (currentStep === 2) {
-      handleNextFromStep2();
+      void handleNextFromDetails();
     } else {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     }
@@ -242,9 +264,33 @@ export function ListingForm({
           <ListingFormStepShell
             onBack={handleBack}
             onNext={handleNext}
-            nextLabel="Next"
+            nextLabel="Continue"
+            busyLabel="Analyzing..."
+            nextDisabled={analyzingPhoto}
+            aside={
+              <>
+                <PhotoGuidelines />
+              </>
+            }
+          >
+            <PhotoUploadForm photos={photos} onChange={setPhotos} />
+            {photoError && (
+              <div className="my-4 rounded-md border border-destructive/20 bg-destructive/10 p-3">
+                <p className="text-sm font-medium text-destructive">
+                  {photoError}
+                </p>
+              </div>
+            )}
+          </ListingFormStepShell>
+        </StepperContent>
+
+        <StepperContent value={2}>
+          <ListingFormStepShell
+            onBack={handleBack}
+            onNext={handleNext}
+            nextLabel="Review"
             busyLabel="Validating..."
-            nextDisabled={validatingStep1}
+            nextDisabled={validatingDetails}
             aside={
               <>
                 <SellerTipsCard />
@@ -257,28 +303,6 @@ export function ListingForm({
               title={mode === 'edit' ? 'Edit Listing Details' : undefined}
               initialData={formData}
             />
-          </ListingFormStepShell>
-        </StepperContent>
-
-        <StepperContent value={2}>
-          <ListingFormStepShell
-            onBack={handleBack}
-            onNext={handleNext}
-            nextLabel="Next"
-            aside={
-              <>
-                <PhotoGuidelines />
-              </>
-            }
-          >
-            <PhotoUploadForm photos={photos} onChange={setPhotos} />
-            {photoError && (
-              <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 my-4">
-                <p className="text-sm font-medium text-destructive">
-                  {photoError}
-                </p>
-              </div>
-            )}
           </ListingFormStepShell>
         </StepperContent>
 

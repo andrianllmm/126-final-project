@@ -1,6 +1,6 @@
 'use client';
 
-import { useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -42,6 +42,7 @@ export const ListingDetailsForm = forwardRef<
     control,
     trigger,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<ListingFormValues>({
     resolver: zodResolver(listingFormSchema),
@@ -54,6 +55,16 @@ export const ListingDetailsForm = forwardRef<
     },
     mode: 'onTouched',
   });
+
+  useEffect(() => {
+    reset({
+      title: initialData?.title ?? '',
+      categoryId: initialData?.categoryId ?? '',
+      price: initialData?.price ?? 0,
+      description: initialData?.description ?? '',
+      condition: initialData?.condition ?? '',
+    });
+  }, [initialData, reset]);
 
   const { data: categories } = useCategories();
 
