@@ -45,7 +45,7 @@ model User {
 
   notifications Notification[]
 
-  savedListings SavedListing[]
+  likedListings LikedListing[]
   listings      Listing[]
   messages      Message[]
 
@@ -215,7 +215,7 @@ model Listing {
   soldAt    DateTime?
 
   images        ListingImage[]
-  savedBy       SavedListing[]
+  likedBy       LikedListing[]
   conversations Conversation[]
   transactions  Transaction[]
   reviews       Review[]
@@ -241,7 +241,7 @@ model ListingImage {
   @@index([listingId])
 }
 
-model SavedListing {
+model LikedListing {
   id String @id @default(cuid())
 
   userId String

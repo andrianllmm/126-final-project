@@ -9,6 +9,7 @@ import { currencyFormatter } from '@/shared/lib/currency-formatter';
 import { ListingConditionBadge } from './listing-condition-badge';
 import { ListingStatusBadge } from './listing-status-badge';
 import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
+import { ListingLikeButton } from './listing-like-button';
 
 import {
   Card,
@@ -123,7 +124,12 @@ export function ListingCard({
               {listing.seller.name}
             </Button>
           </div>
-          <div></div>
+
+          <ListingLikeButton
+            listingId={listing.id}
+            likeCount={listing.likeCount}
+            isLikedByUser={listing.isLikedByUser}
+          />
         </div>
 
         <TransactionRequestButton listing={listing} />

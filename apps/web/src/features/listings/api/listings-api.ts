@@ -19,6 +19,12 @@ export const getListings = (query: ListingPaginationQuery) =>
 export const getListing = (id: string) =>
   apiClient.get<Listing>(`/listings/${id}`);
 
+export const likeListing = (id: string) =>
+  apiClient.post<Listing>(`/listings/${id}/like`, undefined);
+
+export const unlikeListing = (id: string) =>
+  apiClient.delete<Listing>(`/listings/${id}/like`);
+
 export const createListing = (input: CreateListingInput) =>
   apiClient.post<Listing, CreateListingInput>('/listings', input);
 
