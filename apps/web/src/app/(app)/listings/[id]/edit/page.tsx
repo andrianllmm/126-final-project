@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Pattern } from '@/features/listings/components/listing-stepper';
+import { AuthRouteGuard } from '@/features/auth/components/auth-route-guard';
 import { useListing } from '@/features/listings/hooks/use-listing-detail';
 import {
   ListingFormValues,
@@ -93,13 +94,15 @@ export default function Page() {
     }));
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <Pattern
-        mode="edit"
-        listingId={listingId}
-        initialData={initialData as ListingFormValues}
-        initialPhotos={initialPhotos}
-      />
-    </div>
+    <AuthRouteGuard>
+      <div className="min-h-screen bg-background py-8">
+        <Pattern
+          mode="edit"
+          listingId={listingId}
+          initialData={initialData as ListingFormValues}
+          initialPhotos={initialPhotos}
+        />
+      </div>
+    </AuthRouteGuard>
   );
 }
