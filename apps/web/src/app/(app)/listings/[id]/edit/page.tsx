@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { Pattern } from '@/features/listings/components/listing-stepper';
+import { Pattern } from '@/features/listings/components/listing-form/listing-stepper';
 import { AuthRouteGuard } from '@/features/auth/components/auth-route-guard';
 import { useListing } from '@/features/listings/hooks/use-listing-detail';
 import {
