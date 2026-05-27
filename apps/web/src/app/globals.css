@@ -132,4 +132,18 @@
   .maplibregl-popup-tip {
     @apply hidden!;
   }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  ::-moz-selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@layer utilities {
+  .page-container {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
 }

@@ -6,7 +6,7 @@ export function NeedHelpCard() {
     <Card>
       <div className="px-6 py-2">
         <div className="flex items-center gap-2 mb-6">
-          <HelpCircle className="w-5 h-5 text-primary" />
+          <HelpCircle className="size-5 text-primary" />
           <h3 className="text-lg font-semibold">Need Help?</h3>
         </div>
 

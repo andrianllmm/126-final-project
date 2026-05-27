@@ -51,7 +51,7 @@ export default function BuyListingPage() {
 
   if (!user || isLoading || !listing) {
     return (
-      <div className="container max-w-3xl py-10 flex items-center justify-center min-h-100">
+      <div className="page-container flex min-h-100 items-center justify-center py-10">
         <Spinner className="size-8 text-primary" />
       </div>
     );
@@ -88,33 +88,34 @@ export default function BuyListingPage() {
   };
 
   return (
-    <div className="container max-w-3xl py-10 space-y-10">
-      <div className="space-y-4">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/listings/${listingId}`)}
-          className="px-0"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to listing
-        </Button>
+    <div className="page-container py-10">
+      <div className="max-w-3xl space-y-10 mb-8">
+        <div className="space-y-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.push(`/listings/${listingId}`)}
+          >
+            <ArrowLeft className="size-4 mr-1" />
+            Back
+          </Button>
 
-        <div>
-          <h1 className="text-2xl font-semibold">Review request</h1>
-          <p className="text-sm text-muted-foreground">
-            Confirm before sending your purchase request
-          </p>
+          <div>
+            <h1 className="text-2xl font-semibold">Review request</h1>
+            <p className="text-sm text-muted-foreground">
+              Confirm before sending your purchase request
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-sm font-semibold mb-3">You will request</h3>
+          <h3 className="mb-3 text-sm font-semibold">You will request</h3>
           <ListingCardCompact listing={listing} />
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold mb-3">Sold by</h3>
+          <h3 className="mb-3 text-sm font-semibold">Sold by</h3>
           <UserCardCompact user={listing.seller} />
         </div>
 
@@ -122,7 +123,7 @@ export default function BuyListingPage() {
 
         <Alert>
           <AlertDescription>
-            <ul className="list-disc list-inside space-y-1 mt-2 text-sm">
+            <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
               <li>Seller will be notified</li>
               <li>You can message while waiting</li>
               <li>No payment is processed yet</li>

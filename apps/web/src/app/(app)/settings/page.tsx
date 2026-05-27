@@ -11,5 +11,9 @@ export default function Page() {
 
   if (!userId) return null;
 
-  return <SettingsView userId={userId} />;
+  return (
+    <div className="page-container py-8">
+      <SettingsView userId={userId} />
+    </div>
+  );
 }

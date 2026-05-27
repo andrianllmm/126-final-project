@@ -88,21 +88,29 @@ export function ListingCard({
       </div>
 
       {/* HEADER */}
-      <CardHeader className="space-y-1 px-4 pt-4 mb-1">
-        <div className="flex flex-wrap gap-1">
-          <ListingStatusBadge status={listing.status} />
-          <ListingConditionBadge condition={listing.condition} />
-          <Badge variant="outline">
-            {listing.category?.categoryName ?? listing.category?.slug}
-          </Badge>
+      <CardHeader className="mb-1 space-y-1 px-4 pt-4">
+        <div className="flex flex-nowrap gap-1 overflow-hidden">
+          <div className="shrink-0 whitespace-nowrap">
+            <ListingStatusBadge status={listing.status} />
+          </div>
+
+          <div className="shrink-0 whitespace-nowrap">
+            <ListingConditionBadge condition={listing.condition} />
+          </div>
+
+          <div className="shrink-0 whitespace-nowrap">
+            <Badge variant="outline">
+              {listing.category?.categoryName ?? listing.category?.slug}
+            </Badge>
+          </div>
         </div>
 
-        <div className="flex items-start justify-between gap-3">
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <h3 className="min-w-0 truncate text-sm font-semibold sm:text-base">
             {listing.title}
           </h3>
 
-          <p className="shrink-0 text-lg font-bold text-primary">
+          <p className="whitespace-nowrap text-lg font-bold text-primary">
             {currencyFormatter.format(listing.price)}
           </p>
         </div>
@@ -116,8 +124,8 @@ export function ListingCard({
       </CardContent>
 
       {/* FOOTER */}
-      <CardFooter className="flex flex-col gap-2 px-4 pb-4 pt-2 mt-auto">
-        <div className="w-full flex items-center justify-between">
+      <CardFooter className="mt-auto flex flex-col gap-2 px-4 pb-4 pt-2">
+        <div className="flex w-full items-center justify-between">
           {/* Seller + Message */}
           <div className="flex items-center gap-0">
             <MessageButton
@@ -150,7 +158,7 @@ export function ListingCard({
         <div className="w-full">
           {isOwner ? (
             <div className="grid w-full grid-cols-2 gap-2">
-              <Button size="lg" className="w-full" onClick={goToEdit}>
+              <Button size="sm" className="w-full" onClick={goToEdit}>
                 Edit
               </Button>
               <DeleteListingDialog

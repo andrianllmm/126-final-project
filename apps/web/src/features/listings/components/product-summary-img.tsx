@@ -102,7 +102,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
             className="absolute left-3 top-1/2 -translate-y-1/2 bg-background text-foreground hover:bg-muted rounded-full h-10 w-10 border border-border shadow-md"
             onClick={prevImage}
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="size-5" />
           </Button>
 
           <Button
@@ -112,7 +112,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
             className="absolute right-3 top-1/2 -translate-y-1/2 bg-background text-foreground hover:bg-muted rounded-full h-10 w-10 border border-border shadow-md"
             onClick={nextImage}
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="size-5" />
           </Button>
 
           {/* Counter */}

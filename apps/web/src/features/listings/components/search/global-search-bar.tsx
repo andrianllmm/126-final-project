@@ -44,35 +44,17 @@ export function GlobalSearchBar({ className }: { className?: string }) {
   return (
     <form onSubmit={handleSubmit} className={cn('w-full', className)}>
       <InputGroup className="h-10 overflow-hidden rounded-full border bg-transparent shadow-none dark:bg-transparent">
-        <div className="hidden sm:flex flex-1">
+        <div className="flex min-w-0 flex-1">
           <InputGroupInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search listings"
-            aria-label="Search listings"
+            placeholder="Search"
+            aria-label="Search"
             className="h-10 px-4"
           />
         </div>
 
-        <div className="flex sm:hidden flex-1 justify-center">
-          <InputGroupButton
-            type="button"
-            variant="default"
-            className="size-10 rounded-full"
-            aria-label="Search"
-            onClick={() => {
-              if (query.trim()) {
-                submit(query);
-              } else {
-                router.push('/search');
-              }
-            }}
-          >
-            <Search className="size-4" />
-          </InputGroupButton>
-        </div>
-
-        <InputGroupAddon align="inline-end" className="hidden sm:flex">
+        <InputGroupAddon align="inline-end">
           <InputGroupButton
             type="submit"
             variant="default"

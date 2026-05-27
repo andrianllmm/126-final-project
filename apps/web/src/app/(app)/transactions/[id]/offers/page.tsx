@@ -21,36 +21,38 @@ export default function TransactionOffersPage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto max-w-3xl p-6 text-sm text-muted-foreground">
-        Loading...
+      <main className="page-container py-6 text-sm text-muted-foreground">
+        <div className="mx-auto max-w-3xl">Loading...</div>
       </main>
     );
   }
 
   if (!transaction) {
     return (
-      <main className="mx-auto max-w-3xl p-6 text-sm text-muted-foreground">
-        Transaction not found
+      <main className="page-container py-6 text-sm text-muted-foreground">
+        <div className="mx-auto max-w-3xl">Transaction not found</div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() =>
-            router.push(`/transactions/${transaction.transactionId}`)
-          }
-        >
-          <ArrowLeft className="size-4" />
-          Back
-        </Button>
-      </div>
+    <main className="page-container py-6">
+      <div className="mx-auto max-w-3xl space-y-6">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              router.push(`/transactions/${transaction.transactionId}`)
+            }
+          >
+            <ArrowLeft className="size-4 mr-1" />
+            Back
+          </Button>
+        </div>
 
-      <OfferHistory transaction={transaction} currentUserId={user.id} />
+        <OfferHistory transaction={transaction} currentUserId={user.id} />
+      </div>
     </main>
   );
 }

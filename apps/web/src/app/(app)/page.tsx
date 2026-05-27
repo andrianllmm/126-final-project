@@ -2,7 +2,7 @@ import HomePage from '@/shared/components/homepage';
 
 export default function Page() {
   return (
-    <div className="w-full">
+    <div className="page-container">
       <HomePage />
     </div>
   );

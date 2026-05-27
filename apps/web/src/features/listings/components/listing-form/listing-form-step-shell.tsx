@@ -26,13 +26,13 @@ export function ListingFormStepShell({
   nextDisabled,
 }: ListingFormStepShellProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+    <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
       <div className="mt-4 md:col-span-2">
         {children}
 
         <div className="flex justify-between pt-6">
           <Button type="button" variant="outline" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="size-4 mr-1" />
             Back
           </Button>
           <Button
@@ -42,7 +42,7 @@ export function ListingFormStepShell({
             disabled={nextDisabled}
           >
             {nextDisabled && busyLabel ? busyLabel : nextLabel}
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>

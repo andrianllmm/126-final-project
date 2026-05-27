@@ -17,16 +17,20 @@ export function MessagingPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon-sm">
           <MessageCircleIcon />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" className="w-95 p-0 overflow-hidden">
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        className="overflow-hidden rounded-lg p-0 w-screen max-w-none md:w-88 md:max-w-sm"
+      >
         <div className="flex h-125 flex-col">
           <ConversationList mode="popover" />
 
-          <div className="border-t p-2">
+          <div className="border-t p-2 bg-background">
             <Button asChild className="w-full" variant="secondary">
               <Link href="/messages">Open Messages</Link>
             </Button>

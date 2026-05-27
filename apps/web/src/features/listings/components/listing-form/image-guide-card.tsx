@@ -41,7 +41,7 @@ export function PhotoGuidelines() {
             return (
               <div key={guideline.title} className="flex gap-3">
                 <div className="shrink-0">
-                  <Icon className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <Icon className="size-5 text-muted-foreground mt-0.5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground text-sm">

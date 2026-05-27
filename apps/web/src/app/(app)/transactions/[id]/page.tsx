@@ -57,7 +57,7 @@ export default function TransactionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-6xl py-8 flex items-center justify-center min-h-100">
+      <div className="page-container flex min-h-100 items-center justify-center py-8">
         <Spinner className="size-8 text-primary" />
       </div>
     );
@@ -65,7 +65,7 @@ export default function TransactionDetailPage() {
 
   if (!transaction) {
     return (
-      <div className="container max-w-6xl py-8">
+      <div className="page-container py-8">
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">Transaction not found</p>
           <Button onClick={() => router.push('/transactions')}>Back</Button>
@@ -110,18 +110,18 @@ export default function TransactionDetailPage() {
 
   return (
     <>
-      <div className="container max-w-6xl py-8 space-y-8">
+      <div className="page-container py-8">
         <Button
           variant="ghost"
           className="mb-2"
           onClick={() => router.push('/transactions')}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="size-4 mr-1" />
           Back
         </Button>
 
         {/* MAIN + SIDEBAR LAYOUT */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* MAIN COLUMN */}
           <div className="lg:col-span-2 space-y-6">
             <div className="space-y-2">

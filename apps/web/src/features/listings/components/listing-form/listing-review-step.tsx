@@ -32,7 +32,7 @@ export function ListingReviewStep({
   onPublish,
 }: ListingReviewStepProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6">
+    <div>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         <div>
           <ProductSummaryImg photos={photos} />
@@ -60,7 +60,7 @@ export function ListingReviewStep({
           onClick={onBack}
           disabled={isSubmitting}
         >
-          <ArrowLeft />
+          <ArrowLeft className="size-4 mr-1" />
           <span>Back</span>
         </Button>
 
@@ -78,7 +78,7 @@ export function ListingReviewStep({
               : mode === 'edit'
                 ? 'Save Changes'
                 : 'Publish Listing'}
-            <Rocket className="h-4 w-4" />
+            <Rocket className="size-4" />
           </Button>
         </div>
       </div>
