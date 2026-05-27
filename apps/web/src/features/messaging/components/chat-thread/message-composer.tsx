@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
 import { Send } from 'lucide-react';
 
-import { Button } from '@/shared/components/ui/button';
-import { cn } from '@/shared/lib/utils';
-import { Textarea } from '@/shared/components/ui/textarea';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from '@/shared/components/ui/input-group';
 
 type Props = {
   onSend: (content: string) => void;
@@ -45,14 +48,12 @@ export function ChatComposer({
       if (stopTypingTimeoutRef.current) {
         clearTimeout(stopTypingTimeoutRef.current);
       }
-
       stopTyping();
     };
   }, []);
 
   const submit = () => {
     const content = value.trim();
-
     if (!content || disabled) return;
 
     onSend(content);
@@ -67,12 +68,18 @@ export function ChatComposer({
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border bg-background p-3">
-      <Textarea
+    <InputGroup className="items-end rounded-2xl border bg-background p-1">
+      <TextareaAutosize
+        autoFocus
+        minRows={1}
+        maxRows={8}
         value={value}
+        disabled={disabled}
+        placeholder="Write a message..."
+        data-slot="input-group-control"
+        className="flex w-full resize-none bg-transparent px-1 pt-2 pb-4 text-sm outline-none"
         onChange={(event) => {
           const nextValue = event.target.value;
-
           setValue(nextValue);
 
           if (disabled) return;
@@ -82,7 +89,6 @@ export function ChatComposer({
               clearTimeout(stopTypingTimeoutRef.current);
               stopTypingTimeoutRef.current = null;
             }
-
             stopTyping();
             return;
           }
@@ -105,26 +111,20 @@ export function ChatComposer({
             clearTimeout(stopTypingTimeoutRef.current);
             stopTypingTimeoutRef.current = null;
           }
-
           stopTyping();
         }}
-        disabled={disabled}
-        rows={2}
-        placeholder="Write a message..."
-        className={cn(
-          'min-h-10 max-h-36 flex-1 resize-none border-0 bg-transparent dark:bg-transparent px-1 py-2 text-sm outline-none shadow-none focus-visible:ring-0',
-          disabled && 'cursor-not-allowed opacity-50',
-        )}
       />
 
-      <Button
-        type="button"
-        size="icon-lg"
-        onClick={submit}
-        disabled={disabled || !value.trim()}
-      >
-        <Send className="size-4" />
-      </Button>
-    </div>
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton
+          onClick={submit}
+          disabled={disabled || !value.trim()}
+          className="rounded-xl size-9 p-0"
+          variant="default"
+        >
+          <Send className="size-4" />
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   );
 }
