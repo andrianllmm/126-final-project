@@ -5,7 +5,7 @@ import { Rocket } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 
 import { ProductSummaryCard } from './product-summary-card';
-import { ProductSummaryImg } from '../product-summary-img';
+import { ProductSummaryImg } from './product-summary-img';
 import type { ListingFormValues } from '@repo/api';
 import type { UploadedPhoto } from './photo-upload-types';
 import { ArrowLeft } from 'lucide-react';
