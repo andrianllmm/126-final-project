@@ -83,7 +83,6 @@ export function ProductSummaryCard({
               {description}
             </p>
           </div>
-
         </CardContent>
       </Card>
     </div>

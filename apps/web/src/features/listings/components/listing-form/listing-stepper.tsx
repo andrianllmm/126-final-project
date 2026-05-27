@@ -20,22 +20,22 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { ListingForm } from '@/features/listings/components/listing-form';
-import { SellerTipsCard } from '@/features/listings/components/seller-tips-card';
-import { NeedHelpCard } from '@/features/listings/components/need-help-card';
-import { PhotoUploadForm } from './listing-form/photo-upload-form';
+import { SellerTipsCard } from '@/features/listings/components/listing-form/seller-tips-card';
+import { NeedHelpCard } from '@/features/listings/components/listing-form/need-help-card';
+import { PhotoUploadForm } from './photo-upload-form';
 import { PhotoGuidelines } from './image-guide-card';
 import { ProductSummaryCard } from './product-summary-card';
-import { ProductSummaryImg } from './product-summary-img';
+import { ProductSummaryImg } from '../product-summary-img';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateListing } from '../hooks/use-create-listing';
+import { useCreateListing } from '../../hooks/use-create-listing';
 import {
   useAddListingImages,
   useRemoveListingImage,
-} from '../hooks/use-listing-images';
-import { useUpdateListing } from '../hooks/use-update-listing';
-import type { ListingFormHandle } from './listing-form';
-import type { ListingFormValues } from '../lib/listing-schema';
+} from '../../hooks/use-listing-images';
+import { useUpdateListing } from '../../hooks/use-update-listing';
+import type { ListingFormHandle } from '.';
+import type { ListingFormValues } from '../../lib/listing-schema';
 import { ListingCondition } from '@repo/api';
 
 const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
