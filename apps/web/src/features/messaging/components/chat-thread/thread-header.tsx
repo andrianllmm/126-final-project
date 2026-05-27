@@ -1,3 +1,4 @@
+import { ListingStatusBadge } from '@/features/listings/components/listing-status-badge';
 import { UserAvatar } from '@/features/users/components/user-avatar';
 import type { Conversation } from '@repo/api';
 import Link from 'next/link';
@@ -34,12 +35,17 @@ export function ChatThreadHeader({ conversation, currentUserId }: Props) {
         />
       </Link>
       <div className="flex flex-col min-w-0">
-        <Link
-          href={`/listings/${conversation.listingId}`}
-          className="truncate text-sm font-semibold text-foreground hover:text-primary"
-        >
-          {conversation.listing.title}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/listings/${conversation.listingId}`}
+            className="truncate text-sm font-semibold text-foreground hover:text-primary"
+          >
+            {conversation.listing.title}
+          </Link>
+          {conversation.listing.status && (
+            <ListingStatusBadge status={conversation.listing.status} />
+          )}
+        </div>
         <Link
           href={`/profile/${otherParticipant.id}`}
           className="text-sm text-muted-foreground hover:text-primary"
