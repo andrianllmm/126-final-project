@@ -39,7 +39,7 @@ export function Navbar({ className }: { className?: string }) {
         <div className="flex h-16 items-center justify-backdrop gap-2">
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <Logo className="h-8 w-8 md:hidden" />
+            <Logo className="text-primary h-8 w-8 md:hidden" />
             <Wordmark className="text-primary hidden h-8 md:block" />
           </Link>
 
