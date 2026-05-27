@@ -33,10 +33,13 @@ export class ListingsController {
   constructor(private readonly listingsService: ListingsService) {}
 
   @Get()
-  @AllowAnonymous()
+  @OptionalAuth()
   @ZodResponse({ type: ListingPageDto })
-  findAll(@Query() query: ListingPageQueryDto) {
-    return this.listingsService.findAll(query);
+  findAll(
+    @Session() session: UserSession | undefined,
+    @Query() query: ListingPageQueryDto,
+  ) {
+    return this.listingsService.findAll(query, session?.user.id);
   }
 
   @Get('categories')
@@ -49,8 +52,11 @@ export class ListingsController {
   @Get(':id')
   @OptionalAuth()
   @ZodResponse({ type: ListingDto })
-  findOne(@Param('id') id: string) {
-    return this.listingsService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Session() session: UserSession | undefined,
+  ) {
+    return this.listingsService.findOne(id, session?.user.id);
   }
 
   @Post()
@@ -83,6 +89,18 @@ export class ListingsController {
   @ZodResponse({ type: ListingDto })
   delete(@Param('id') id: string, @Session() session: UserSession) {
     return this.listingsService.delete(id, session.user.id);
+  }
+
+  @Post(':id/like')
+  @ZodResponse({ type: ListingDto })
+  likeListing(@Param('id') id: string, @Session() session: UserSession) {
+    return this.listingsService.likeListing(id, session.user.id);
+  }
+
+  @Delete(':id/like')
+  @ZodResponse({ type: ListingDto })
+  unlikeListing(@Param('id') id: string, @Session() session: UserSession) {
+    return this.listingsService.unlikeListing(id, session.user.id);
   }
 
   @Get(':id/transactions')

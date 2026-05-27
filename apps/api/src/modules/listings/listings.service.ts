@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../database/prisma.service.js';
 
 import {
@@ -9,44 +8,17 @@ import {
   UpdateListingInput,
   ListingStatus,
   Listing,
-  ListingList,
   Transaction,
   TransactionStatus,
   ListingCategoryList,
 } from '@repo/api';
 
 import { ListingPolicy } from './listing.policy.js';
-
-const LISTING_INCLUDE = {
-  category: true,
-
-  images: {
-    orderBy: { sortOrder: 'asc' },
-    select: {
-      id: true,
-      sortOrder: true,
-      upload: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-    },
-  },
-
-  seller: {
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  },
-} satisfies Prisma.ListingInclude;
-
-const mapListing = (listing: any) => ({
-  ...listing,
-  price: Number(listing.price),
-});
+import {
+  decorateListing,
+  decorateListings,
+  LISTING_INCLUDE,
+} from './listing-metadata.js';
 
 const mapTransaction = (t: any) => ({
   ...t,
@@ -67,7 +39,10 @@ export class ListingsService {
     private readonly policy: ListingPolicy,
   ) {}
 
-  async findAll(query: ListingPaginationQuery): Promise<ListingPage> {
+  async findAll(
+    query: ListingPaginationQuery,
+    userId?: string,
+  ): Promise<ListingPage> {
     const page = query.page ?? 1;
     const limit = query.limit ?? 12;
     const skip = (page - 1) * limit;
@@ -89,7 +64,7 @@ export class ListingsService {
     ]);
 
     return {
-      data: listings.map(mapListing),
+      data: await decorateListings(this.prisma, listings, userId),
       meta: {
         total,
         totalPages: Math.max(1, Math.ceil(total / limit)),
@@ -99,14 +74,14 @@ export class ListingsService {
     };
   }
 
-  async findOne(listingId: string): Promise<Listing> {
+  async findOne(listingId: string, userId?: string): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
     if (listing.status !== ListingStatus.AVAILABLE) {
       throw new NotFoundException('Listing not found');
     }
 
-    return mapListing(listing);
+    return decorateListing(this.prisma, listing, userId);
   }
 
   async create(sellerId: string, input: CreateListingInput): Promise<Listing> {
@@ -126,7 +101,7 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
-    return mapListing(listing);
+    return decorateListing(this.prisma, listing);
   }
 
   async update(
@@ -157,7 +132,7 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
-    return mapListing(updated);
+    return decorateListing(this.prisma, updated);
   }
 
   async updateStatus(
@@ -183,7 +158,7 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
-    return mapListing(updated);
+    return decorateListing(this.prisma, updated);
   }
 
   async delete(listingId: string, userId: string): Promise<Listing> {
@@ -197,7 +172,7 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
-    return mapListing(deleted);
+    return decorateListing(this.prisma, deleted);
   }
 
   private async getListingOrThrow(id: string) {
@@ -209,6 +184,57 @@ export class ListingsService {
     if (!listing) throw new NotFoundException('Listing not found');
 
     return listing;
+  }
+
+  async likeListing(listingId: string, userId: string): Promise<Listing> {
+    const listing = await this.getListingOrThrow(listingId);
+
+    await this.prisma.likedListing.upsert({
+      where: {
+        userId_listingId: {
+          userId,
+          listingId,
+        },
+      },
+      create: {
+        userId,
+        listingId,
+      },
+      update: {},
+    });
+
+    return decorateListing(this.prisma, listing, userId);
+  }
+
+  async unlikeListing(listingId: string, userId: string): Promise<Listing> {
+    const listing = await this.getListingOrThrow(listingId);
+
+    await this.prisma.likedListing.deleteMany({
+      where: {
+        userId,
+        listingId,
+      },
+    });
+
+    return decorateListing(this.prisma, listing, userId);
+  }
+
+  async getLikedListings(userId: string): Promise<Listing[]> {
+    const likedListings = await this.prisma.likedListing.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        listing: {
+          include: LISTING_INCLUDE,
+        },
+      },
+    });
+
+    return decorateListings(
+      this.prisma,
+      likedListings.map((entry) => entry.listing),
+      userId,
+    );
   }
 
   async getListingTransactions(
