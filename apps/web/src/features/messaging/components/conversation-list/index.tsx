@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ArrowLeftIcon, ExpandIcon } from 'lucide-react';
 
 import { useAuth } from '@/features/auth/hooks/use-auth';
 
@@ -10,16 +12,20 @@ import { ConversationListItemSkeleton } from './conversation-list-item-skeleton'
 
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeftIcon } from 'lucide-react';
 
-export function ConversationList() {
+type ConversationListProps = {
+  mode?: 'default' | 'popover';
+};
+
+export function ConversationList({ mode = 'default' }: ConversationListProps) {
   const pathname = usePathname();
 
   const { user, isPending } = useAuth();
   const { data, isLoading, error } = useConversations();
 
   const loading = isPending || isLoading;
+
+  const isPopover = mode === 'popover';
 
   if (error) {
     return (
@@ -31,24 +37,45 @@ export function ConversationList() {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="flex items-center justify-between gap-3 px-4 py-4">
+      <div
+        className={[
+          'flex items-center justify-between gap-3 border-b',
+          isPopover ? 'px-3 py-3' : 'px-4 py-4',
+        ].join(' ')}
+      >
         <div className="flex items-center gap-3">
-          <Button size="icon-sm" variant="ghost" asChild>
-            <Link href="/">
-              <ArrowLeftIcon className="size-5" />
+          {!isPopover && (
+            <Button size="icon-sm" variant="ghost" asChild>
+              <Link href="/">
+                <ArrowLeftIcon className="size-5" />
+              </Link>
+            </Button>
+          )}
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/messages"
+              className={[
+                'font-semibold tracking-tight hover:text-primary transition-colors',
+                isPopover ? 'text-base' : 'text-2xl',
+              ].join(' ')}
+            >
+              Chats
             </Link>
-          </Button>
-          <Link
-            href="/messages"
-            className="text-2xl font-semibold tracking-tight hover:text-primary"
-          >
-            Chat
-          </Link>
+
+            <Badge variant="secondary" className="rounded-full aspect-square">
+              {loading ? '' : (data?.length ?? 0)}
+            </Badge>
+          </div>
         </div>
 
-        <Badge variant="secondary" className="rounded-full aspect-square">
-          {loading ? '' : (data?.length ?? 0)}
-        </Badge>
+        {isPopover && (
+          <Button size="icon-sm" variant="ghost" asChild>
+            <Link href="/messages">
+              <ExpandIcon className="size-4" />
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">

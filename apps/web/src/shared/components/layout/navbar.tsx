@@ -26,7 +26,8 @@ import { Wordmark } from '@/shared/components/brand/wordmark';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { GlobalSearchBar } from '@/features/listings/components/search/global-search-bar';
 
-import { MessageCircleIcon, PackageIcon } from 'lucide-react';
+import { PackageIcon } from 'lucide-react';
+import { MessagingPopover } from '@/features/messaging/components/messaging-popover';
 
 function NavMenuItem({
   title,
@@ -129,11 +130,7 @@ export function Navbar({ className }: { className?: string }) {
             </Button>
           </Link>
 
-          <Link href="/messages">
-            <Button variant="ghost" size="icon">
-              <MessageCircleIcon />
-            </Button>
-          </Link>
+          <MessagingPopover />
 
           <NotificationBell />
           <NavUser />
