@@ -10,6 +10,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
 import { ConversationDetailsSheet } from './conversation-details-sheet';
 import { ChatThreadHeader } from './thread-header';
+import { LatestOfferBanner } from './latest-offer-banner';
 import { ChatMessageList } from './message-list';
 import { TypingBubble } from './typing-bubble';
 
@@ -88,6 +89,11 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
           ) : null}
         </div>
       </div>
+
+      <LatestOfferBanner
+        conversation={conversation}
+        currentUserId={currentUserId}
+      />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
