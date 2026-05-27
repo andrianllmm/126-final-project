@@ -23,12 +23,6 @@ export const listingFormSchema = z.object({
 
   price: z.number().min(0.01, 'Price must be greater than 0'),
 
-  meetupLocation: z
-    .string()
-    .min(1, 'Meetup location is required')
-    .min(3, 'Meetup location must be at least 3 characters')
-    .max(150, 'Meetup location must be 150 characters or fewer'),
-
   description: z
     .string()
     .min(1, 'Description is required')

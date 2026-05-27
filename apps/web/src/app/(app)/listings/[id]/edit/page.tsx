@@ -60,7 +60,6 @@ export default function Page() {
       title: listing.title,
       categoryId: resolveCategoryValue(listing.category),
       price: listing.price,
-      meetupLocation: listing.meetupLocation ?? '',
       description: listing.description,
       condition: listing.condition,
     };

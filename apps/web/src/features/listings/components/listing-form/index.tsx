@@ -54,7 +54,6 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
         title: initialData?.title ?? '',
         categoryId: initialData?.categoryId ?? '',
         price: initialData?.price ?? 0.0,
-        meetupLocation: initialData?.meetupLocation ?? '',
         description: initialData?.description ?? '',
         condition: initialData?.condition ?? '',
       },
@@ -70,7 +69,6 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
         title: initialData.title ?? '',
         categoryId: initialData.categoryId ?? '',
         price: initialData.price ?? 0.0,
-        meetupLocation: initialData.meetupLocation ?? '',
         description: initialData.description ?? '',
         condition: initialData.condition ?? '',
       });
@@ -89,7 +87,6 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
       values.title,
       values.categoryId,
       values.price,
-      values.meetupLocation,
       values.description,
       values.condition,
     ]);
@@ -179,24 +176,6 @@ export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
                 )}
               </Field>
             </div>
-          </FieldSet>
-
-          {/*  Meetup Location  */}
-          <FieldSet>
-            <Field>
-              <FieldLabel htmlFor="meetup-location">Meetup Location</FieldLabel>
-              <Input
-                id="meetup-location"
-                placeholder="e.g. Admin Building, Library Main Entrance"
-                aria-invalid={!!errors.meetupLocation}
-                {...register('meetupLocation')}
-              />
-              {errors.meetupLocation && (
-                <p className="mt-1 text-xs text-destructive">
-                  {errors.meetupLocation.message}
-                </p>
-              )}
-            </Field>
           </FieldSet>
 
           {/*  Condition  */}

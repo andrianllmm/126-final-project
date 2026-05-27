@@ -86,7 +86,6 @@ export function Pattern({
       title: '',
       categoryId: '',
       price: 0,
-      meetupLocation: '',
       description: '',
       condition: '',
     },
@@ -164,7 +163,6 @@ export function Pattern({
         categoryId: formData.categoryId,
         condition: formData.condition || ListingCondition.GOOD,
         price: formData.price || 0,
-        meetupLocation: formData.meetupLocation,
         description: formData.description,
       };
 
@@ -335,7 +333,6 @@ export function Pattern({
                   category={formData.categoryId}
                   price={formData.price.toString()}
                   description={formData.description}
-                  meetupLocation={formData.meetupLocation}
                   condition={formData.condition}
                 />
               </div>

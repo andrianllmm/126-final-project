@@ -1,15 +1,12 @@
 'use client';
 
 import { Card, CardContent } from '@/shared/components/ui/card';
-import { MapPin } from 'lucide-react';
 
 interface ProductSummaryCardProps {
   productTitle: string;
   category: string;
   price: string;
   description: string;
-  meetupLocation: string;
-  meetupTime?: string;
   condition?: string;
 }
 
@@ -24,8 +21,6 @@ export function ProductSummaryCard({
   category,
   price,
   description,
-  meetupLocation,
-  meetupTime,
   condition,
 }: ProductSummaryCardProps) {
   return (
@@ -89,25 +84,6 @@ export function ProductSummaryCard({
             </p>
           </div>
 
-          {/* Meetup Location Box */}
-          <div className="rounded-2xl border border-primary/40 bg-muted/50 p-5">
-            <div className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Meetup Location
-                </p>
-                <p className="text-base font-bold text-card-foreground">
-                  {meetupLocation}
-                </p>
-                {meetupTime && (
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Preferred Time: {meetupTime}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
