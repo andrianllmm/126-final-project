@@ -48,8 +48,13 @@ export class ListingsService {
     const skip = (page - 1) * limit;
 
     const where = {
-      status:
-        ListingStatus.AVAILABLE || ListingStatus.RESERVED || ListingStatus.SOLD,
+      status: {
+        in: [
+          ListingStatus.AVAILABLE,
+          ListingStatus.RESERVED,
+          ListingStatus.SOLD,
+        ],
+      },
     };
 
     const [listings, total] = await Promise.all([
