@@ -46,7 +46,7 @@ export default function TransactionOffersPage() {
               router.push(`/transactions/${transaction.transactionId}`)
             }
           >
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-4 mr-1" />
             Back
           </Button>
         </div>

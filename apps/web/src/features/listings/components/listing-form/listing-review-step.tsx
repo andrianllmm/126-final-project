@@ -60,7 +60,7 @@ export function ListingReviewStep({
           onClick={onBack}
           disabled={isSubmitting}
         >
-          <ArrowLeft />
+          <ArrowLeft className="h-4 w-4 mr-1" />
           <span>Back</span>
         </Button>
 

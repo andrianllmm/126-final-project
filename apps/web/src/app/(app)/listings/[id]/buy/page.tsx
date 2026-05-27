@@ -89,15 +89,14 @@ export default function BuyListingPage() {
 
   return (
     <div className="page-container py-10">
-      <div className="mx-auto max-w-3xl space-y-10">
+      <div className="max-w-3xl space-y-10 mb-8">
         <div className="space-y-4">
           <Button
             variant="ghost"
             onClick={() => router.push(`/listings/${listingId}`)}
-            className="px-0"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to listing
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
           </Button>
 
           <div>

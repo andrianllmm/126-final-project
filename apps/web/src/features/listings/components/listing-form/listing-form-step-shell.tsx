@@ -32,7 +32,7 @@ export function ListingFormStepShell({
 
         <div className="flex justify-between pt-6">
           <Button type="button" variant="outline" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 mr-1" />
             Back
           </Button>
           <Button
