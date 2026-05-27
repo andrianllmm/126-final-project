@@ -1,37 +1,23 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Req,
-  UsePipes,
-  ValidationPipe,
-  Get,
-  Param,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { ZodResponse } from 'nestjs-zod';
 import { ReviewsService } from './reviews.service.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { ReviewDto, ReviewListDto } from './reviews.dto.js';
 
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
-  // POST /reviews
   @Post()
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Req() req: any, @Body() dto: CreateReviewDto) {
-    const user = req.user;
-    if (!user || !user.id) {
-      throw new UnauthorizedException();
-    }
-
-    const review = await this.reviewsService.create(user.id, dto);
-    return review;
+  @ZodResponse({ type: ReviewDto })
+  create(@Session() session: UserSession, @Body() dto: CreateReviewDto) {
+    return this.reviewsService.create(session.user.id, dto);
   }
 
-  // GET /reviews/user/:id - list reviews for a user
   @Get('user/:id')
-  async forUser(@Param('id') id: string) {
+  @ZodResponse({ type: ReviewListDto })
+  forUser(@Param('id') id: string) {
     return this.reviewsService.findByUser(id);
   }
 }
