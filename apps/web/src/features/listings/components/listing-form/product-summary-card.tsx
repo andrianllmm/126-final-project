@@ -3,13 +3,14 @@
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { ListingConditionBadge } from '@/features/listings/components/listing-condition-badge';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
+import { ListingCondition } from '@repo/api';
 
 interface ProductSummaryCardProps {
   productTitle: string;
   categoryName?: string;
-  price: string;
+  price: number;
   description: string;
-  condition?: string;
+  condition?: ListingCondition;
 }
 
 export function ProductSummaryCard({

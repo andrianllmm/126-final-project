@@ -41,9 +41,9 @@ export function ListingReviewStep({
           <ProductSummaryCard
             productTitle={formData.title}
             categoryName={categoryName}
-            price={formData.price.toString()}
+            price={formData.price}
             description={formData.description}
-            condition={formData.condition}
+            condition={formData.condition || undefined}
           />
         </div>
       </div>
