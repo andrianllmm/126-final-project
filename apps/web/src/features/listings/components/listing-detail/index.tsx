@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, MessageCircle } from 'lucide-react';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -127,7 +127,6 @@ export function ListingDetail() {
             {listing.category && (
               <p className="text-sm text-muted-foreground mb-3">
                 {listing.category?.categoryName ??
-                  listing.category?.name ??
                   listing.category?.slug}
               </p>
             )}
@@ -141,23 +140,6 @@ export function ListingDetail() {
             <p className="text-muted-foreground">{listing.description}</p>
           </div>
 
-          {/* Meetup Location */}
-          {listing.meetupLocation && (
-            <div className="rounded-2xl border border-primary/40 bg-muted/50 p-5">
-              <div className="flex gap-3">
-                <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Meetup Location
-                  </p>
-                  <p className="text-base font-bold">
-                    {listing.meetupLocation}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Seller Info */}
           <Card className="p-4">
             <div className="flex items-center justify-between gap-3">
@@ -165,7 +147,7 @@ export function ListingDetail() {
                 <UserAvatar
                   name={listing.seller.name}
                   email={listing.seller.email}
-                  src={listing.seller.image ?? undefined}
+                  src={undefined}
                   sizeClassName="size-12"
                   fallbackClassName="text-sm font-semibold"
                 />
