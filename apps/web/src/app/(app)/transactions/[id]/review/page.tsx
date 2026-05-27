@@ -111,11 +111,6 @@ export default function TransactionReviewPage() {
               placeholder="e.g. Great communication, fast shipping, item was exactly as described..."
               className="min-h-44 resize-y text-sm leading-relaxed"
             />
-            {comment.length > 0 && (
-              <p className="text-right text-xs text-muted-foreground">
-                {comment.length} characters
-              </p>
-            )}
           </div>
 
           <div className="flex items-center justify-between">
