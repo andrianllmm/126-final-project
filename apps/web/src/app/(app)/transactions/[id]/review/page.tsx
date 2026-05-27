@@ -1,19 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import type { FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Star, ArrowLeft, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
+import { Star } from 'lucide-react';
 
 import { useSession } from '@/features/auth/hooks/use-session';
 import { useTransaction } from '@/features/transactions/hooks/use-transaction';
-
-import { Button } from '@/shared/components/ui/button';
-import { Label } from '@/shared/components/ui/label';
-import { Textarea } from '@/shared/components/ui/textarea';
 import { Spinner } from '@/shared/components/ui/spinner';
-import { cn } from '@/shared/lib/utils';
+import { useMyReviews } from '@/features/reviews/hooks/use-my-reviews';
+import { ReviewRole, type Review } from '@repo/api';
+import { ReviewForm } from '@/features/reviews/components/review-form';
 
 export default function TransactionReviewPage() {
   const params = useParams<{ id: string }>();
@@ -23,17 +18,8 @@ export default function TransactionReviewPage() {
   const user = session?.user ?? null;
 
   const { data: transaction, isLoading } = useTransaction(params?.id ?? '');
-
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [hoveredRating, setHoveredRating] = useState<number | null>(null);
-
-  const activeRating = hoveredRating ?? rating;
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    toast.info('Review submission is not wired up yet.');
-  };
+  const { data: myReviews, isLoading: isLoadingMyReviews } =
+    useMyReviews(!!user);
 
   if (!user) return null;
 
@@ -45,90 +31,124 @@ export default function TransactionReviewPage() {
     );
   }
 
-  return (
-    <main className="page-container py-12">
-      <div className="mx-auto max-w-xl space-y-8">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            How did it go?
-          </h1>
-          <p className="text-muted-foreground">
-            Your honest feedback helps build trust in the community.
+  if (!transaction) {
+    return (
+      <main className="page-container py-12">
+        <div className="mx-auto max-w-xl rounded-2xl border bg-card p-8 text-center shadow-sm">
+          <h1 className="text-xl font-semibold">Review not found</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            The transaction could not be loaded.
           </p>
+          <button
+            type="button"
+            onClick={() => router.push('/transactions')}
+            className="mt-6 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium"
+          >
+            Back to transactions
+          </button>
         </div>
+      </main>
+    );
+  }
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+  if (transaction.status !== 'COMPLETED') {
+    return (
+      <main className="page-container py-12">
+        <div className="mx-auto max-w-xl rounded-2xl border bg-card p-8 text-center shadow-sm">
+          <h1 className="text-xl font-semibold">Review unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You can only leave a review after the transaction is completed.
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              router.push(`/transactions/${transaction.transactionId}`)
+            }
+            className="mt-6 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium"
+          >
+            Back to transaction
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  const isBuyer = transaction.buyerId === user.id;
+  const targetName = isBuyer ? transaction.seller.name : transaction.buyer.name;
+  const reviewRole = isBuyer
+    ? ReviewRole.BUYER_TO_SELLER
+    : ReviewRole.SELLER_TO_BUYER;
+
+  const existingReview: Review | null =
+    myReviews?.find(
+      (review) =>
+        review.transactionId === transaction.transactionId &&
+        review.role === reviewRole,
+    ) ?? null;
+
+  if (isLoadingMyReviews) {
+    return (
+      <main className="page-container flex min-h-screen items-center justify-center">
+        <Spinner className="size-7 text-primary" />
+      </main>
+    );
+  }
+
+  const title = `Leave a review for ${targetName}`;
+  const description = existingReview
+    ? `You already reviewed ${transaction.listing.title}.`
+    : isBuyer
+      ? `Tell others about your experience buying ${transaction.listing.title}.`
+      : `Tell others about your experience selling ${transaction.listing.title}.`;
+
+  if (existingReview) {
+    return (
+      <main className="page-container py-12">
+        <div className="mx-auto max-w-xl space-y-8">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-primary">{targetName}</p>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Your review
+            </h1>
+            <p className="text-muted-foreground">{description}</p>
+          </div>
+
           <div className="space-y-4 rounded-2xl border bg-card p-6 shadow-sm">
             <div className="space-y-1">
-              <Label className="text-base font-medium">Your rating</Label>
+              <p className="text-base font-medium">Your rating</p>
               <p className="text-xs text-muted-foreground">
-                Tap a star to set your rating.
+                Your submitted rating.
               </p>
             </div>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((value) => (
-                <button
+                <Star
                   key={value}
-                  type="button"
-                  className="rounded-full p-1 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  onClick={() => setRating(value)}
-                  onMouseEnter={() => setHoveredRating(value)}
-                  onMouseLeave={() => setHoveredRating(null)}
-                  aria-label={`Rate ${value} star${value === 1 ? '' : 's'}`}
-                >
-                  <Star
-                    className={cn(
-                      'size-9 transition-colors duration-100',
-                      value <= activeRating
-                        ? 'fill-primary text-primary'
-                        : 'fill-transparent text-muted-foreground/25',
-                    )}
-                  />
-                </button>
+                  className={
+                    value <= existingReview.rating
+                      ? 'size-9 fill-primary text-primary'
+                      : 'size-9 fill-transparent text-muted-foreground/25'
+                  }
+                />
               ))}
             </div>
+            <p className="rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+              {existingReview.comment || 'No written comment was left.'}
+            </p>
           </div>
+        </div>
+      </main>
+    );
+  }
 
-          <div className="space-y-4 rounded-2xl border bg-card p-6 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <Label
-                  htmlFor="review-comment"
-                  className="text-base font-medium"
-                >
-                  Share the details
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  What went well? Anything to watch out for?
-                </p>
-              </div>
-              <MessageSquare className="size-5 text-muted-foreground/40" />
-            </div>
-            <Textarea
-              id="review-comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="e.g. Great communication, fast shipping, item was exactly as described..."
-              className="min-h-44 resize-y text-sm leading-relaxed"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => router.back()}
-              className="gap-1.5 px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
-            >
-              <ArrowLeft className="size-4" />
-              Back
-            </Button>
-            <Button type="submit" size="lg" className="min-w-36">
-              Submit review
-            </Button>
-          </div>
-        </form>
-      </div>
-    </main>
+  return (
+    <ReviewForm
+      transactionId={transaction.transactionId}
+      listingId={transaction.listingId}
+      targetName={targetName}
+      title={title}
+      description={description}
+      existingReview={existingReview}
+    />
   );
 }

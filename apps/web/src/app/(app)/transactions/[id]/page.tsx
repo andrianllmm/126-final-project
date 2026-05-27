@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { format } from 'date-fns';
@@ -19,16 +19,19 @@ import { UserCardCompact } from '@/features/users/components/user-card-compact';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import { Spinner } from '@/shared/components/ui/spinner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
+import Link from 'next/link';
 import {
   TransactionAction,
   TransactionStatus,
+  ReviewRole,
   type Transaction,
 } from '@repo/api';
 import { toast } from 'sonner';
 import { CopyText } from '@/shared/components/copy-text';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { TransactionOffersPanel } from '@/features/transactions/components/transaction-offers-panel';
+import { useMyReviews } from '@/features/reviews/hooks/use-my-reviews';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -40,8 +43,44 @@ export default function TransactionDetailPage() {
   const user = session?.user ?? null;
 
   const { data: transaction, isLoading } = useTransaction(transactionId);
+  const { data: myReviews, isLoading: isLoadingMyReviews } =
+    useMyReviews(!!user);
 
   const updateStatus = useUpdateTransactionStatus();
+
+  const userRole = transaction?.buyerId === user?.id ? 'buyer' : 'seller';
+  const reviewRole =
+    userRole === 'buyer'
+      ? ReviewRole.BUYER_TO_SELLER
+      : ReviewRole.SELLER_TO_BUYER;
+
+  const hasReviewedThisTransaction = myReviews?.some(
+    (review) =>
+      review.transactionId === transaction?.transactionId &&
+      review.role === reviewRole,
+  );
+
+  const existingReview = myReviews?.find(
+    (review) =>
+      review.transactionId === transaction?.transactionId &&
+      review.role === reviewRole,
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    if (!transaction) return;
+    if (transaction.status !== TransactionStatus.COMPLETED) return;
+    if (isLoadingMyReviews) return;
+    if (hasReviewedThisTransaction) return;
+
+    router.replace(`/transactions/${transaction.transactionId}/review`);
+  }, [
+    hasReviewedThisTransaction,
+    isLoadingMyReviews,
+    user,
+    router,
+    transaction,
+  ]);
 
   const [dialog, setDialog] = useState<{
     open: boolean;
@@ -73,8 +112,6 @@ export default function TransactionDetailPage() {
       </div>
     );
   }
-
-  const userRole = transaction.buyerId === user.id ? 'buyer' : 'seller';
 
   const counterparty =
     userRole === 'buyer' ? transaction.seller : transaction.buyer;
@@ -156,6 +193,33 @@ export default function TransactionDetailPage() {
               transaction={transaction}
               userRole={userRole}
             />
+
+            {transaction.status === TransactionStatus.COMPLETED && (
+              <div className="flex justify-end">
+                {existingReview ? (
+                  <div className="flex items-center gap-1 rounded-md border px-3 py-2">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <Star
+                        key={value}
+                        className={
+                          value <= existingReview.rating
+                            ? 'size-4 fill-primary text-primary'
+                            : 'size-4 fill-transparent text-muted-foreground/25'
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={`/transactions/${transaction.transactionId}/review`}
+                    >
+                      Leave review
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
 
             <Separator />
 

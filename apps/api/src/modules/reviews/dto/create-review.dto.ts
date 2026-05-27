@@ -1,27 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsInt,
-  Min,
-  Max,
-  IsOptional,
-} from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { createReviewSchema } from '@repo/api';
 
-export class CreateReviewDto {
-  @IsString()
-  @IsNotEmpty()
-  transactionId!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  listingId!: string;
-
-  @IsInt()
-  @Min(1)
-  @Max(5)
-  rating!: number;
-
-  @IsOptional()
-  @IsString()
-  comment?: string;
-}
+export class CreateReviewDto extends createZodDto(createReviewSchema) {}

@@ -5,12 +5,17 @@ import {
   ForbiddenException,
   ConflictException,
 } from '@nestjs/common';
+import { NotificationType, ReviewRole, TransactionStatus } from '@repo/api';
 import { PrismaService } from '../../database/prisma.service.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(reviewerId: string, dto: CreateReviewDto) {
     const { transactionId, listingId, rating, comment } = dto;
@@ -26,7 +31,7 @@ export class ReviewsService {
       throw new BadRequestException('Listing does not match transaction');
     }
 
-    if (transaction.status !== 'COMPLETED') {
+    if (transaction.status !== TransactionStatus.COMPLETED) {
       throw new BadRequestException(
         'Can only review after transaction is completed',
       );
@@ -41,7 +46,9 @@ export class ReviewsService {
       );
     }
 
-    const role = isBuyer ? 'BUYER_TO_SELLER' : 'SELLER_TO_BUYER';
+    const role = isBuyer
+      ? ReviewRole.BUYER_TO_SELLER
+      : ReviewRole.SELLER_TO_BUYER;
 
     const existing = await this.prisma.review.findFirst({
       where: {
@@ -58,30 +65,39 @@ export class ReviewsService {
 
     const revieweeId = isBuyer ? transaction.sellerId : transaction.buyerId;
 
-    const review = await this.prisma.$transaction(async (tx) => {
-      const createdReview = await tx.review.create({
-        data: {
-          reviewerId,
-          revieweeId,
-          listingId,
-          transactionId,
-          rating,
-          comment,
-          role,
-        },
-      });
+    const { review, notification } = await this.prisma.$transaction(
+      async (tx) => {
+        const createdReview = await tx.review.create({
+          data: {
+            reviewerId,
+            revieweeId,
+            listingId,
+            transactionId,
+            rating,
+            comment: comment?.trim() || null,
+            role,
+          },
+        });
 
-      await tx.notification.create({
-        data: {
-          userId: revieweeId,
-          type: 'RATING',
-          title: 'You received a new rating',
-          message: `You received a ${rating} star rating`,
-        },
-      });
+        const createdNotification =
+          await this.notificationsService.createWithTx(
+            tx,
+            revieweeId,
+            NotificationType.RATING,
+            'You received a new review',
+            `You received a ${rating}-star review`,
+            undefined,
+            `/transactions/${transactionId}`,
+          );
 
-      return createdReview;
-    });
+        return {
+          review: createdReview,
+          notification: createdNotification,
+        };
+      },
+    );
+
+    this.notificationsService.emitCreated(notification);
 
     return review;
   }
@@ -89,6 +105,22 @@ export class ReviewsService {
   async findByUser(userId: string) {
     return this.prisma.review.findMany({
       where: { revieweeId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        reviewer: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findByReviewer(userId: string) {
+    return this.prisma.review.findMany({
+      where: { reviewerId: userId },
       orderBy: { createdAt: 'desc' },
     });
   }

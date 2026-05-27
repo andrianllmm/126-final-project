@@ -259,6 +259,32 @@ export class TransactionsService {
         notification2 as NotificationRecord,
       );
 
+      const reviewNotification1 = await this.notificationsService.createWithTx(
+        tx,
+        transaction.buyerId,
+        NotificationType.RATING,
+        'Leave a review',
+        `Please review ${transaction.listing.title} and share your experience.`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}/review`,
+      );
+      this.notificationsService.emitCreated(
+        reviewNotification1 as NotificationRecord,
+      );
+
+      const reviewNotification2 = await this.notificationsService.createWithTx(
+        tx,
+        transaction.sellerId,
+        NotificationType.RATING,
+        'Leave a review',
+        `Please review ${transaction.listing.title} and share your experience.`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}/review`,
+      );
+      this.notificationsService.emitCreated(
+        reviewNotification2 as NotificationRecord,
+      );
+
       return updatedTransaction;
     });
   }
