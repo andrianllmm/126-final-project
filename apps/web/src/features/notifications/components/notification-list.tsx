@@ -5,17 +5,18 @@ import { CheckCheckIcon } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';
 import type { Notification } from '@repo/api';
-
 import { NotificationItem } from './notification-item';
 
 export function NotificationList({
   notifications,
   onMarkAllAsRead,
   isMarkingAllAsRead,
+  onNotificationClick,
 }: {
   notifications: Notification[];
   onMarkAllAsRead?: () => void;
   isMarkingAllAsRead?: boolean;
+  onNotificationClick?: (id: string) => void;
 }) {
   const hasUnread = notifications.some((n) => !n.isRead);
 
@@ -59,6 +60,7 @@ export function NotificationList({
               <NotificationItem
                 key={notification.id}
                 notification={notification}
+                onClick={onNotificationClick}
               />
             ))}
           </div>

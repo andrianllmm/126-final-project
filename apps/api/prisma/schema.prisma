@@ -8,9 +8,9 @@ datasource db {
 }
 
 model Location {
-  id           Int                                  @id @default(autoincrement())
-  name         String
-  position     Unsupported("geometry(Point, 4326)")
+  id       Int                                  @id @default(autoincrement())
+  name     String
+  position Unsupported("geometry(Point, 4326)")
 
   transactions Transaction[]
   offers       Offer[]
@@ -53,7 +53,8 @@ model User {
   avatarUploadId String? @unique
   avatarUpload   Upload? @relation("UserAvatar", fields: [avatarUploadId], references: [id], onDelete: SetNull)
 
-  bio String?
+  bio               String?
+  pushSubscriptions PushSubscription[]
 
   @@map("user")
 }
@@ -376,7 +377,23 @@ model Notification {
   type    NotificationType
   title   String
   message String
+  actionLink String?
   isRead  Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PushSubscription {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint String @unique
+  p256dh   String
+  auth     String
 
   createdAt DateTime @default(now())
 

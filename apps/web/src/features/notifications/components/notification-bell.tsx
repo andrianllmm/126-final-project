@@ -14,8 +14,13 @@ import { NotificationList } from './notification-list';
 import { useNotifications } from '../hooks/use-notifications';
 
 export function NotificationBell() {
-  const { notifications, unreadCount, markAllAsRead, isMarkingAllAsRead } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    markAllAsRead,
+    isMarkingAllAsRead,
+    markNotificationAsRead,
+  } = useNotifications();
 
   return (
     <Popover>
@@ -35,6 +40,7 @@ export function NotificationBell() {
           notifications={notifications}
           onMarkAllAsRead={() => markAllAsRead()}
           isMarkingAllAsRead={isMarkingAllAsRead}
+          onNotificationClick={(id) => markNotificationAsRead(id)}
         />
       </PopoverContent>
     </Popover>
