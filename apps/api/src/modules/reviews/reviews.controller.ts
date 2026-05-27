@@ -7,6 +7,7 @@ import {
   ValidationPipe,
   Get,
   Param,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
@@ -21,7 +22,7 @@ export class ReviewsController {
   async create(@Req() req: any, @Body() dto: CreateReviewDto) {
     const user = req.user;
     if (!user || !user.id) {
-      throw new Error('Unauthorized');
+      throw new UnauthorizedException();
     }
 
     const review = await this.reviewsService.create(user.id, dto);

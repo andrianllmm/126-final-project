@@ -10,16 +10,16 @@ import {
 export class CreateReviewDto {
   @IsString()
   @IsNotEmpty()
-  transactionId: string;
+  transactionId!: string;
 
   @IsString()
   @IsNotEmpty()
-  listingId: string;
+  listingId!: string;
 
   @IsInt()
   @Min(1)
   @Max(5)
-  rating: number;
+  rating!: number;
 
   @IsOptional()
   @IsString()
