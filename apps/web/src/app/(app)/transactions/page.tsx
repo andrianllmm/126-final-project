@@ -65,6 +65,7 @@ function useTransactionsUrlState() {
 export default function TransactionsPage() {
   const { user } = useAuth();
   const { tab, status, setParams } = useTransactionsUrlState();
+  const router = useRouter();
 
   const [dialog, setDialog] = useState<{
     open: boolean;
@@ -118,7 +119,10 @@ export default function TransactionsPage() {
           toast.success('Transaction updated');
           setDialog({ open: false, action: null, transaction: null });
           if (dialog.action === 'complete') {
-            router.push(`/transactions/${dialog.transaction.transactionId}/review`);
+            if (!dialog.transaction) return;
+            router.push(
+              `/transactions/${dialog.transaction.transactionId}/review`,
+            );
           }
         },
         onError: () => toast.error('Failed to update transaction'),
