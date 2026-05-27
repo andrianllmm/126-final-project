@@ -1,6 +1,7 @@
 'use client';
 
 import type { Notification } from '@repo/api';
+import Link from 'next/link';
 import { cn } from '@/shared/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -11,8 +12,19 @@ export function NotificationItem({
 }) {
   const unread = !notification.isRead;
 
+  const Wrapper: React.ComponentType<React.ComponentProps<'div'>> =
+    notification.actionLink ? (Link as any) : 'div';
+
+  const wrapperProps: any = notification.actionLink
+    ? {
+        href: notification.actionLink,
+        className: 'rounded-xl p-3 block transition-colors hover:bg-muted',
+      }
+    : { className: 'rounded-xl p-3 transition-colors hover:bg-muted' };
+
   return (
-    <div className="rounded-xl p-3 transition-colors hover:bg-muted">
+    // @ts-expect-error allow Link as wrapper
+    <Wrapper {...wrapperProps}>
       <div className="flex gap-3">
         {unread && (
           <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
@@ -43,6 +55,6 @@ export function NotificationItem({
           </p>
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 }

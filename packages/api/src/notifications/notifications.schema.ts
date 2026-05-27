@@ -8,6 +8,7 @@ export const notificationSchema = z.object({
   type: NotificationTypeSchema,
   title: z.string(),
   message: z.string(),
+  actionLink: z.string().nullable().optional(),
   isRead: z.boolean(),
   createdAt: stringToDate,
 });

@@ -32,6 +32,7 @@ export class NotificationsService {
     title: string,
     message: string,
     metadata?: Record<string, unknown>,
+    actionLink?: string,
   ) {
     void metadata;
 
@@ -41,6 +42,7 @@ export class NotificationsService {
         type,
         title,
         message,
+        actionLink,
       },
     });
   }
@@ -52,6 +54,7 @@ export class NotificationsService {
     title: string,
     message: string,
     metadata?: Record<string, unknown>,
+    actionLink?: string,
   ) {
     void metadata;
 
@@ -61,6 +64,7 @@ export class NotificationsService {
         type,
         title,
         message,
+        actionLink,
       },
     });
   }
@@ -71,6 +75,7 @@ export class NotificationsService {
     title: string,
     message: string,
     metadata?: Record<string, unknown>,
+    actionLink?: string,
   ) {
     const notification = await this.create(
       userId,
@@ -78,6 +83,7 @@ export class NotificationsService {
       title,
       message,
       metadata,
+      actionLink,
     );
 
     // emit over sockets
@@ -87,6 +93,7 @@ export class NotificationsService {
     void this.sendPushToUser(userId, {
       title,
       body: message,
+      actionLink,
     });
 
     return notification;
@@ -233,6 +240,7 @@ export class NotificationsService {
     void this.sendPushToUser(notification.userId, {
       title: notification.title,
       body: notification.message,
+      actionLink: notification.actionLink,
     });
   }
 

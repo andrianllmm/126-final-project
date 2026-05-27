@@ -377,6 +377,7 @@ model Notification {
   type    NotificationType
   title   String
   message String
+  actionLink String?
   isRead  Boolean          @default(false)
 
   createdAt DateTime @default(now())

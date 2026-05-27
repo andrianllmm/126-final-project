@@ -161,6 +161,18 @@ export function useNotifications() {
 
       toast(notification.title, {
         description: notification.message,
+        action: notification.actionLink
+          ? {
+              label: 'Open',
+              onClick: () => {
+                try {
+                  window.open(notification.actionLink, '_blank');
+                } catch (e) {
+                  // ignore
+                }
+              },
+            }
+          : undefined,
       });
     };
 

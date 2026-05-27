@@ -208,6 +208,7 @@ export class MessagingService {
       {
         conversationId,
       },
+      `/messages/${conversation.id}`,
     );
 
     this.notificationsGateway.emitNotificationCreated(notification);

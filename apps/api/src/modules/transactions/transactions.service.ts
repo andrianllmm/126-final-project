@@ -70,6 +70,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Purchase requested',
         `Transaction created for ${listing.title}`,
+        undefined,
+        `/transactions/${transaction.transactionId}`,
       );
 
       await this.notificationsService.createWithTx(
@@ -78,6 +80,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'New purchase request',
         `You received a transaction request for ${listing.title}`,
+        undefined,
+        `/transactions/${transaction.transactionId}`,
       );
 
       return transaction;
@@ -125,6 +129,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction accepted',
         `${transaction.listing.title} transaction was accepted`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
 
       return updatedTransaction;
@@ -169,6 +175,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction rejected',
         `${transaction.listing.title} transaction was rejected`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
 
       return updatedTransaction;
@@ -222,6 +230,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
       await this.notificationsService.createWithTx(
         tx,
@@ -229,6 +239,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
 
       return updatedTransaction;
@@ -276,6 +288,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
       await this.notificationsService.createWithTx(
         tx,
@@ -283,6 +297,8 @@ export class TransactionsService {
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
 
       return updatedTransaction;

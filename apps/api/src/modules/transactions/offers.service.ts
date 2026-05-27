@@ -112,6 +112,8 @@ export class OffersService {
       NotificationType.TRANSACTION,
       'New offer received',
       `New offer for ${transaction.listing.title}`,
+      undefined,
+      `/transactions/${dto.transactionId}`,
     );
 
     return offer;
@@ -222,6 +224,8 @@ export class OffersService {
         NotificationType.TRANSACTION,
         'Offer accepted',
         `Your offer for ${offer.transaction.listing.title} was accepted`,
+        undefined,
+        `/transactions/${offer.transactionId}`,
       );
 
       return transaction;
@@ -273,6 +277,8 @@ export class OffersService {
       NotificationType.TRANSACTION,
       'Offer rejected',
       `Your offer for ${offer.transaction.listing.title} was rejected`,
+      undefined,
+      `/transactions/${offer.transactionId}`,
     );
 
     return rejectedOffer;
