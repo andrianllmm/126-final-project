@@ -40,8 +40,10 @@ export async function autofillListingFormFromImage({
 
     const categorySchema = z.enum(categoryIds as [string, ...string[]]);
 
+    const model = process.env.GOOGLE_AI_MODEL ?? 'gemini-2.5-flash';
+
     const result = await generateText({
-      model: google('gemini-2.5-flash'),
+      model: google(model),
       output: Output.object({
         schema: listingFormAutofillSchema.extend({
           categoryId: categorySchema,
