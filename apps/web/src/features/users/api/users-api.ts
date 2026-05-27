@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/lib/api-client';
 import {
+  type ListingList,
   type UserProfile,
   type UserProfileUpdateInput,
   type UserProfileStats,
@@ -10,6 +11,9 @@ export const getUserProfile = (userId: string) =>
 
 export const getUserProfileStats = (userId: string) =>
   apiClient.get<UserProfileStats>(`/users/${userId}/stats`);
+
+export const getMyLikedListings = () =>
+  apiClient.get<ListingList>('/users/me/liked-listings');
 
 export const updateUserProfile = (input: UserProfileUpdateInput) =>
   apiClient.patch<UserProfile, UserProfileUpdateInput>(
