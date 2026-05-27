@@ -95,6 +95,8 @@ export const listingSchema = z.object({
   title: z.string(),
   description: z.string(),
   price: z.number(),
+  likeCount: z.number().int().nonnegative(),
+  isLikedByUser: z.boolean(),
   condition: ListingConditionSchema,
   status: ListingStatusSchema,
 
