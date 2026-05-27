@@ -14,7 +14,7 @@ import { TransactionStatusMessage } from '@/features/transactions/components/tra
 import { TransactionActions } from '@/features/transactions/components/transaction-actions';
 import { TransactionActionDialog } from '@/features/transactions/components/transaction-action-dialog';
 import { ListingCardCompact } from '@/features/transactions/components/listing-card-compact';
-import { UserCardCompact } from '@/features/transactions/components/user-card-compact';
+import { UserCardCompact } from '@/features/users/components/user-card-compact';
 
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '@/shared/components/ui/separator';

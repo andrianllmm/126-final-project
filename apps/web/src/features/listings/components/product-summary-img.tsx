@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Button } from '@/shared/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -12,36 +13,41 @@ interface ProductSummaryImgProps {
 export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Use uploaded photos if available, otherwise show placeholder
   const displayImages = photos.length > 0 ? photos.map((p) => p.preview) : [];
 
   const nextImage = () => {
-    if (displayImages.length === 0) return;
+    if (!displayImages.length) return;
     setCurrentImageIndex((prev) => (prev + 1) % displayImages.length);
   };
 
   const prevImage = () => {
-    if (displayImages.length === 0) return;
+    if (!displayImages.length) return;
     setCurrentImageIndex(
       (prev) => (prev - 1 + displayImages.length) % displayImages.length,
     );
   };
 
-  // If no photos uploaded, show empty state
+  const selectImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
   if (displayImages.length === 0) {
     return (
       <div className="w-full not-prose">
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-2 w-24 shrink-0">
+        <div className="flex gap-2 flex-col sm:flex-row">
+          <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-24 shrink-0">
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="aspect-square bg-muted rounded-lg border-2 border-border"
+                className="aspect-square w-16 sm:w-full bg-muted rounded-lg border-2 border-border"
               />
             ))}
           </div>
-          <div className="flex-1 relative aspect-4/5 bg-muted rounded-xl overflow-hidden flex items-center justify-center">
-            <p className="text-muted-foreground">No photos uploaded yet</p>
+
+          <div className="w-full sm:w-95 md:w-105 relative aspect-4/5 bg-muted rounded-xl overflow-hidden flex items-center justify-center">
+            <p className="text-muted-foreground text-sm">
+              No photos uploaded yet
+            </p>
           </div>
         </div>
       </div>
@@ -50,38 +56,45 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
 
   return (
     <div className="w-full not-prose">
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-col sm:flex-row items-start">
         {/* Thumbnails */}
-        <div className="flex flex-col gap-2 w-24 shrink-0">
+        <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-24 shrink-0 overflow-x-auto sm:overflow-visible">
           {displayImages.map((image, index) => (
             <button
               key={index}
-              onClick={() => setCurrentImageIndex(index)}
+              onClick={() => selectImage(index)}
               className={cn(
-                'aspect-square bg-muted rounded-lg overflow-hidden border-2 transition-colors',
+                'relative aspect-square w-16 sm:w-full bg-muted rounded-lg overflow-hidden border-2 transition-colors shrink-0',
                 currentImageIndex === index
                   ? 'border-primary'
                   : 'border-transparent hover:border-primary/40',
               )}
             >
-              <img
+              <Image
                 src={image}
                 alt={`Photo ${index + 1}`}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="80px"
               />
             </button>
           ))}
         </div>
 
         {/* Main Image */}
-        <div className="flex-1 relative aspect-4/5 bg-muted rounded-xl overflow-hidden">
-          <img
-            src={displayImages[currentImageIndex]}
-            alt="Product"
-            className="w-full h-full object-cover"
-          />
+        <div className="w-full sm:w-90 md:w-105 lg:w-115 relative aspect-4/5 bg-muted rounded-xl overflow-hidden">
+          {displayImages.length > 0 && displayImages[currentImageIndex] && (
+            <Image
+              src={displayImages[currentImageIndex]}
+              alt="Product"
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 360px, (max-width: 1024px) 420px, 460px"
+            />
+          )}
 
-          {/* Navigation Arrows */}
+          {/* Navigation */}
           <Button
             type="button"
             variant="default"
@@ -91,6 +104,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
+
           <Button
             type="button"
             variant="default"
@@ -101,7 +115,7 @@ export function ProductSummaryImg({ photos = [] }: ProductSummaryImgProps) {
             <ChevronRight className="w-5 h-5" />
           </Button>
 
-          {/* Image Counter */}
+          {/* Counter */}
           <div className="absolute bottom-3 right-3 bg-foreground/60 text-background text-xs font-medium px-2 py-1 rounded-full">
             {currentImageIndex + 1} / {displayImages.length}
           </div>

@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/utils';
 
 import { ListingCondition } from '@repo/api';
 
-const listingConditionBadgeVariants = cva('border backdrop-blur-sm', {
+const listingConditionBadgeVariants = cva('border', {
   variants: {
     condition: {
       NEW: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:text-emerald-400',

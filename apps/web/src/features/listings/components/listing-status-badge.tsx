@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib/utils';
 
 import { ListingStatus } from '@repo/api';
 
-const listingStatusBadgeVariants = cva('border backdrop-blur-sm capitalize', {
+const listingStatusBadgeVariants = cva('border capitalize', {
   variants: {
     status: {
       AVAILABLE:

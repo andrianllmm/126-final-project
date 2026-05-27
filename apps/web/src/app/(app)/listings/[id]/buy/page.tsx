@@ -13,7 +13,7 @@ import { useCreateTransaction } from '@/features/transactions/hooks/use-create-t
 import { ListingStatus, type CreateTransactionInput } from '@repo/api';
 import { toast } from 'sonner';
 import { Spinner } from '@/shared/components/ui/spinner';
-import { UserCardCompact } from '@/features/transactions/components/user-card-compact';
+import { UserCardCompact } from '@/features/users/components/user-card-compact';
 import { ListingCardCompact } from '@/features/transactions/components/listing-card-compact';
 import { MessageButton } from '@/features/messaging/components/message-button';
 
