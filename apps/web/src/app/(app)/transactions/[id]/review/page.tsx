@@ -80,7 +80,7 @@ export default function TransactionReviewPage() {
                     className={cn(
                       'size-9 transition-colors duration-100',
                       value <= activeRating
-                        ? 'fill-amber-400 text-amber-400'
+                        ? 'fill-primary text-primary'
                         : 'fill-transparent text-muted-foreground/25',
                     )}
                   />
