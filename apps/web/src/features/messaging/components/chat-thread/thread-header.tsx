@@ -1,14 +1,20 @@
+import Link from 'next/link';
 import { ListingStatusBadge } from '@/features/listings/components/listing-status-badge';
 import { UserAvatar } from '@/features/users/components/user-avatar';
+import { cn } from '@/shared/lib/utils';
 import type { Conversation } from '@repo/api';
-import Link from 'next/link';
 
 type Props = {
   conversation?: Conversation;
   currentUserId?: string;
+  isConnected?: boolean;
 };
 
-export function ChatThreadHeader({ conversation, currentUserId }: Props) {
+export function ChatThreadHeader({
+  conversation,
+  currentUserId,
+  isConnected,
+}: Props) {
   if (!conversation) {
     return (
       <div>
@@ -28,11 +34,20 @@ export function ChatThreadHeader({ conversation, currentUserId }: Props) {
   return (
     <div className="flex items-center gap-2 min-w-0">
       <Link href={`/profile/${otherParticipant.id}`}>
-        <UserAvatar
-          name={otherParticipant.name}
-          src={otherParticipant.image}
-          sizeClassName="size-10 border-2 border-primary"
-        />
+        <div className="relative inline-block">
+          <UserAvatar
+            name={otherParticipant.name}
+            src={otherParticipant.image}
+            sizeClassName="size-10 border-2 border-primary"
+          />
+
+          <span
+            className={cn(
+              'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background',
+              isConnected ? 'bg-primary' : 'bg-muted-foreground',
+            )}
+          />
+        </div>
       </Link>
       <div className="flex flex-col min-w-0">
         <div className="flex items-center gap-2">
@@ -46,12 +61,14 @@ export function ChatThreadHeader({ conversation, currentUserId }: Props) {
             <ListingStatusBadge status={conversation.listing.status} />
           )}
         </div>
-        <Link
-          href={`/profile/${otherParticipant.id}`}
-          className="text-sm text-muted-foreground hover:text-primary"
-        >
-          {otherParticipant.name ?? 'Conversation'}
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link
+            href={`/profile/${otherParticipant.id}`}
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
+            {otherParticipant.name ?? 'Conversation'}
+          </Link>
+        </div>
       </div>
     </div>
   );

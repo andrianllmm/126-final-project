@@ -6,7 +6,6 @@ import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useMessaging } from '../../hooks/use-messaging';
 
 import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
 import { ConversationDetailsSheet } from './conversation-details-sheet';
 import { ChatThreadHeader } from './thread-header';
@@ -70,17 +69,11 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
           <ChatThreadHeader
             conversation={conversation}
             currentUserId={currentUserId}
+            isConnected={isConnected}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge
-            variant={isConnected ? 'secondary' : 'outline'}
-            className="shrink-0"
-          >
-            {isConnected ? 'Live' : 'Offline'}
-          </Badge>
-
           {conversation ? (
             <ConversationDetailsSheet
               conversation={conversation}
