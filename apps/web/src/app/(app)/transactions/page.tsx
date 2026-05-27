@@ -117,6 +117,9 @@ export default function TransactionsPage() {
         onSuccess: () => {
           toast.success('Transaction updated');
           setDialog({ open: false, action: null, transaction: null });
+          if (dialog.action === 'complete') {
+            router.push(`/transactions/${dialog.transaction.transactionId}/review`);
+          }
         },
         onError: () => toast.error('Failed to update transaction'),
       },
