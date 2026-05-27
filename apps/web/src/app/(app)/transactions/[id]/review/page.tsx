@@ -114,14 +114,15 @@ export default function TransactionReviewPage() {
           </div>
 
           <div className="flex items-center justify-between">
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => router.back()}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="gap-1.5 px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
             >
               <ArrowLeft className="size-4" />
               Back
-            </button>
+            </Button>
             <Button type="submit" size="lg" className="min-w-36">
               Submit review
             </Button>
