@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Pattern } from '@/features/listings/components/listing-form/listing-stepper';
-=======
 import { ListingForm } from '@/features/listings/components/listing-form';
->>>>>>> main
 import { AuthRouteGuard } from '@/features/auth/components/auth-route-guard';
 
 export default function Page() {
