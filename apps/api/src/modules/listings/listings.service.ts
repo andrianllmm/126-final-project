@@ -244,6 +244,7 @@ export class ListingsService {
       include: {
         buyer: true,
         seller: true,
+        meetupLocation: true,
         listing: {
           include: {
             images: {

@@ -139,6 +139,9 @@ export default function TransactionDetailPage() {
 
                 <MessageButton
                   listingId={transaction.listingId}
+                  buyerId={
+                    userRole === 'seller' ? transaction.buyerId : undefined
+                  }
                   disabled={transaction.status === TransactionStatus.COMPLETED}
                 >
                   Message

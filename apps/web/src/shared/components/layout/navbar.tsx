@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
@@ -26,7 +27,9 @@ import { Wordmark } from '@/shared/components/brand/wordmark';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { GlobalSearchBar } from '@/features/listings/components/search/global-search-bar';
 
-import { MessageCircleIcon, PackageIcon } from 'lucide-react';
+import { PackageIcon } from 'lucide-react';
+import { MessagingPopover } from '@/features/messaging/components/messaging-popover';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 function NavMenuItem({
   title,
@@ -92,6 +95,13 @@ function NavSectionItem({ section }: { section: (typeof navItems)[number] }) {
 export function Navbar({ className }: { className?: string }) {
   const pathname = usePathname();
   const hideSearch = pathname.startsWith('/search');
+  const { user, isPending } = useAuth();
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header
@@ -123,19 +133,20 @@ export function Navbar({ className }: { className?: string }) {
 
           <ThemeToggle />
 
-          <Link href="/transactions">
-            <Button variant="ghost" size="icon">
-              <PackageIcon />
-            </Button>
-          </Link>
+          {mounted && user && !isPending && (
+            <>
+              <Link href="/transactions">
+                <Button variant="ghost" size="icon">
+                  <PackageIcon />
+                </Button>
+              </Link>
 
-          <Link href="/messages">
-            <Button variant="ghost" size="icon">
-              <MessageCircleIcon />
-            </Button>
-          </Link>
+              <MessagingPopover />
 
-          <NotificationBell />
+              <NotificationBell />
+            </>
+          )}
+
           <NavUser />
         </div>
       </div>

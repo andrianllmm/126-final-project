@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { stringToDate } from '../codecs.js';
+import { ListingStatusSchema } from '../enums.js';
 
 export const conversationUserSchema = z.object({
   id: z.string(),
@@ -11,7 +12,7 @@ export const conversationListingSchema = z.object({
   id: z.string(),
   title: z.string(),
   price: z.number().nullable().optional(),
-  status: z.string().nullable().optional(),
+  status: ListingStatusSchema.nullable().optional(),
 });
 
 export const messageSchema = z.object({

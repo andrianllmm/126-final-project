@@ -2,7 +2,6 @@
 
 import { BellIcon } from 'lucide-react';
 
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -10,23 +9,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover';
-import { Skeleton } from '@/shared/components/ui/skeleton';
 
 import { NotificationList } from './notification-list';
 import { useNotifications } from '../hooks/use-notifications';
 
 export function NotificationBell() {
-  const { user, isPending } = useAuth();
   const { notifications, unreadCount, markAllAsRead, isMarkingAllAsRead } =
     useNotifications();
-
-  if (isPending) {
-    return <Skeleton className="h-9 w-9 rounded-md" />;
-  }
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <Popover>

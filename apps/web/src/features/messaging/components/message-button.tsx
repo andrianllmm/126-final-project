@@ -6,16 +6,21 @@ import { toast } from 'sonner';
 
 import { Button, type ButtonProps } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
-import { useGetOrCreateConversation } from '../hooks/use-conversations';
+import {
+  useGetOrCreateConversation,
+  useGetOrCreateConversationWithBuyer,
+} from '../hooks/use-conversations';
 import { Spinner } from '@/shared/components/ui/spinner';
 
 type MessageButtonProps = ButtonProps & {
   listingId: string;
+  buyerId?: string;
   onSuccessNavigate?: (conversationId: string) => void;
 };
 
 export function MessageButton({
   listingId,
+  buyerId,
   className,
   disabled,
   children,
@@ -24,7 +29,12 @@ export function MessageButton({
   ...buttonProps
 }: MessageButtonProps) {
   const router = useRouter();
-  const { mutate, isPending } = useGetOrCreateConversation();
+  const buyerConversationMutation = useGetOrCreateConversationWithBuyer();
+  const listingConversationMutation = useGetOrCreateConversation();
+
+  const isPending =
+    buyerConversationMutation.isPending ||
+    listingConversationMutation.isPending;
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -32,19 +42,28 @@ export function MessageButton({
 
     onClick?.(e);
 
-    mutate(listingId, {
-      onSuccess: (conversation) => {
-        if (onSuccessNavigate) {
-          onSuccessNavigate(conversation.id);
-          return;
-        }
+    const onSuccess = (conversation: { id: string }) => {
+      if (onSuccessNavigate) {
+        onSuccessNavigate(conversation.id);
+        return;
+      }
 
-        router.push(`/messages/${conversation.id}`);
-      },
-      onError: () => {
-        toast.error('Failed to open conversation');
-      },
-    });
+      router.push(`/messages/${conversation.id}`);
+    };
+
+    const onError = () => {
+      toast.error('Failed to open conversation');
+    };
+
+    if (buyerId) {
+      buyerConversationMutation.mutate(
+        { listingId, buyerId },
+        { onSuccess, onError },
+      );
+      return;
+    }
+
+    listingConversationMutation.mutate(listingId, { onSuccess, onError });
   };
 
   return (

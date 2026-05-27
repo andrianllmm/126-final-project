@@ -129,7 +129,7 @@ function ConversationContent({
           {conversation.lastMessageAt && (
             <>
               <span className="text-muted-foreground/60">•</span>
-              <span>
+              <span className="whitespace-nowrap">
                 <span>
                   {formatDistanceToNowStrict(
                     new Date(conversation.lastMessageAt),
