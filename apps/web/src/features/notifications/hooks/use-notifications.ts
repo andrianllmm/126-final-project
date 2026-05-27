@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { initializeSocket } from '@/shared/lib/socket-client';
 import type { Notification } from '@repo/api';
+import { useRouter } from 'next/navigation';
 
 import {
   getNotifications,
@@ -36,6 +37,7 @@ function upsertNotificationList(
 
 export function useNotifications() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.id;
   const [isConnected, setIsConnected] = useState(false);
@@ -106,22 +108,20 @@ export function useNotifications() {
     },
   });
 
+  const markAsRead = markNotificationAsReadMutation.mutate;
+
   useEffect(() => {
     if (!userId) return;
 
     const socket = initializeSocket('/notifications');
 
-    const handleConnect = () => {
-      setIsConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-    };
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
 
     const applyReadNotification = (notification: Notification) => {
       const currentNotifications =
         queryClient.getQueryData<Notification[]>(notificationsKey);
+
       const existingNotification = currentNotifications?.find(
         (item) => item.id === notification.id,
       );
@@ -166,10 +166,14 @@ export function useNotifications() {
               label: 'Open',
               onClick: () => {
                 try {
-                  window.open(notification.actionLink, '_blank');
-                } catch (e) {
-                  // ignore
-                }
+                  markAsRead(notification.id);
+                } catch {}
+
+                try {
+                  if (notification.actionLink) {
+                    router.push(notification.actionLink);
+                  }
+                } catch {}
               },
             }
           : undefined,
@@ -185,11 +189,8 @@ export function useNotifications() {
     socket.on('notification:new', handleNewNotification);
     socket.on('notification:read', handleNotificationRead);
 
-    if (!socket.connected) {
-      socket.connect();
-    } else {
-      handleConnect();
-    }
+    if (!socket.connected) socket.connect();
+    else handleConnect();
 
     return () => {
       socket.off('connect', handleConnect);
@@ -197,7 +198,7 @@ export function useNotifications() {
       socket.off('notification:new', handleNewNotification);
       socket.off('notification:read', handleNotificationRead);
     };
-  }, [queryClient, userId]);
+  }, [queryClient, userId, router, markAsRead]);
 
   const notifications = notificationsQuery.data ?? [];
   const unreadCount = Number(unreadCountQuery.data ?? 0);

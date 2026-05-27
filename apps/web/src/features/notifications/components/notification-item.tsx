@@ -1,30 +1,40 @@
-'use client';
-
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Notification } from '@repo/api';
-import Link from 'next/link';
 import { cn } from '@/shared/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
 export function NotificationItem({
   notification,
+  onClick,
 }: {
   notification: Notification;
+  onClick?: (id: string) => void;
 }) {
   const unread = !notification.isRead;
+  const router = useRouter();
 
-  const Wrapper: React.ComponentType<React.ComponentProps<'div'>> =
-    notification.actionLink ? (Link as any) : 'div';
+  const handleClick = useCallback(() => {
+    try {
+      onClick?.(notification.id);
+    } catch (e) {
+      // ignore
+    }
 
-  const wrapperProps: any = notification.actionLink
-    ? {
-        href: notification.actionLink,
-        className: 'rounded-xl p-3 block transition-colors hover:bg-muted',
-      }
-    : { className: 'rounded-xl p-3 transition-colors hover:bg-muted' };
+    if (notification.actionLink) {
+      router.push(notification.actionLink);
+    }
+  }, [onClick, notification, router]);
 
   return (
-    // @ts-expect-error allow Link as wrapper
-    <Wrapper {...wrapperProps}>
+    <div
+      role={notification.actionLink ? 'link' : 'button'}
+      onClick={handleClick}
+      className={cn(
+        'rounded-xl p-3 transition-colors hover:bg-muted',
+        'cursor-pointer',
+      )}
+    >
       <div className="flex gap-3">
         {unread && (
           <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
@@ -55,6 +65,6 @@ export function NotificationItem({
           </p>
         </div>
       </div>
-    </Wrapper>
+    </div>
   );
 }

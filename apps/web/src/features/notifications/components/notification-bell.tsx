@@ -35,6 +35,7 @@ export function NotificationBell() {
           notifications={notifications}
           onMarkAllAsRead={() => markAllAsRead()}
           isMarkingAllAsRead={isMarkingAllAsRead}
+          onNotificationClick={(id) => markNotificationAsRead(id)}
         />
       </PopoverContent>
     </Popover>
