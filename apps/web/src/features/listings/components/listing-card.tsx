@@ -9,8 +9,10 @@ import { currencyFormatter } from '@/shared/lib/currency-formatter';
 import { ListingConditionBadge } from './listing-condition-badge';
 import { ListingStatusBadge } from './listing-status-badge';
 import { TransactionRequestButton } from '@/features/transactions/components/transaction-request-button';
+import { ListingLikeButton } from './listing-like-button';
 
 import { Button } from '@/shared/components/ui/button';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -83,21 +85,32 @@ export function ListingCard({
             <Package className="h-10 w-10" />
           </div>
         )}
-
-        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-          <ListingConditionBadge condition={listing.condition} />
-          <ListingStatusBadge status={listing.status} />
-        </div>
       </div>
 
       {/* HEADER */}
-      <CardHeader className="space-y-3 px-4 pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 text-sm font-semibold sm:text-base">
+      <CardHeader className="mb-1 space-y-1 px-4 pt-4">
+        <div className="flex flex-nowrap gap-1 overflow-hidden">
+          <div className="shrink-0 whitespace-nowrap">
+            <ListingStatusBadge status={listing.status} />
+          </div>
+
+          <div className="shrink-0 whitespace-nowrap">
+            <ListingConditionBadge condition={listing.condition} />
+          </div>
+
+          <div className="shrink-0 whitespace-nowrap">
+            <Badge variant="outline">
+              {listing.category?.categoryName ?? listing.category?.slug}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <h3 className="min-w-0 truncate text-sm font-semibold sm:text-base">
             {listing.title}
           </h3>
 
-          <p className="shrink-0 text-lg font-bold text-primary">
+          <p className="whitespace-nowrap text-lg font-bold text-primary">
             {currencyFormatter.format(listing.price)}
           </p>
         </div>
@@ -105,14 +118,14 @@ export function ListingCard({
 
       {/* CONTENT */}
       <CardContent className="space-y-3 px-4">
-        <p className="line-clamp-2 text-sm text-muted-foreground">
+        <p className="truncate text-sm text-muted-foreground">
           {listing.description}
         </p>
       </CardContent>
 
       {/* FOOTER */}
-      <CardFooter className="flex flex-col gap-2 px-4 pb-4 mt-auto">
-        <div className="w-full flex items-center justify-between">
+      <CardFooter className="mt-auto flex flex-col gap-2 px-4 pb-4 pt-2">
+        <div className="flex w-full items-center justify-between">
           {/* Seller + Message */}
           <div className="flex items-center gap-0">
             <MessageButton
@@ -132,26 +145,32 @@ export function ListingCard({
               {listing.seller.name}
             </Button>
           </div>
-          <div></div>
-        </div>
-      </CardFooter>
 
-      {/* FOOTER */}
-      <CardFooter className="px-4 pb-4 pt-4 w-full">
-        {isOwner ? (
-          <div className="grid w-full grid-cols-2 gap-2">
-            <Button size="lg" className="w-full" onClick={goToEdit}>
-              Edit
-            </Button>
-            <DeleteListingDialog
-              listingId={listing.id}
-              listingTitle={listing.title}
-              onDeleted={() => router.push('/')}
-            />
-          </div>
-        ) : (
-          <TransactionRequestButton listing={listing} />
-        )}
+          {/* Like */}
+          <ListingLikeButton
+            listingId={listing.id}
+            likeCount={listing.likeCount}
+            isLikedByUser={listing.isLikedByUser}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="w-full">
+          {isOwner ? (
+            <div className="grid w-full grid-cols-2 gap-2">
+              <Button size="sm" className="w-full" onClick={goToEdit}>
+                Edit
+              </Button>
+              <DeleteListingDialog
+                listingId={listing.id}
+                listingTitle={listing.title}
+                onDeleted={() => router.push('/')}
+              />
+            </div>
+          ) : (
+            <TransactionRequestButton listing={listing} />
+          )}
+        </div>
       </CardFooter>
     </Card>
   );

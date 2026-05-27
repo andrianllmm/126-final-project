@@ -8,6 +8,7 @@ import { PrismaService } from '../../database/prisma.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { NotificationType } from '@repo/api';
 import { CreateOfferDto } from './offers.dto.js';
+import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
 
 @Injectable()
 export class OffersService {
@@ -107,12 +108,16 @@ export class OffersService {
       },
     });
 
-    await this.notificationsService.create(
+    const notification = await this.notificationsService.create(
       this.getCounterpartyId(transaction, userId),
       NotificationType.TRANSACTION,
       'New offer received',
       `New offer for ${transaction.listing.title}`,
+      undefined,
+      `/transactions/${dto.transactionId}`,
     );
+
+    this.notificationsService.emitCreated(notification as NotificationRecord);
 
     return offer;
   }
@@ -216,13 +221,16 @@ export class OffersService {
         data: { status: 'RESERVED' },
       });
 
-      await this.notificationsService.createWithTx(
+      const notification = await this.notificationsService.createWithTx(
         tx,
         counterpartyId,
         NotificationType.TRANSACTION,
         'Offer accepted',
         `Your offer for ${offer.transaction.listing.title} was accepted`,
+        undefined,
+        `/transactions/${offer.transactionId}`,
       );
+      this.notificationsService.emitCreated(notification as NotificationRecord);
 
       return transaction;
     });
@@ -268,12 +276,15 @@ export class OffersService {
       data: { status: 'REJECTED' },
     });
 
-    await this.notificationsService.create(
+    const notification = await this.notificationsService.create(
       counterpartyId,
       NotificationType.TRANSACTION,
       'Offer rejected',
       `Your offer for ${offer.transaction.listing.title} was rejected`,
+      undefined,
+      `/transactions/${offer.transactionId}`,
     );
+    this.notificationsService.emitCreated(notification as NotificationRecord);
 
     return rejectedOffer;
   }

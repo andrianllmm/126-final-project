@@ -12,7 +12,7 @@ export default function AuthLayout({
       <header className="w-full">
         <div className="mx-auto flex h-24 max-w-6xl items-center justify-center px-4">
           <Link href="/" className="flex items-center">
-            <Logo className="text-primary w-8 h-8 md:hidden" />
+            <Logo className="text-primary size-8 md:hidden" />
             <Wordmark className="text-primary hidden md:block h-8 w-auto" />
           </Link>
         </div>

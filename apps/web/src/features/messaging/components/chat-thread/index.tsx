@@ -6,9 +6,10 @@ import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useMessaging } from '../../hooks/use-messaging';
 
 import { Button } from '@/shared/components/ui/button';
-import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
+import { ConversationDetailsSheet } from './conversation-details-sheet';
 import { ChatThreadHeader } from './thread-header';
+import { LatestOfferBanner } from './latest-offer-banner';
 import { ChatMessageList } from './message-list';
 import { TypingBubble } from './typing-bubble';
 
@@ -68,16 +69,24 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
           <ChatThreadHeader
             conversation={conversation}
             currentUserId={currentUserId}
+            isConnected={isConnected}
           />
         </div>
 
-        <Badge
-          variant={isConnected ? 'secondary' : 'outline'}
-          className="shrink-0"
-        >
-          {isConnected ? 'Live' : 'Offline'}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {conversation ? (
+            <ConversationDetailsSheet
+              conversation={conversation}
+              currentUserId={currentUserId}
+            />
+          ) : null}
+        </div>
       </div>
+
+      <LatestOfferBanner
+        conversation={conversation}
+        currentUserId={currentUserId}
+      />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">

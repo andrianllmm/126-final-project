@@ -55,7 +55,7 @@ export function DeleteListingDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          size="lg"
+          size="sm"
           variant="destructive"
           className="w-full"
           onClick={(event) => event.stopPropagation()}

@@ -8,36 +8,7 @@ import {
   type ListingSearchQuery,
 } from '@repo/api';
 
-const LISTING_INCLUDE = {
-  category: true,
-
-  images: {
-    orderBy: { sortOrder: 'asc' },
-    select: {
-      id: true,
-      sortOrder: true,
-      upload: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-    },
-  },
-
-  seller: {
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  },
-} satisfies Prisma.ListingInclude;
-
-const mapListing = (listing: any) => ({
-  ...listing,
-  price: Number(listing.price),
-});
+import { decorateListings, LISTING_INCLUDE } from './listing-metadata.js';
 
 function buildOrderBy(
   sortBy: NonNullable<ListingSearchQuery['sortBy']>,
@@ -155,7 +126,10 @@ function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
 export class SearchService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async search(query: ListingSearchQuery): Promise<ListingPage> {
+  async search(
+    query: ListingSearchQuery,
+    userId?: string,
+  ): Promise<ListingPage> {
     const page = query.page ?? 1;
     const limit = query.limit ?? 12;
     const skip = (page - 1) * limit;
@@ -176,7 +150,7 @@ export class SearchService {
     ]);
 
     return {
-      data: listings.map(mapListing),
+      data: await decorateListings(this.prisma, listings, userId),
       meta: {
         total,
         totalPages: Math.max(1, Math.ceil(total / limit)),

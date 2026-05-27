@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { MoonIcon, MonitorIcon, SunIcon, LogOutIcon } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { authClient } from '@/shared/lib/auth-client';
@@ -16,18 +18,27 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Button } from '@/shared/components/ui/button';
-import { LogOutIcon } from 'lucide-react';
 import { UserAvatar } from '@/features/users/components/user-avatar';
 
-export function NavUser() {
+type Theme = 'light' | 'dark' | 'system';
+
+export function NavUser({ className }: { className?: string }) {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
   const { user, isPending, refetch } = useAuth();
   const profileQuery = useUserProfile(user?.id ?? '');
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     disconnectSocket();
@@ -43,7 +54,7 @@ export function NavUser() {
 
   if (!user) {
     return (
-      <Button asChild>
+      <Button asChild className={className}>
         <Link href="/sign-in">Sign in</Link>
       </Button>
     );
@@ -55,10 +66,14 @@ export function NavUser() {
   const displayName = profile?.name ?? name;
   const displayEmail = profile?.email ?? email;
   const avatarUrl = profile?.image ?? null;
+  const currentTheme: Theme =
+    theme === 'light' || theme === 'dark' || theme === 'system'
+      ? theme
+      : 'system';
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className={className}>
         <button className="flex items-center rounded-full focus:outline-none">
           <UserAvatar name={displayName} email={displayEmail} src={avatarUrl} />
         </button>
@@ -81,6 +96,28 @@ export function NavUser() {
         <DropdownMenuItem asChild>
           <Link href="/settings">Account</Link>
         </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+
+        <DropdownMenuRadioGroup
+          value={mounted ? currentTheme : 'system'}
+          onValueChange={(value) => setTheme(value as Theme)}
+        >
+          <DropdownMenuRadioItem value="light">
+            <SunIcon />
+            Light
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark">
+            <MoonIcon />
+            Dark
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system">
+            <MonitorIcon />
+            System
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
 
         <DropdownMenuSeparator />
 

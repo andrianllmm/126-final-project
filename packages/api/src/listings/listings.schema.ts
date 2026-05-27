@@ -95,6 +95,8 @@ export const listingSchema = z.object({
   title: z.string(),
   description: z.string(),
   price: z.number(),
+  likeCount: z.number().int().nonnegative(),
+  isLikedByUser: z.boolean(),
   condition: ListingConditionSchema,
   status: ListingStatusSchema,
 
@@ -143,27 +145,45 @@ export const listingPageSchema = z.object({
   meta: listingPageMetaSchema,
 });
 
+const listingTitleSchema = z
+  .string()
+  .min(1, 'Product name is required')
+  .min(3, 'Product name must be at least 3 characters')
+  .max(100, 'Product name must be 100 characters or fewer');
+
+const listingDescriptionSchema = z
+  .string()
+  .min(1, 'Description is required')
+  .min(10, 'Description must be at least 10 characters')
+  .max(1000, 'Description must be 1000 characters or fewer');
+
+const listingPriceSchema = z.number().min(0.01, 'Price must be greater than 0');
+
+const listingCategoryIdSchema = z.string().min(1, 'Category is required');
+
+const listingFormConditionSchema = z
+  .union([ListingConditionSchema, z.literal('')])
+  .refine((condition) => condition !== '', 'Condition is required');
+
 export const createListingSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  price: z.number().min(0),
-  categoryId: z.string(),
+  title: listingTitleSchema,
+  description: listingDescriptionSchema,
+  price: listingPriceSchema,
+  categoryId: listingCategoryIdSchema,
   condition: ListingConditionSchema,
   status: ListingStatusSchema.optional(),
 });
 
+export const listingFormSchema = createListingSchema.extend({
+  condition: listingFormConditionSchema,
+});
+
 export const updateListingSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  price: z.number().min(0).optional(),
-  categoryId: z.string().optional(),
+  title: listingTitleSchema.optional(),
+  description: listingDescriptionSchema.optional(),
+  price: listingPriceSchema.optional(),
+  categoryId: listingCategoryIdSchema.optional(),
   condition: ListingConditionSchema.optional(),
-  uploadIds: z
-    .array(z.string())
-    .refine((arr) => new Set(arr).size === arr.length, {
-      message: 'Array must contain unique values',
-    })
-    .optional(),
   status: ListingStatusSchema.optional(),
 });
 
@@ -188,3 +208,5 @@ export type UpdateListingInput = z.infer<typeof updateListingSchema>;
 export type UpdateListingStatusInput = z.infer<
   typeof updateListingStatusSchema
 >;
+export type ListingFormValues = z.input<typeof listingFormSchema>;
+export type ValidListingFormValues = z.output<typeof listingFormSchema>;

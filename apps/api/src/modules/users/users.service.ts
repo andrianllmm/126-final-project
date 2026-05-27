@@ -6,7 +6,13 @@ import {
   UserProfile,
   UserProfileUpdateInput,
   UserProfileStats,
+  ListingList,
 } from '@repo/api';
+
+import {
+  decorateListings,
+  LISTING_INCLUDE,
+} from '../listings/listing-metadata.js';
 
 @Injectable()
 export class UsersService {
@@ -200,5 +206,23 @@ export class UsersService {
       listingCount,
       responseRate,
     };
+  }
+
+  async getLikedListings(userId: string): Promise<ListingList> {
+    const likedListings = await this.prisma.likedListing.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        listing: {
+          include: LISTING_INCLUDE,
+        },
+      },
+    });
+
+    return decorateListings(
+      this.prisma,
+      likedListings.map((entry) => entry.listing),
+      userId,
+    );
   }
 }

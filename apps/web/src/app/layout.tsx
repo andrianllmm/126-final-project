@@ -5,6 +5,7 @@ import { cn } from '@/shared/lib/utils';
 import { QueryProvider } from '@/shared/providers/query-provider';
 import { ThemeProvider } from '@/shared/providers/theme-provider';
 import { Toaster } from '@/shared/components/ui/sonner';
+import SWRegister from './sw-register';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
+        <SWRegister />
         <QueryProvider>
           <ThemeProvider
             attribute="class"

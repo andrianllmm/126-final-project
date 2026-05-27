@@ -25,6 +25,7 @@ import {
   UpdateMyProfileDto,
   UserProfileStatsDto,
 } from './users.dto.js';
+import { ListingListDto } from '../listings/listings.dto.js';
 
 import { UsersService } from './users.service.js';
 import { ImageFileValidationPipe } from '../uploads/pipes/image-file-validation.pipe.js';
@@ -78,6 +79,12 @@ export class UsersController {
   @ZodResponse({ type: UserProfileDto })
   async removeMyAvatar(@Session() session: UserSession) {
     return this.usersService.removeAvatar(session.user.id);
+  }
+
+  @Get('me/liked-listings')
+  @ZodResponse({ type: ListingListDto })
+  getMyLikedListings(@Session() session: UserSession) {
+    return this.usersService.getLikedListings(session.user.id);
   }
 
   @Get(':id/stats')

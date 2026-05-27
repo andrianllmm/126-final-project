@@ -39,17 +39,15 @@ export function SettingsView({ userId }: SettingsViewProps) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center">
-          <Spinner className="size-8 text-primary" />
-        </div>
+      <div className="flex items-center justify-center py-8">
+        <Spinner className="size-8 text-primary" />
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8 space-y-4">
+      <div className="space-y-4 py-8">
         <p className="text-lg font-semibold">Profile unavailable</p>
         <p className="text-sm text-muted-foreground">
           {error?.message ?? 'Unable to load your profile.'}
@@ -59,7 +57,7 @@ export function SettingsView({ userId }: SettingsViewProps) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
       <Tabs value={tab} onValueChange={setTab} className="w-full space-y-4">

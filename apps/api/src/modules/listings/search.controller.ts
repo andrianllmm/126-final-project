@@ -1,5 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import {
+  OptionalAuth,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 import { ZodResponse } from 'nestjs-zod';
 
 import { ListingPageDto } from './listings.dto.js';
@@ -11,9 +15,12 @@ export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
   @Get()
-  @AllowAnonymous()
+  @OptionalAuth()
   @ZodResponse({ type: ListingPageDto })
-  search(@Query() query: SearchListingsQueryDto) {
-    return this.searchService.search(query);
+  search(
+    @Session() session: UserSession | undefined,
+    @Query() query: SearchListingsQueryDto,
+  ) {
+    return this.searchService.search(query, session?.user.id);
   }
 }

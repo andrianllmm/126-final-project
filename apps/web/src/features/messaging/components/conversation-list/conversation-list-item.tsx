@@ -101,7 +101,7 @@ function ConversationContent({
               {conversation.listing.title}
 
               {isUnread && (
-                <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                <span className="size-2 rounded-full bg-primary shrink-0" />
               )}
             </div>
 
@@ -129,7 +129,7 @@ function ConversationContent({
           {conversation.lastMessageAt && (
             <>
               <span className="text-muted-foreground/60">•</span>
-              <span>
+              <span className="whitespace-nowrap">
                 <span>
                   {formatDistanceToNowStrict(
                     new Date(conversation.lastMessageAt),
@@ -159,7 +159,7 @@ function ConversationActions({ conversation }: { conversation: Conversation }) {
             size="icon-sm"
             className="h-7 w-7 border-0 rounded-full"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="size-4" />
           </Button>
         </DropdownMenuTrigger>
 

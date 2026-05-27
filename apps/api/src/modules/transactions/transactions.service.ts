@@ -13,6 +13,7 @@ import {
 import { NotificationsService } from '../notifications/notifications.service.js';
 import { ListingStatus, NotificationType, TransactionStatus } from '@repo/api';
 import { PrismaTx } from '../../common/prisma-tx.js';
+import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
 
 @Injectable()
 export class TransactionsService {
@@ -64,20 +65,30 @@ export class TransactionsService {
         },
       });
 
-      await this.notificationsService.createWithTx(
+      const notification1 = await this.notificationsService.createWithTx(
         tx,
         buyerId,
         NotificationType.TRANSACTION,
         'Purchase requested',
         `Transaction created for ${listing.title}`,
+        undefined,
+        `/transactions/${transaction.transactionId}`,
+      );
+      this.notificationsService.emitCreated(
+        notification1 as NotificationRecord,
       );
 
-      await this.notificationsService.createWithTx(
+      const notification2 = await this.notificationsService.createWithTx(
         tx,
         listing.sellerId,
         NotificationType.TRANSACTION,
         'New purchase request',
         `You received a transaction request for ${listing.title}`,
+        undefined,
+        `/transactions/${transaction.transactionId}`,
+      );
+      this.notificationsService.emitCreated(
+        notification2 as NotificationRecord,
       );
 
       return transaction;
@@ -119,13 +130,16 @@ export class TransactionsService {
         data: { status: 'RESERVED' },
       });
 
-      await this.notificationsService.createWithTx(
+      const notification = await this.notificationsService.createWithTx(
         tx,
         transaction.buyerId,
         NotificationType.TRANSACTION,
         'Transaction accepted',
         `${transaction.listing.title} transaction was accepted`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
+      this.notificationsService.emitCreated(notification as NotificationRecord);
 
       return updatedTransaction;
     });
@@ -163,13 +177,16 @@ export class TransactionsService {
 
       await this.syncListingStatus(tx, transaction.listingId, 'REJECTED');
 
-      await this.notificationsService.createWithTx(
+      const notification = await this.notificationsService.createWithTx(
         tx,
         transaction.buyerId,
         NotificationType.TRANSACTION,
         'Transaction rejected',
         `${transaction.listing.title} transaction was rejected`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
+      this.notificationsService.emitCreated(notification as NotificationRecord);
 
       return updatedTransaction;
     });
@@ -216,19 +233,30 @@ export class TransactionsService {
         },
       });
 
-      await this.notificationsService.createWithTx(
+      const notification1 = await this.notificationsService.createWithTx(
         tx,
         transaction.buyerId,
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
-      await this.notificationsService.createWithTx(
+      this.notificationsService.emitCreated(
+        notification1 as NotificationRecord,
+      );
+
+      const notification2 = await this.notificationsService.createWithTx(
         tx,
         transaction.sellerId,
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
+      );
+      this.notificationsService.emitCreated(
+        notification2 as NotificationRecord,
       );
 
       return updatedTransaction;
@@ -270,19 +298,30 @@ export class TransactionsService {
 
       await this.syncListingStatus(tx, transaction.listingId, 'CANCELLED');
 
-      await this.notificationsService.createWithTx(
+      const notification1 = await this.notificationsService.createWithTx(
         tx,
         transaction.buyerId,
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
       );
-      await this.notificationsService.createWithTx(
+      this.notificationsService.emitCreated(
+        notification1 as NotificationRecord,
+      );
+
+      const notification2 = await this.notificationsService.createWithTx(
         tx,
         transaction.sellerId,
         NotificationType.TRANSACTION,
         'Transaction completed',
         `${transaction.listing.title} transaction completed`,
+        undefined,
+        `/transactions/${updatedTransaction.transactionId}`,
+      );
+      this.notificationsService.emitCreated(
+        notification2 as NotificationRecord,
       );
 
       return updatedTransaction;

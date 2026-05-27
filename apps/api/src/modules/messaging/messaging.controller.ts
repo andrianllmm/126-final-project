@@ -17,6 +17,18 @@ export class MessagingController {
     );
   }
 
+  @Post('conversations/with-buyer')
+  async getOrCreateConversationWithBuyer(
+    @Body() body: { listingId: string; buyerId: string },
+    @Session() session: UserSession,
+  ) {
+    return this.messagingService.getOrCreateConversationWithBuyer(
+      session.user.id,
+      body.listingId,
+      body.buyerId,
+    );
+  }
+
   @Get('conversations')
   getConversations(@Session() session: UserSession) {
     return this.messagingService.getConversations(session.user.id);

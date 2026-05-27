@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { initializeSocket } from '@/shared/lib/socket-client';
 import type { Notification } from '@repo/api';
+import { useRouter } from 'next/navigation';
 
 import {
   getNotifications,
@@ -36,6 +37,7 @@ function upsertNotificationList(
 
 export function useNotifications() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { user } = useAuth();
   const userId = user?.id;
   const [isConnected, setIsConnected] = useState(false);
@@ -68,11 +70,13 @@ export function useNotifications() {
       queryClient.setQueryData<number>(notificationCountKey, (current) => {
         if (current === undefined) return current;
 
+        const numeric = Number(current ?? 0);
+
         if (existingNotification && !existingNotification.isRead) {
-          return Math.max(current - 1, 0);
+          return Math.max(numeric - 1, 0);
         }
 
-        return current;
+        return numeric;
       });
     },
   });
@@ -104,22 +108,20 @@ export function useNotifications() {
     },
   });
 
+  const markAsRead = markNotificationAsReadMutation.mutate;
+
   useEffect(() => {
     if (!userId) return;
 
     const socket = initializeSocket('/notifications');
 
-    const handleConnect = () => {
-      setIsConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-    };
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
 
     const applyReadNotification = (notification: Notification) => {
       const currentNotifications =
         queryClient.getQueryData<Notification[]>(notificationsKey);
+
       const existingNotification = currentNotifications?.find(
         (item) => item.id === notification.id,
       );
@@ -131,15 +133,17 @@ export function useNotifications() {
       queryClient.setQueryData<number>(notificationCountKey, (current) => {
         if (current === undefined) return current;
 
+        const numeric = Number(current ?? 0);
+
         if (
           existingNotification &&
           !existingNotification.isRead &&
           notification.isRead
         ) {
-          return Math.max(current - 1, 0);
+          return Math.max(numeric - 1, 0);
         }
 
-        return current;
+        return numeric;
       });
     };
 
@@ -148,12 +152,31 @@ export function useNotifications() {
         upsertNotificationList(current, notification),
       );
 
-      queryClient.setQueryData<number>(notificationCountKey, (current) =>
-        current === undefined ? 1 : current + (notification.isRead ? 0 : 1),
-      );
+      queryClient.setQueryData<number>(notificationCountKey, (current) => {
+        const numeric = Number(current ?? 0);
+        return numeric === 0 && current === undefined
+          ? 1
+          : numeric + (notification.isRead ? 0 : 1);
+      });
 
       toast(notification.title, {
         description: notification.message,
+        action: notification.actionLink
+          ? {
+              label: 'Open',
+              onClick: () => {
+                try {
+                  markAsRead(notification.id);
+                } catch {}
+
+                try {
+                  if (notification.actionLink) {
+                    router.push(notification.actionLink);
+                  }
+                } catch {}
+              },
+            }
+          : undefined,
       });
     };
 
@@ -166,11 +189,8 @@ export function useNotifications() {
     socket.on('notification:new', handleNewNotification);
     socket.on('notification:read', handleNotificationRead);
 
-    if (!socket.connected) {
-      socket.connect();
-    } else {
-      handleConnect();
-    }
+    if (!socket.connected) socket.connect();
+    else handleConnect();
 
     return () => {
       socket.off('connect', handleConnect);
@@ -178,10 +198,10 @@ export function useNotifications() {
       socket.off('notification:new', handleNewNotification);
       socket.off('notification:read', handleNotificationRead);
     };
-  }, [queryClient, userId]);
+  }, [queryClient, userId, router, markAsRead]);
 
   const notifications = notificationsQuery.data ?? [];
-  const unreadCount = unreadCountQuery.data ?? 0;
+  const unreadCount = Number(unreadCountQuery.data ?? 0);
 
   return {
     notifications,
