@@ -1,15 +1,22 @@
 'use server';
 
+import { cookies } from 'next/headers';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export async function subscribeUser(sub: PushSubscription) {
-  await fetch(`${API_BASE}/notifications/push/subscribe`, {
+  const cookieStore = await cookies();
+  const response = await fetch(`${API_BASE}/notifications/push/subscribe`, {
     method: 'POST',
     body: JSON.stringify(sub),
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    headers: {
+      Cookie: cookieStore.toString(),
+      'Content-Type': 'application/json',
+    },
   });
-
+  if (!response.ok) {
+    throw new Error('Failed to subscribe');
+  }
   return { success: true };
 }
 
