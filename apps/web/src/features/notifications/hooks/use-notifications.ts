@@ -68,11 +68,13 @@ export function useNotifications() {
       queryClient.setQueryData<number>(notificationCountKey, (current) => {
         if (current === undefined) return current;
 
+        const numeric = Number(current ?? 0);
+
         if (existingNotification && !existingNotification.isRead) {
-          return Math.max(current - 1, 0);
+          return Math.max(numeric - 1, 0);
         }
 
-        return current;
+        return numeric;
       });
     },
   });
@@ -131,15 +133,17 @@ export function useNotifications() {
       queryClient.setQueryData<number>(notificationCountKey, (current) => {
         if (current === undefined) return current;
 
+        const numeric = Number(current ?? 0);
+
         if (
           existingNotification &&
           !existingNotification.isRead &&
           notification.isRead
         ) {
-          return Math.max(current - 1, 0);
+          return Math.max(numeric - 1, 0);
         }
 
-        return current;
+        return numeric;
       });
     };
 
@@ -148,9 +152,12 @@ export function useNotifications() {
         upsertNotificationList(current, notification),
       );
 
-      queryClient.setQueryData<number>(notificationCountKey, (current) =>
-        current === undefined ? 1 : current + (notification.isRead ? 0 : 1),
-      );
+      queryClient.setQueryData<number>(notificationCountKey, (current) => {
+        const numeric = Number(current ?? 0);
+        return numeric === 0 && current === undefined
+          ? 1
+          : numeric + (notification.isRead ? 0 : 1);
+      });
 
       toast(notification.title, {
         description: notification.message,
@@ -181,7 +188,7 @@ export function useNotifications() {
   }, [queryClient, userId]);
 
   const notifications = notificationsQuery.data ?? [];
-  const unreadCount = unreadCountQuery.data ?? 0;
+  const unreadCount = Number(unreadCountQuery.data ?? 0);
 
   return {
     notifications,
