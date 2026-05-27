@@ -8,6 +8,7 @@ import { useMessaging } from '../../hooks/use-messaging';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { ChatComposer } from './message-composer';
+import { ConversationDetailsSheet } from './conversation-details-sheet';
 import { ChatThreadHeader } from './thread-header';
 import { ChatMessageList } from './message-list';
 import { TypingBubble } from './typing-bubble';
@@ -71,12 +72,21 @@ export function ChatThread({ conversationId, showBackButton }: Props) {
           />
         </div>
 
-        <Badge
-          variant={isConnected ? 'secondary' : 'outline'}
-          className="shrink-0"
-        >
-          {isConnected ? 'Live' : 'Offline'}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge
+            variant={isConnected ? 'secondary' : 'outline'}
+            className="shrink-0"
+          >
+            {isConnected ? 'Live' : 'Offline'}
+          </Badge>
+
+          {conversation ? (
+            <ConversationDetailsSheet
+              conversation={conversation}
+              currentUserId={currentUserId}
+            />
+          ) : null}
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
