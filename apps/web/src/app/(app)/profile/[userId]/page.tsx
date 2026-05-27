@@ -11,12 +11,14 @@ export default async function Page({
   const { userId } = await params;
 
   return (
-    <div className="mx-auto max-w-6xl w-full px-4 py-8 sm:px-6 lg:px-8 space-y-4">
-      <ProfileHeader userId={userId} />
-      <Separator />
-      <ProfileStats userId={userId} />
-      <Separator />
-      <ProfileTabs userId={userId} />
+    <div className="page-container py-8">
+      <div className="space-y-4">
+        <ProfileHeader userId={userId} />
+        <Separator />
+        <ProfileStats userId={userId} />
+        <Separator />
+        <ProfileTabs userId={userId} />
+      </div>
     </div>
   );
 }

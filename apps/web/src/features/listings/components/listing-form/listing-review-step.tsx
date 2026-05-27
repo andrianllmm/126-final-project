@@ -32,7 +32,7 @@ export function ListingReviewStep({
   onPublish,
 }: ListingReviewStepProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6">
+    <div>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         <div>
           <ProductSummaryImg photos={photos} />

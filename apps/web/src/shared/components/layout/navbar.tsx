@@ -107,7 +107,7 @@ export function Navbar({ className }: { className?: string }) {
     <header
       className={cn('relative z-50 w-full border-b bg-background', className)}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
+      <div className="page-container flex h-16 items-center gap-4">
         {/* Brand */}
         <Link href="/" className="flex items-center">
           <Logo className="text-primary w-8 h-8 md:hidden" />

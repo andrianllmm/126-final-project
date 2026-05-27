@@ -26,7 +26,7 @@ export function ListingFormStepShell({
   nextDisabled,
 }: ListingFormStepShellProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+    <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
       <div className="mt-4 md:col-span-2">
         {children}
 

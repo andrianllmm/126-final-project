@@ -154,16 +154,16 @@ export function ListingDetail() {
             {isOwner ? (
               <div className="grid w-full grid-cols-2 gap-2">
                 <Button
-                  size="lg"
+                  size="sm"
                   className="w-full"
                   onClick={() => router.push(`/listings/${listing.id}/edit`)}
                 >
-                  Edit Listing
+                  Edit
                 </Button>
                 <DeleteListingDialog
                   listingId={listing.id}
                   listingTitle={listing.title}
-                  triggerLabel="Delete Listing"
+                  triggerLabel="Delete"
                   onDeleted={() => router.push('/')}
                 />
               </div>

@@ -42,7 +42,7 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="page-container flex min-h-screen items-center justify-center py-8">
         <p className="text-muted-foreground">Loading listing...</p>
       </div>
     );
@@ -50,7 +50,7 @@ export default function Page() {
 
   if (isError || !listing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="page-container flex min-h-screen flex-col items-center justify-center gap-4 py-8">
         <p className="text-destructive">Listing not found.</p>
         <Button onClick={() => window.history.back()}>Go back</Button>
       </div>
@@ -69,7 +69,7 @@ export default function Page() {
 
   return (
     <AuthRouteGuard>
-      <div className="min-h-screen bg-background py-8">
+      <div className="page-container py-8">
         <ListingForm
           mode="edit"
           listingId={listingId}

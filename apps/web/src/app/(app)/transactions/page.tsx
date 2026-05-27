@@ -125,7 +125,7 @@ export default function TransactionsPage() {
 
   return (
     <>
-      <div className="container max-w-6xl py-8">
+      <div className="page-container py-8">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold tracking-tight">
             Transactions

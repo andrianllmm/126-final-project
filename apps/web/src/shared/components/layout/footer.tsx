@@ -9,7 +9,7 @@ import { footerLinks, footerMeta } from './footer.data';
 export function Footer({ className }: { className?: string }) {
   return (
     <footer className={cn('border-t bg-background', className)}>
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="page-container py-10">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
