@@ -108,4 +108,11 @@ export class ReviewsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async findByReviewer(userId: string) {
+    return this.prisma.review.findMany({
+      where: { reviewerId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

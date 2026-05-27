@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { format } from 'date-fns';
@@ -23,12 +23,14 @@ import { ArrowLeft } from 'lucide-react';
 import {
   TransactionAction,
   TransactionStatus,
+  ReviewRole,
   type Transaction,
 } from '@repo/api';
 import { toast } from 'sonner';
 import { CopyText } from '@/shared/components/copy-text';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { TransactionOffersPanel } from '@/features/transactions/components/transaction-offers-panel';
+import { useMyReviews } from '@/features/reviews/hooks/use-my-reviews';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -40,8 +42,38 @@ export default function TransactionDetailPage() {
   const user = session?.user ?? null;
 
   const { data: transaction, isLoading } = useTransaction(transactionId);
+  const { data: myReviews, isLoading: isLoadingMyReviews } =
+    useMyReviews(!!user);
 
   const updateStatus = useUpdateTransactionStatus();
+
+  const userRole = transaction?.buyerId === user?.id ? 'buyer' : 'seller';
+  const reviewRole =
+    userRole === 'buyer'
+      ? ReviewRole.BUYER_TO_SELLER
+      : ReviewRole.SELLER_TO_BUYER;
+
+  const hasReviewedThisTransaction = myReviews?.some(
+    (review) =>
+      review.transactionId === transaction?.transactionId &&
+      review.role === reviewRole,
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    if (!transaction) return;
+    if (transaction.status !== TransactionStatus.COMPLETED) return;
+    if (isLoadingMyReviews) return;
+    if (hasReviewedThisTransaction) return;
+
+    router.replace(`/transactions/${transaction.transactionId}/review`);
+  }, [
+    hasReviewedThisTransaction,
+    isLoadingMyReviews,
+    user,
+    router,
+    transaction,
+  ]);
 
   const [dialog, setDialog] = useState<{
     open: boolean;
@@ -73,8 +105,6 @@ export default function TransactionDetailPage() {
       </div>
     );
   }
-
-  const userRole = transaction.buyerId === user.id ? 'buyer' : 'seller';
 
   const counterparty =
     userRole === 'buyer' ? transaction.seller : transaction.buyer;

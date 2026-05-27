@@ -20,4 +20,10 @@ export class ReviewsController {
   forUser(@Param('id') id: string) {
     return this.reviewsService.findByUser(id);
   }
+
+  @Get('me')
+  @ZodResponse({ type: ReviewListDto })
+  forMe(@Session() session: UserSession) {
+    return this.reviewsService.findByReviewer(session.user.id);
+  }
 }

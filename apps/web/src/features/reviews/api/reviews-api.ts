@@ -6,3 +6,5 @@ export const createReview = (input: CreateReviewInput) =>
 
 export const getUserReviews = (userId: string) =>
   apiClient.get<ReviewList>(`/reviews/user/${userId}`);
+
+export const getMyReviews = () => apiClient.get<ReviewList>('/reviews/me');
