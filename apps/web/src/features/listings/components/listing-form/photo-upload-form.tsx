@@ -1,16 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Card } from '@/shared/components/ui/card';
-import { Plus, X } from 'lucide-react';
+import { useRef } from 'react';
 
-interface UploadedPhoto {
-  id: string;
-  preview: string;
-  file?: File;
-  existingImageId?: string;
-  isMain?: boolean;
-}
+import { MAX_LISTING_PHOTOS, type UploadedPhoto } from './photo-upload-types';
+import { PhotoUploadSlot } from './photo-upload-slot';
 
 interface PhotoUploadFormProps {
   photos?: UploadedPhoto[];
@@ -21,145 +14,84 @@ export function PhotoUploadForm({
   photos = [],
   onChange,
 }: PhotoUploadFormProps) {
-  const [localPhotos, setLocalPhotos] = useState<UploadedPhoto[]>(photos);
-  const [targetIndex, setTargetIndex] = useState<number | null>(null);
-
-  const maxPhotos = 5;
-  const isInitialMount = useRef(true);
+  const targetIndexRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (
-      JSON.stringify(photos.map((p) => p.id)) !==
-      JSON.stringify(localPhotos.map((p) => p.id))
-    ) {
-      setLocalPhotos(photos);
-    }
-  }, [photos]);
+  const readFileAsPhoto = (file: File) =>
+    new Promise<UploadedPhoto>((resolve) => {
+      const reader = new FileReader();
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    if (onChange) {
-      onChange(localPhotos);
-    }
-  }, [localPhotos, onChange]);
-
-  const processFiles = (files: FileList) => {
-    if (targetIndex === null) return;
-
-    const filesArray = Array.from(files);
-
-    const newPhotosPromises = filesArray.map((file) => {
-      return new Promise<UploadedPhoto>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const preview = e.target?.result as string;
-          resolve({
-            id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            file,
-            preview,
-          });
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.all(newPhotosPromises).then((newPhotos) => {
-      setLocalPhotos((prev) => {
-        const updated = [...prev];
-        let currentTarget = targetIndex;
-
-        newPhotos.forEach((photo) => {
-          while (currentTarget < maxPhotos) {
-            updated[currentTarget] = photo;
-            currentTarget++;
-            break;
-          }
+      reader.onload = (event) => {
+        resolve({
+          id: crypto.randomUUID(),
+          file,
+          preview: String(event.target?.result ?? ''),
         });
+      };
 
-        const filtered = updated.filter(Boolean);
-        return filtered.map((photo, idx) => ({
-          ...photo,
-          isMain: idx === 0,
-        }));
-      });
-      setTargetIndex(null);
+      reader.readAsDataURL(file);
     });
+
+  const mergePhotos = (
+    currentPhotos: UploadedPhoto[],
+    startIndex: number,
+    incomingPhotos: UploadedPhoto[],
+  ) => {
+    const updatedPhotos = [...currentPhotos];
+    let insertIndex = startIndex;
+
+    for (const photo of incomingPhotos) {
+      if (insertIndex >= MAX_LISTING_PHOTOS) break;
+
+      updatedPhotos[insertIndex] = photo;
+      insertIndex += 1;
+    }
+
+    return updatedPhotos
+      .filter((photo): photo is UploadedPhoto => Boolean(photo))
+      .map((photo, index) => ({
+        ...photo,
+        isMain: index === 0,
+      }));
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files || files.length === 0) {
-      setTargetIndex(null);
+    const targetIndex = targetIndexRef.current;
+
+    if (!files || files.length === 0 || targetIndex === null) {
+      targetIndexRef.current = null;
       return;
     }
-    processFiles(files);
+
+    Promise.all(Array.from(files).map((file) => readFileAsPhoto(file))).then(
+      (newPhotos) => {
+        onChange?.(mergePhotos(photos, targetIndex, newPhotos));
+      },
+    );
+
+    targetIndexRef.current = null;
     event.target.value = '';
   };
 
   const removePhoto = (index: number) => {
-    setLocalPhotos((prev) => {
-      const updated = prev.filter((_, i) => i !== index);
-      return updated.map((photo, idx) => ({ ...photo, isMain: idx === 0 }));
-    });
-  };
-
-  const triggerUploadAtBox = (index: number) => {
-    setTargetIndex(index);
-    fileInputRef.current?.click();
-  };
-
-  const SmallSlot = ({ index }: { index: number }) => {
-    const photo = localPhotos[index];
-
-    if (photo) {
-      return (
-        <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
-          <img
-            src={photo.preview}
-            alt={`Photo ${index + 1}`}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div
-            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
-            onClick={() => triggerUploadAtBox(index)}
-          >
-            <span className="text-white text-sm font-medium">Change Photo</span>
-          </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              removePhoto(index);
-            }}
-            className="absolute top-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity z-20 p-1 cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </Card>
-      );
-    }
-
-    return (
-      <Card
-        onClick={() => triggerUploadAtBox(index)}
-        className="border-2 border-dashed border-border hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full bg-muted/40 cursor-pointer"
-      >
-        <div className="flex flex-col items-center justify-center h-full group">
-          <Plus className="w-5 h-5 text-gray-400 dark:text-gray-500 mb-1 group-hover:text-rose-500 dark:group-hover:text-rose-400 transition-colors" />
-          <p className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-rose-500 dark:group-hover:text-rose-400 transition-colors">
-            Add Photo
-          </p>
-        </div>
-      </Card>
+    onChange?.(
+      photos
+        .filter((_, currentIndex) => currentIndex !== index)
+        .map((photo, currentIndex) => ({
+          ...photo,
+          isMain: currentIndex === 0,
+        })),
     );
   };
 
+  const triggerUploadAtBox = (index: number) => {
+    targetIndexRef.current = index;
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <input
         type="file"
         ref={fileInputRef}
@@ -170,97 +102,58 @@ export function PhotoUploadForm({
       />
 
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h2 className="mb-2 text-2xl font-semibold text-foreground">
           Upload Photos
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Add up to {maxPhotos}&nbsp;photos. The first photo will be your
+        <p className="text-muted-foreground">
+          Add up to {MAX_LISTING_PHOTOS} photos. The first photo will be your
           listing&apos;s cover.
         </p>
       </div>
 
-      <div className="flex gap-4 items-start">
-        {/* Main/Cover Slot */}
-        <div className="flex-2 h-75">
-          {localPhotos[0] ? (
-            <Card className="relative group cursor-pointer overflow-hidden w-full h-full">
-              <img
-                src={localPhotos[0].preview}
-                alt="Main photo"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div
-                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 cursor-pointer"
-                onClick={() => triggerUploadAtBox(0)}
-              >
-                <span className="text-white text-sm font-medium">
-                  Change Photo
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removePhoto(0);
-                }}
-                className="absolute top-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity z-20 p-1 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </Card>
-          ) : (
-            <Card
-              onClick={() => triggerUploadAtBox(0)}
-              className="border-2 border-dashed border-border hover:border-rose-500 dark:hover:border-rose-400/70 transition-colors w-full h-full bg-muted/50 cursor-pointer"
-            >
-              <div className="flex flex-col items-center justify-center h-full group">
-                <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center mb-3 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
-                  <svg
-                    className="w-7 h-7 text-gray-400 dark:text-gray-400 group-hover:text-rose-400 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-                <p className="font-semibold text-gray-700 dark:text-gray-300">
-                  Add Main Photo
-                </p>
-                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                  Required
-                </p>
-              </div>
-            </Card>
-          )}
+      {/* RESPONSIVE GRID LAYOUT */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* MAIN IMAGE */}
+        <div className="sm:col-span-2 h-80 sm:h-75">
+          <PhotoUploadSlot
+            index={0}
+            photo={photos[0]}
+            variant="main"
+            onSelect={triggerUploadAtBox}
+            onRemove={removePhoto}
+            className="h-full w-full"
+          />
         </div>
 
-        <div className="flex-1 h-75">
-          <SmallSlot index={1} />
+        {/* SECOND SLOT */}
+        <div className="sm:col-span-1 h-80 sm:h-75">
+          <PhotoUploadSlot
+            index={1}
+            photo={photos[1]}
+            variant="secondary"
+            onSelect={triggerUploadAtBox}
+            onRemove={removePhoto}
+            className="h-full w-full"
+          />
         </div>
-      </div>
 
-      <div className="grid grid-cols-3 gap-4">
+        {/* MOBILE */}
         {[2, 3, 4].map((index) => (
-          <div key={index} className="h-50">
-            <SmallSlot index={index} />
+          <div key={index} className="sm:col-span-1 h-80 sm:h-50">
+            <PhotoUploadSlot
+              index={index}
+              photo={photos[index]}
+              variant="secondary"
+              onSelect={triggerUploadAtBox}
+              onRemove={removePhoto}
+              className="h-full w-full"
+            />
           </div>
         ))}
       </div>
 
-      <div className="text-sm text-gray-500 dark:text-gray-400">
-        {localPhotos.length} of {maxPhotos} photos added
+      <div className="text-sm text-muted-foreground">
+        {photos.length} of {MAX_LISTING_PHOTOS} photos added
       </div>
     </div>
   );

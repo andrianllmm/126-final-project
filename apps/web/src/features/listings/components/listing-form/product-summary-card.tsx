@@ -1,30 +1,26 @@
 'use client';
 
 import { Card, CardContent } from '@/shared/components/ui/card';
+import { ListingConditionBadge } from '@/features/listings/components/listing-condition-badge';
+import { currencyFormatter } from '@/shared/lib/currency-formatter';
 
 interface ProductSummaryCardProps {
   productTitle: string;
-  category: string;
+  categoryName?: string;
   price: string;
   description: string;
   condition?: string;
 }
 
-/** Capitalizes the first letter of a string (e.g. "electronics" → "Electronics") */
-function capitalize(str: string): string {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 export function ProductSummaryCard({
   productTitle,
-  category,
+  categoryName,
   price,
   description,
   condition,
 }: ProductSummaryCardProps) {
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3 w-full min-w-sm max-w-xl">
       <Card className="w-full bg-card overflow-hidden border border-border/70 shadow-sm rounded-2xl">
         <CardContent className="px-9 pt-4 pb-5 space-y-6">
           {/* Title */}
@@ -42,24 +38,14 @@ export function ProductSummaryCard({
             </p>
           </div>
 
-          {/* Category & Price */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                Category
-              </p>
-              <p className="text-base font-semibold text-foreground">
-                {capitalize(category)}
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                Asking Price
-              </p>
-              <p className="text-2xl font-bold text-primary tracking-tight">
-                ₱{parseFloat(price || '0').toFixed(2)}
-              </p>
-            </div>
+          {/* Category */}
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-muted-foreground">
+              Category
+            </p>
+            <p className="text-base font-semibold text-foreground">
+              {categoryName ?? 'Uncategorized'}
+            </p>
           </div>
 
           {/* Condition */}
@@ -68,9 +54,7 @@ export function ProductSummaryCard({
               <p className="text-xs font-medium text-muted-foreground">
                 Condition
               </p>
-              <p className="text-base font-semibold text-foreground">
-                {capitalize(condition)}
-              </p>
+              <ListingConditionBadge condition={condition} />
             </div>
           )}
 
@@ -81,6 +65,16 @@ export function ProductSummaryCard({
             </p>
             <p className="text-base leading-relaxed text-muted-foreground">
               {description}
+            </p>
+          </div>
+
+          {/* Price */}
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-muted-foreground">
+              Asking Price
+            </p>
+            <p className="text-2xl font-bold text-primary tracking-tight">
+              {currencyFormatter.format(price)}
             </p>
           </div>
         </CardContent>

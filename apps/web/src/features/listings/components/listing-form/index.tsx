@@ -1,234 +1,300 @@
 'use client';
 
-import { useEffect, useImperativeHandle, forwardRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@/shared/components/ui/input';
-import { Textarea } from '@/shared/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select';
+  Stepper,
+  StepperContent,
+  StepperIndicator,
+  StepperItem,
+  StepperNav,
+  StepperPanel,
+  StepperSeparator,
+  StepperTitle,
+  StepperTrigger,
+} from '@/shared/components/ui/stepper';
+import { CheckIcon, LoaderCircleIcon } from 'lucide-react';
+import { ListingDetailsForm } from '@/features/listings/components/listing-form/listing-details-form';
+import { SellerTipsCard } from '@/features/listings/components/listing-form/seller-tips-card';
+import { NeedHelpCard } from '@/features/listings/components/listing-form/need-help-card';
+import { useCategories } from '@/features/listings/hooks/use-categories';
+import { PhotoUploadForm } from './photo-upload-form';
+import { PhotoGuidelines } from './image-guide-card';
+import { ListingFormStepShell } from './listing-form-step-shell';
+import { ListingReviewStep } from './listing-review-step';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCreateListing } from '../../hooks/use-create-listing';
 import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from '@/shared/components/ui/field';
-import {
-  listingFormSchema,
-  ListingFormValues,
-  CATEGORIES,
-} from '@/features/listings/lib/listing-schema';
+  useAddListingImages,
+  useRemoveListingImage,
+} from '../../hooks/use-listing-images';
+import { useUpdateListing } from '../../hooks/use-update-listing';
+import type { ListingFormHandle } from './listing-details-form';
+import type { ListingFormValues, CreateListingInput } from '@repo/api';
+import type { UploadedPhoto } from './photo-upload-types';
+import { ListingCondition } from '@repo/api';
 
-// Public ref handle
-export interface ListingFormHandle {
-  /** Runs full validation; resolves true when all fields are valid. */
-  triggerValidation: () => Promise<boolean>;
+const steps = [{ title: 'Details' }, { title: 'Photos' }, { title: 'Review' }];
+
+interface ListingStepperProps {
+  mode?: 'create' | 'edit';
+  listingId?: string;
+  initialData?: ListingFormValues;
+  initialPhotos?: UploadedPhoto[];
 }
 
-// Props
-interface ListingFormProps {
-  title?: string;
-  initialData?: Partial<ListingFormValues>;
-  onChange?: (data: ListingFormValues) => void;
-}
+export function ListingForm({
+  mode = 'create',
+  listingId,
+  initialData,
+  initialPhotos,
+}: ListingStepperProps) {
+  const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
+  const { data: categories } = useCategories();
 
-// Component
-export const ListingForm = forwardRef<ListingFormHandle, ListingFormProps>(
-  function ListingForm({ title, initialData, onChange }, ref) {
-    const {
-      register,
-      control,
-      trigger,
-      watch,
-      reset,
-      formState: { errors },
-    } = useForm<ListingFormValues>({
-      resolver: zodResolver(listingFormSchema),
-      defaultValues: {
-        title: initialData?.title ?? '',
-        categoryId: initialData?.categoryId ?? '',
-        price: initialData?.price ?? 0.0,
-        description: initialData?.description ?? '',
-        condition: initialData?.condition ?? '',
-      },
-      mode: 'onTouched',
-    });
+  const createListingMutation = useCreateListing();
+  const updateListingMutation = useUpdateListing();
+  const addImagesMutation = useAddListingImages();
+  const removeListingImageMutation = useRemoveListingImage();
 
-    useEffect(() => {
-      if (!initialData) {
-        return;
+  const isSubmitting =
+    createListingMutation.isPending ||
+    updateListingMutation.isPending ||
+    addImagesMutation.isPending ||
+    removeListingImageMutation.isPending;
+
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [validatingStep1, setValidatingStep1] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const listingFormRef = useRef<ListingFormHandle>(null);
+
+  const [formData, setFormData] = useState<ListingFormValues>(
+    initialData ?? {
+      title: '',
+      categoryId: '',
+      price: 0,
+      description: '',
+      condition: '',
+    },
+  );
+  const [photos, setPhotos] = useState<UploadedPhoto[]>(initialPhotos ?? []);
+  const [originalImageIds, setOriginalImageIds] = useState<string[]>([]);
+
+  const categoryName = categories?.find(
+    (category) => category.id === formData.categoryId,
+  )?.categoryName;
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    setPhotos(initialPhotos ?? []);
+    setOriginalImageIds(
+      (initialPhotos ?? [])
+        .filter((photo) => Boolean(photo.existingImageId))
+        .map((photo) => photo.existingImageId as string),
+    );
+  }, [initialPhotos]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep]);
+
+  const handleNextFromStep1 = async () => {
+    setValidatingStep1(true);
+    setPhotoError(null);
+    try {
+      const isValid = await listingFormRef.current?.triggerValidation();
+      if (isValid) {
+        const latestValues = listingFormRef.current?.getValues();
+        if (latestValues) {
+          setFormData(latestValues);
+        }
+        setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+      }
+    } finally {
+      setValidatingStep1(false);
+    }
+  };
+
+  const handleNextFromStep2 = () => {
+    if (photos.length === 0) {
+      setPhotoError('Please upload at least one photo before proceeding.');
+      return;
+    }
+    setPhotoError(null);
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
+
+  const handleNext = () => {
+    if (currentStep === 1) {
+      handleNextFromStep1();
+    } else if (currentStep === 2) {
+      handleNextFromStep2();
+    } else {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep === 1) {
+      router.back();
+    } else {
+      setCurrentStep((prev) => Math.max(prev - 1, 1));
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      setPublishError(null);
+
+      const latestValues = listingFormRef.current?.getValues();
+      const currentFormData = latestValues ?? formData;
+
+      const listingPayload: CreateListingInput = {
+        title: currentFormData.title,
+        categoryId: currentFormData.categoryId,
+        condition: currentFormData.condition || ListingCondition.GOOD,
+        price: currentFormData.price || 0,
+        description: currentFormData.description,
+      };
+
+      const listing =
+        mode === 'edit' && listingId
+          ? await updateListingMutation.mutateAsync({
+              id: listingId,
+              input: listingPayload,
+            })
+          : await createListingMutation.mutateAsync(listingPayload);
+
+      if (mode === 'edit' && listingId && originalImageIds.length > 0) {
+        const keptExistingIds = photos
+          .filter((photo) => Boolean(photo.existingImageId))
+          .map((photo) => photo.existingImageId as string);
+
+        const removedImageIds = originalImageIds.filter(
+          (id) => !keptExistingIds.includes(id),
+        );
+
+        if (removedImageIds.length > 0) {
+          await Promise.all(
+            removedImageIds.map((imageId) =>
+              removeListingImageMutation.mutateAsync({ listingId, imageId }),
+            ),
+          );
+        }
       }
 
-      reset({
-        title: initialData.title ?? '',
-        categoryId: initialData.categoryId ?? '',
-        price: initialData.price ?? 0.0,
-        description: initialData.description ?? '',
-        condition: initialData.condition ?? '',
-      });
-    }, [initialData, reset]);
+      const newFiles = photos
+        .filter((photo) => photo.file)
+        .map((photo) => photo.file as File);
 
-    // Expose triggerValidation to the parent stepper via ref
-    useImperativeHandle(ref, () => ({
-      triggerValidation: () => trigger(),
-    }));
+      if (newFiles.length > 0) {
+        await addImagesMutation.mutateAsync({
+          listingId: listing.id,
+          files: newFiles,
+        });
+      }
 
-    // Bubble values up whenever any field changes
-    const values = watch();
-    useEffect(() => {
-      onChange?.(values);
-    }, [
-      values.title,
-      values.categoryId,
-      values.price,
-      values.description,
-      values.condition,
-    ]);
+      router.push(`/listings/${listing.id}`);
+    } catch (err) {
+      setPublishError(
+        err instanceof Error
+          ? err.message
+          : mode === 'edit'
+            ? 'Failed to save listing changes.'
+            : 'Failed to publish listing.',
+      );
+    }
+  };
 
-    const heading = title ?? 'Create New Listing';
+  return (
+    <Stepper
+      value={currentStep}
+      indicators={{
+        completed: <CheckIcon className="size-3.5" />,
+        loading: <LoaderCircleIcon className="size-3.5 animate-spin" />,
+      }}
+      className="w-full space-y-8"
+    >
+      <div className="flex justify-center">
+        <StepperNav className="max-w-md w-full">
+          {steps.map((step, index) => (
+            <StepperItem key={index} step={index + 1} className="relative">
+              <StepperTrigger className="flex justify-start gap-1.5">
+                <StepperIndicator>{index + 1}</StepperIndicator>
+                <StepperTitle>{step.title}</StepperTitle>
+              </StepperTrigger>
 
-    return (
-      <div className="bg-background text-foreground rounded-lg border border-border p-8">
-        <h1 className="text-2xl font-bold mb-6 text-foreground">{heading}</h1>
-
-        <FieldGroup>
-          {/*  Product Name  */}
-          <FieldSet>
-            <Field>
-              <FieldLabel htmlFor="product-name">Product Name</FieldLabel>
-              <Input
-                id="product-name"
-                placeholder="e.g. Calculus Textbook, Mini Fridge"
-                aria-invalid={!!errors.title}
-                {...register('title')}
-              />
-              {errors.title && (
-                <p className="mt-1 text-xs text-destructive">
-                  {errors.title.message}
-                </p>
+              {steps.length > index + 1 && (
+                <StepperSeparator className="group-data-[state=completed]/step:bg-primary md:mx-2.5" />
               )}
-            </Field>
-          </FieldSet>
-
-          {/*  Category + Price  */}
-          <FieldSet>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Category */}
-              <Field>
-                <FieldLabel htmlFor="category">Category</FieldLabel>
-                <Controller
-                  name="categoryId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger
-                        id="category"
-                        aria-invalid={!!errors.categoryId}
-                        onBlur={field.onBlur}
-                      >
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CATEGORIES.map(({ value, label }) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.categoryId && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.categoryId.message}
-                  </p>
-                )}
-              </Field>
-
-              {/* Price */}
-              <Field>
-                <FieldLabel htmlFor="price">Price</FieldLabel>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    ₱
-                  </span>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    aria-invalid={!!errors.price}
-                    className="pl-7"
-                    {...register('price', { valueAsNumber: true })}
-                  />
-                </div>
-                {errors.price && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.price.message}
-                  </p>
-                )}
-              </Field>
-            </div>
-          </FieldSet>
-
-          {/*  Condition  */}
-          <FieldSet>
-            <Field>
-              <FieldLabel htmlFor="condition">Condition</FieldLabel>
-              <Controller
-                name="condition"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      id="condition"
-                      aria-invalid={!!errors.condition}
-                      onBlur={field.onBlur}
-                    >
-                      <SelectValue placeholder="Select condition" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NEW">New</SelectItem>
-                      <SelectItem value="LIKE_NEW">Like New</SelectItem>
-                      <SelectItem value="GOOD">Good</SelectItem>
-                      <SelectItem value="FAIR">Fair</SelectItem>
-                      <SelectItem value="FOR_PARTS">For Parts</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.condition && (
-                <p className="mt-1 text-xs text-destructive">
-                  {errors.condition.message}
-                </p>
-              )}
-            </Field>
-          </FieldSet>
-
-          {/*  Description  */}
-          <FieldSet>
-            <FieldLegend>Description</FieldLegend>
-            <Textarea
-              placeholder="Describe the item's condition, age, and any specific details..."
-              aria-invalid={!!errors.description}
-              className="min-h-48 !resize-none break-all min-w-0 w-full"
-              {...register('description')}
-            />
-            {errors.description && (
-              <p className="mt-1 text-xs text-destructive">
-                {errors.description.message}
-              </p>
-            )}
-          </FieldSet>
-        </FieldGroup>
+            </StepperItem>
+          ))}
+        </StepperNav>
       </div>
-    );
-  },
-);
+
+      <StepperPanel>
+        <StepperContent value={1}>
+          <ListingFormStepShell
+            onBack={handleBack}
+            onNext={handleNext}
+            nextLabel="Next"
+            busyLabel="Validating..."
+            nextDisabled={validatingStep1}
+            aside={
+              <>
+                <SellerTipsCard />
+                <NeedHelpCard />
+              </>
+            }
+          >
+            <ListingDetailsForm
+              ref={listingFormRef}
+              title={mode === 'edit' ? 'Edit Listing Details' : undefined}
+              initialData={formData}
+            />
+          </ListingFormStepShell>
+        </StepperContent>
+
+        <StepperContent value={2}>
+          <ListingFormStepShell
+            onBack={handleBack}
+            onNext={handleNext}
+            nextLabel="Next"
+            aside={
+              <>
+                <PhotoGuidelines />
+              </>
+            }
+          >
+            <PhotoUploadForm photos={photos} onChange={setPhotos} />
+            {photoError && (
+              <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 my-4">
+                <p className="text-sm font-medium text-destructive">
+                  {photoError}
+                </p>
+              </div>
+            )}
+          </ListingFormStepShell>
+        </StepperContent>
+
+        <StepperContent value={3}>
+          <ListingReviewStep
+            formData={formData}
+            photos={photos}
+            categoryName={categoryName}
+            publishError={publishError}
+            isSubmitting={isSubmitting}
+            mode={mode}
+            onBack={handleBack}
+            onPublish={handlePublish}
+          />
+        </StepperContent>
+      </StepperPanel>
+    </Stepper>
+  );
+}

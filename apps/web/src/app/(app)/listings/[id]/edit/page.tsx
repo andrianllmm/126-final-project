@@ -2,69 +2,43 @@
 
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { Pattern } from '@/features/listings/components/listing-form/listing-stepper';
+
+import { ListingForm } from '@/features/listings/components/listing-form';
 import { AuthRouteGuard } from '@/features/auth/components/auth-route-guard';
 import { useListing } from '@/features/listings/hooks/use-listing-detail';
-import {
-  ListingFormValues,
-  CATEGORIES,
-} from '@/features/listings/lib/listing-schema';
+import { useCategories } from '@/features/listings/hooks/use-categories';
+
+import type { ListingFormValues } from '@repo/api';
 import { Button } from '@/shared/components/ui/button';
-
-function resolveCategoryValue(category: unknown) {
-  const candidates: unknown[] = [];
-
-  if (typeof category === 'string') {
-    candidates.push(category);
-  } else if (category && typeof category === 'object') {
-    const categoryRecord = category as Record<string, unknown>;
-
-    candidates.push(
-      categoryRecord.slug,
-      categoryRecord.value,
-      categoryRecord.categoryName,
-      categoryRecord.name,
-      categoryRecord.label,
-      categoryRecord.id,
-    );
-  }
-
-  for (const candidate of candidates) {
-    if (typeof candidate !== 'string' || !candidate) {
-      continue;
-    }
-
-    const normalizedCandidate = candidate.toLowerCase();
-    const matchedCategory = CATEGORIES.find(
-      ({ value, label }) =>
-        value.toLowerCase() === normalizedCandidate ||
-        label.toLowerCase() === normalizedCandidate,
-    );
-
-    if (matchedCategory) {
-      return matchedCategory.value;
-    }
-  }
-
-  return '';
-}
 
 export default function Page() {
   const params = useParams();
   const listingId = params.id as string;
+
   const { data: listing, isLoading, isError } = useListing(listingId);
+  const { data: categories } = useCategories();
+
+  const categoryId = useMemo(() => {
+    if (!listing || !categories) return '';
+
+    const listingCategoryId = listing.category?.id;
+    if (!listingCategoryId) return '';
+
+    const match = categories.find((c) => c.id === listingCategoryId);
+    return match?.id ?? '';
+  }, [listing, categories]);
 
   const initialData = useMemo<Partial<ListingFormValues>>(() => {
     if (!listing) return {};
 
     return {
       title: listing.title,
-      categoryId: resolveCategoryValue(listing.category),
+      categoryId,
       price: listing.price,
       description: listing.description,
       condition: listing.condition,
     };
-  }, [listing]);
+  }, [listing, categoryId]);
 
   if (isLoading) {
     return (
@@ -96,7 +70,7 @@ export default function Page() {
   return (
     <AuthRouteGuard>
       <div className="min-h-screen bg-background py-8">
-        <Pattern
+        <ListingForm
           mode="edit"
           listingId={listingId}
           initialData={initialData as ListingFormValues}
