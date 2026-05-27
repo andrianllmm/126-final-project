@@ -19,6 +19,7 @@ import { UserCardCompact } from '@/features/users/components/user-card-compact';
 import { ListingBreadcrumb } from './listing-detail-breadcrumb';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
+import { ListingStatus } from '@repo/api';
 
 export function ListingDetail() {
   const params = useParams();
@@ -172,6 +173,7 @@ export function ListingDetail() {
                   listingId={listing.id}
                   size="default"
                   variant="outline"
+                  disabled={listing.status === ListingStatus.SOLD}
                   className="w-full"
                 >
                   Message Seller
