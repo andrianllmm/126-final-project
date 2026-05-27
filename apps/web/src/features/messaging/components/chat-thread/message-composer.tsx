@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Send } from 'lucide-react';
@@ -7,6 +9,8 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from '@/shared/components/ui/input-group';
+
+import { EmojiPickerPopover } from '@/shared/components/ui/emoji-picker-popover';
 
 type Props = {
   onSend: (content: string) => void;
@@ -20,6 +24,9 @@ export function ChatComposer({
   disabled = false,
 }: Props) {
   const [value, setValue] = useState('');
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const isTypingRef = useRef(false);
   const stopTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -52,6 +59,24 @@ export function ChatComposer({
     };
   }, []);
 
+  const insertEmoji = (emoji: string) => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+
+    const next = value.slice(0, start) + emoji + value.slice(end);
+
+    setValue(next);
+
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + emoji.length;
+      el.setSelectionRange(pos, pos);
+    });
+  };
+
   const submit = () => {
     const content = value.trim();
     if (!content || disabled) return;
@@ -70,6 +95,7 @@ export function ChatComposer({
   return (
     <InputGroup className="items-end rounded-2xl border bg-background p-1">
       <TextareaAutosize
+        ref={textareaRef}
         autoFocus
         minRows={1}
         maxRows={8}
@@ -115,11 +141,13 @@ export function ChatComposer({
         }}
       />
 
-      <InputGroupAddon align="inline-end">
+      <InputGroupAddon align="inline-end" className="gap-1">
+        <EmojiPickerPopover onSelect={insertEmoji} disabled={disabled} />
+
         <InputGroupButton
           onClick={submit}
           disabled={disabled || !value.trim()}
-          className="rounded-xl size-9 p-0"
+          className="size-9 p-0 rounded-xl"
           variant="default"
         >
           <Send className="size-4" />
