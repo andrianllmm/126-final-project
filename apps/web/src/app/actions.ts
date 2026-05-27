@@ -14,30 +14,43 @@ export async function subscribeUser(sub: PushSubscription) {
       'Content-Type': 'application/json',
     },
   });
+
   if (!response.ok) {
-    throw new Error('Failed to subscribe');
+    const errorBody = await response.text();
+    throw new Error(`Failed: ${response.status} ${errorBody}`);
   }
-  return { success: true };
+
+  return { success: true, response };
 }
 
 export async function unsubscribeUser(endpoint?: string) {
-  await fetch(`${API_BASE}/notifications/push/unsubscribe`, {
+  const response = await fetch(`${API_BASE}/notifications/push/unsubscribe`, {
     method: 'DELETE',
     body: JSON.stringify({ endpoint }),
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
 
-  return { success: true };
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Failed: ${response.status} ${errorBody}`);
+  }
+
+  return { success: true, response };
 }
 
 export async function sendNotification(message: string) {
-  await fetch(`${API_BASE}/notifications/push/send-test`, {
+  const response = await fetch(`${API_BASE}/notifications/push/send-test`, {
     method: 'POST',
     body: JSON.stringify({ message }),
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
 
-  return { success: true };
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Failed: ${response.status} ${errorBody}`);
+  }
+
+  return { success: true, response };
 }
