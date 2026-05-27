@@ -10,8 +10,6 @@ import { Button } from '@/shared/components/ui/button';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
 import { cn } from '@/shared/lib/utils';
 
-import { OfferStatusBadge } from './offer-status-badge';
-
 type Props = {
   offer: Offer;
   transaction: Transaction;
