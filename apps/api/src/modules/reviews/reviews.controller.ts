@@ -3,7 +3,11 @@ import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
 import { ZodResponse } from 'nestjs-zod';
 import { ReviewsService } from './reviews.service.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
-import { ReviewDto, ReviewListDto } from './reviews.dto.js';
+import {
+  ReviewDto,
+  ReviewListDto,
+  ReviewWithAuthorListDto,
+} from './reviews.dto.js';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -16,7 +20,7 @@ export class ReviewsController {
   }
 
   @Get('user/:id')
-  @ZodResponse({ type: ReviewListDto })
+  @ZodResponse({ type: ReviewWithAuthorListDto })
   forUser(@Param('id') id: string) {
     return this.reviewsService.findByUser(id);
   }
