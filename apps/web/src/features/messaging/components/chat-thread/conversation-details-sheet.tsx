@@ -97,7 +97,7 @@ export function ConversationDetailsSheet({
 
             {transaction ? (
               <div className="space-y-4 rounded-xl border p-4">
-                <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <dl className="space-y-3 text-sm">
                   <div>
                     <dt className="text-muted-foreground">Agreed price</dt>
                     <dd className="font-medium">
