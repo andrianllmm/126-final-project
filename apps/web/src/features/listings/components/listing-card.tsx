@@ -19,11 +19,10 @@ import {
 } from '@/shared/components/ui/card';
 import { Package } from 'lucide-react';
 
-import { useDeleteListing } from '@/features/listings/hooks/use-delete-listing';
-import { toast } from 'sonner';
 import { ListingStatus, type Listing } from '@repo/api';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { DeleteListingDialog } from './delete-listing-dialog';
 
 interface ListingCardProps {
   listing: Listing;
@@ -38,7 +37,6 @@ export function ListingCard({
 }: ListingCardProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const deleteMutation = useDeleteListing();
 
   const primaryImage = [...listing.images].sort(
     (a, b) => a.sortOrder - b.sortOrder,
@@ -57,24 +55,6 @@ export function ListingCard({
   const goToEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/listings/${listing.id}/edit`);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!window.confirm('Delete this listing? This action cannot be undone.')) {
-      return;
-    }
-
-    deleteMutation.mutate(listing.id, {
-      onSuccess: () => {
-        toast.success('Listing deleted');
-        router.push('/');
-      },
-      onError: () => {
-        toast.error('Failed to delete listing');
-      },
-    });
   };
 
   return (
@@ -163,14 +143,11 @@ export function ListingCard({
             <Button size="lg" className="w-full" onClick={goToEdit}>
               Edit
             </Button>
-            <Button
-              size="lg"
-              variant="destructive"
-              className="w-full"
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
+            <DeleteListingDialog
+              listingId={listing.id}
+              listingTitle={listing.title}
+              onDeleted={() => router.push('/')}
+            />
           </div>
         ) : (
           <TransactionRequestButton listing={listing} />
