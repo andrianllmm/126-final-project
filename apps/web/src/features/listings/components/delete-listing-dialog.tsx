@@ -21,12 +21,14 @@ interface DeleteListingDialogProps {
   listingId: string;
   listingTitle?: string;
   onDeleted?: () => void;
+  triggerLabel?: string;
 }
 
 export function DeleteListingDialog({
   listingId,
   listingTitle,
   onDeleted,
+  triggerLabel = 'Delete',
 }: DeleteListingDialogProps) {
   const router = useRouter();
   const deleteMutation = useDeleteListing();
@@ -58,7 +60,7 @@ export function DeleteListingDialog({
           className="w-full"
           onClick={(event) => event.stopPropagation()}
         >
-          Delete
+          {triggerLabel}
         </Button>
       </DialogTrigger>
 
