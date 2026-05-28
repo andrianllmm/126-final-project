@@ -1,11 +1,15 @@
 'use client';
 
 import { useAuth } from '@/features/auth/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from 'sonner';
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 import { useListingTransactions } from '@/features/listings/hooks/use-listing-transactions';
 
@@ -22,6 +26,9 @@ export function TransactionRequestButton({
 }: TransactionRequestButtonProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPath = getCurrentPathWithSearch(pathname, searchParams);
 
   const { data: transactions, isLoading } = useListingTransactions(listing.id, [
     TransactionStatus.PENDING,
@@ -35,7 +42,7 @@ export function TransactionRequestButton({
 
     if (!user) {
       toast.error('Please sign in to buy');
-      router.push('/sign-in');
+      router.replace(createSignInUrl(currentPath));
       return;
     }
 

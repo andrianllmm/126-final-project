@@ -1,7 +1,8 @@
 'use client';
 
 import { cn } from '@/shared/lib/utils';
-import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -28,11 +29,22 @@ import Link from 'next/link';
 import { signInSchema, SignInInput } from '@repo/api';
 import { GoogleAuthButton } from './google-auth-button';
 
+import {
+  createSignInCallbackURL,
+  getSafeReturnTo,
+} from '@/shared/lib/auth-redirect';
+
 export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get('returnTo'));
+  const signInCallbackURL = useMemo(
+    () => createSignInCallbackURL(returnTo),
+    [returnTo],
+  );
 
   const {
     register,
@@ -53,7 +65,7 @@ export function SignInForm({
       return;
     }
 
-    router.push('/');
+    router.replace(returnTo);
   }
 
   return (
@@ -69,6 +81,7 @@ export function SignInForm({
               <GoogleAuthButton
                 className="w-full"
                 label="Continue with Google"
+                callbackURL={signInCallbackURL}
                 onAuthError={(message) =>
                   setError('root', {
                     message,

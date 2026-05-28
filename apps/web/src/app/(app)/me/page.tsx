@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 export default function Page() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const returnTo = getCurrentPathWithSearch(pathname, searchParams);
 
   const { user, isPending } = useAuth();
 
@@ -13,12 +20,12 @@ export default function Page() {
     if (isPending) return;
 
     if (!user?.id) {
-      router.replace('/sign-in');
+      router.replace(createSignInUrl(returnTo));
       return;
     }
 
     router.replace(`/profile/${user.id}`);
-  }, [user?.id, isPending, router]);
+  }, [returnTo, user?.id, isPending, router]);
 
   return null;
 }

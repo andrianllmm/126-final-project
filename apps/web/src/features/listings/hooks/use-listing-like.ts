@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 import { likeListing, unlikeListing } from '../api/listings-api';
 
@@ -25,7 +29,10 @@ export function useListingLikeState({
 }) {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const currentPath = getCurrentPathWithSearch(pathname, searchParams);
 
   const [state, setState] = useState<ListingLikeState>({
     isLikedByUser: initialIsLikedByUser,
@@ -92,7 +99,7 @@ export function useListingLikeState({
   const toggleLike = () => {
     if (!user) {
       toast.error('Please sign in to like listings');
-      router.push('/sign-in');
+      router.replace(createSignInUrl(currentPath));
       return;
     }
 

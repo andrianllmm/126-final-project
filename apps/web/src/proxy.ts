@@ -2,6 +2,11 @@ import { getSessionCookie } from 'better-auth/cookies';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
+
 const authPages = [
   '/sign-in',
   '/sign-up',
@@ -18,10 +23,18 @@ export function proxy(req: NextRequest) {
   const isAuthenticated = !!sessionCookie;
 
   const isAuthPage = authPages.some((p) => pathname.startsWith(p));
-  const isProtected = protectedRoutes.some((p) => pathname.startsWith(p));
+  const isProtected =
+    protectedRoutes.some((p) => pathname.startsWith(p)) ||
+    pathname === '/listings/new' ||
+    (pathname.startsWith('/listings/') && pathname.endsWith('/edit'));
 
   if (isProtected && !isAuthenticated) {
-    return NextResponse.redirect(new URL('/sign-in', req.url));
+    const returnTo = getCurrentPathWithSearch(
+      pathname,
+      req.nextUrl.searchParams,
+    );
+
+    return NextResponse.redirect(new URL(createSignInUrl(returnTo), req.url));
   }
 
   if (isAuthPage && isAuthenticated) {
@@ -36,6 +49,7 @@ export const config = {
     '/settings/:path*',
     '/transactions/:path*',
     '/messages/:path*',
+    '/listings/:path*',
     '/sign-in',
     '/sign-up',
     '/forgot-password',

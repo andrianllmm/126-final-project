@@ -2,6 +2,7 @@
 
 import { cn } from '@/shared/lib/utils';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Checkbox } from '@/shared/components/ui/checkbox';
@@ -29,11 +30,18 @@ import Link from 'next/link';
 import { signUpSchema, SignUpInput } from '@repo/api';
 import { GoogleAuthButton } from './google-auth-button';
 
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
+
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const pathname = usePathname();
+  const currentPath = getCurrentPathWithSearch(pathname);
 
   const {
     control,
@@ -187,7 +195,10 @@ export function SignupForm({
                 </Button>
 
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <Link href="/sign-in">Sign in</Link>
+                  Already have an account?{' '}
+                  <Link href={createSignInUrl(currentPath)} replace>
+                    Sign in
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
