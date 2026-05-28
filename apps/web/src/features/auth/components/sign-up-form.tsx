@@ -2,8 +2,9 @@
 
 import { cn } from '@/shared/lib/utils';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Checkbox } from '@/shared/components/ui/checkbox';
 
 import { authClient } from '@/shared/lib/auth-client';
 
@@ -35,12 +36,16 @@ export function SignupForm({
   const router = useRouter();
 
   const {
+    control,
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      acceptedTerms: false,
+    },
   });
 
   async function onSubmit(values: SignUpInput) {
@@ -118,6 +123,54 @@ export function SignupForm({
                 {errors.password && (
                   <FieldDescription className="text-destructive">
                     {errors.password.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              <Field>
+                <div className="flex items-start gap-2">
+                  <Controller
+                    control={control}
+                    name="acceptedTerms"
+                    render={({ field }) => (
+                      <Checkbox
+                        id="acceptedTerms"
+                        checked={field.value}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked === true)
+                        }
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                        className="mt-0.5"
+                      />
+                    )}
+                  />
+
+                  <label
+                    htmlFor="acceptedTerms"
+                    className="text-xs leading-relaxed text-muted-foreground"
+                  >
+                    I agree to the{' '}
+                    <Link
+                      href="/terms"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      href="/privacy"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
+
+                {errors.acceptedTerms && (
+                  <FieldDescription className="text-destructive">
+                    {errors.acceptedTerms.message}
                   </FieldDescription>
                 )}
               </Field>
