@@ -1,28 +1,32 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 interface AuthRouteGuardProps {
   children: React.ReactNode;
-  redirectTo?: string;
 }
 
-export function AuthRouteGuard({
-  children,
-  redirectTo = '/sign-in',
-}: AuthRouteGuardProps) {
+export function AuthRouteGuard({ children }: AuthRouteGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, isPending } = useAuth();
+  const returnTo = getCurrentPathWithSearch(pathname, searchParams);
 
   useEffect(() => {
     if (isPending) return;
 
     if (!user?.id) {
-      router.replace(redirectTo);
+      router.replace(createSignInUrl(returnTo));
     }
-  }, [isPending, redirectTo, router, user?.id]);
+  }, [isPending, returnTo, router, user?.id]);
 
   if (isPending || !user?.id) {
     return null;

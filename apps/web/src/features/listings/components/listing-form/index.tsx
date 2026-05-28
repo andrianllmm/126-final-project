@@ -35,6 +35,56 @@ import { ListingCondition } from '@repo/api';
 import { autofillListingFormFromImage } from '../../actions/autofill-listing-form';
 
 const steps = [{ title: 'Photos' }, { title: 'Details' }, { title: 'Review' }];
+const listingFormDraftStoragePrefix = 'listing-form-draft';
+
+type ListingFormDraftPhoto = Pick<
+  UploadedPhoto,
+  'id' | 'preview' | 'existingImageId' | 'isMain'
+>;
+
+type ListingFormDraft = {
+  currentStep: number;
+  formData: ListingFormValues;
+  photos: ListingFormDraftPhoto[];
+  originalImageIds: string[];
+};
+
+function getListingFormDraftStorageKey(
+  mode: 'create' | 'edit',
+  listingId?: string,
+) {
+  return `${listingFormDraftStoragePrefix}:${mode}:${listingId ?? 'new'}`;
+}
+
+function serializeListingPhoto(photo: UploadedPhoto): ListingFormDraftPhoto {
+  return {
+    id: photo.id,
+    preview: photo.preview,
+    existingImageId: photo.existingImageId,
+    isMain: photo.isMain,
+  };
+}
+
+async function restoreListingPhoto(
+  photo: ListingFormDraftPhoto,
+): Promise<UploadedPhoto> {
+  if (photo.existingImageId || !photo.preview.startsWith('data:')) {
+    return photo;
+  }
+
+  try {
+    const response = await fetch(photo.preview);
+    const blob = await response.blob();
+    const extension = blob.type.split('/')[1] || 'png';
+
+    return {
+      ...photo,
+      file: new File([blob], `${photo.id}.${extension}`, { type: blob.type }),
+    };
+  } catch {
+    return photo;
+  }
+}
 
 interface ListingStepperProps {
   mode?: 'create' | 'edit';
@@ -69,6 +119,9 @@ export function ListingForm({
   const [validatingDetails, setValidatingDetails] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const listingFormRef = useRef<ListingFormHandle>(null);
+  const hasRestoredDraftRef = useRef(false);
+  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
+  const draftStorageKey = getListingFormDraftStorageKey(mode, listingId);
 
   const [formData, setFormData] = useState<ListingFormValues>(
     initialData ?? {
@@ -87,12 +140,67 @@ export function ListingForm({
   )?.categoryName;
 
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
+    let isCancelled = false;
+
+    const restoreDraft = async () => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      const savedDraft = window.localStorage.getItem(draftStorageKey);
+
+      if (!savedDraft) {
+        if (!isCancelled) {
+          setIsDraftHydrated(true);
+        }
+
+        return;
+      }
+
+      try {
+        const parsedDraft = JSON.parse(savedDraft) as ListingFormDraft;
+        const restoredPhotos = await Promise.all(
+          (parsedDraft.photos ?? []).map((photo) => restoreListingPhoto(photo)),
+        );
+
+        if (isCancelled) {
+          return;
+        }
+
+        hasRestoredDraftRef.current = true;
+        setCurrentStep(parsedDraft.currentStep ?? 1);
+        setFormData(parsedDraft.formData);
+        setPhotos(restoredPhotos);
+        setOriginalImageIds(parsedDraft.originalImageIds ?? []);
+      } catch {
+        window.localStorage.removeItem(draftStorageKey);
+      } finally {
+        if (!isCancelled) {
+          setIsDraftHydrated(true);
+        }
+      }
+    };
+
+    void restoreDraft();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [draftStorageKey]);
+
+  useEffect(() => {
+    if (hasRestoredDraftRef.current || !initialData) {
+      return;
     }
+
+    setFormData(initialData);
   }, [initialData]);
 
   useEffect(() => {
+    if (hasRestoredDraftRef.current) {
+      return;
+    }
+
     setPhotos(initialPhotos ?? []);
     setOriginalImageIds(
       (initialPhotos ?? [])
@@ -100,6 +208,28 @@ export function ListingForm({
         .map((photo) => photo.existingImageId as string),
     );
   }, [initialPhotos]);
+
+  useEffect(() => {
+    if (!isDraftHydrated || typeof window === 'undefined') {
+      return;
+    }
+
+    const draft: ListingFormDraft = {
+      currentStep,
+      formData,
+      photos: photos.map(serializeListingPhoto),
+      originalImageIds,
+    };
+
+    window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
+  }, [
+    draftStorageKey,
+    formData,
+    currentStep,
+    isDraftHydrated,
+    originalImageIds,
+    photos,
+  ]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -221,6 +351,7 @@ export function ListingForm({
         });
       }
 
+      window.localStorage.removeItem(draftStorageKey);
       router.push(`/listings/${listing.id}`);
     } catch (err) {
       setPublishError(

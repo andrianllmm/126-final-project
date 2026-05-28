@@ -7,6 +7,12 @@ export const signUpSchema = z.object({
     .email('Invalid email address')
     .refine(isAllowedEmail, 'Only university email addresses are allowed'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  acceptedTerms: z
+    .boolean()
+    .refine(
+      (accepted) => accepted,
+      'You must accept the Terms and Privacy Policy',
+    ),
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;

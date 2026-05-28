@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { ListingGrid } from '@/features/listings/components/listing-grid';
+import { useListings } from '@/features/listings/hooks/use-listings';
 import { RatingCard } from '@/features/reviews/components/rating-card';
 import { useUserReviews } from '@/features/reviews/hooks/use-user-reviews';
 import { Spinner } from '@/shared/components/ui/spinner';
@@ -20,6 +21,11 @@ import { useMyLikedListings } from '../hooks/use-user-profile';
 export function ProfileTabs({ userId }: { userId: string }) {
   const { user, isPending } = useAuth();
   const isOwner = user?.id === userId;
+  const {
+    data: listings,
+    isLoading: listingsLoading,
+    isError: listingsError,
+  } = useListings({ page: 1, limit: 1000 });
   const { data: likedListings, isLoading: likedListingsLoading } =
     useMyLikedListings(isOwner && !isPending);
   const {
@@ -31,14 +37,22 @@ export function ProfileTabs({ userId }: { userId: string }) {
   return (
     <Tabs defaultValue="listings" className="w-full">
       <TabsList variant="line">
-        <TabsTrigger value="listings">Listings</TabsTrigger>
+        <TabsTrigger value="listings">
+          {isOwner ? 'My Listings' : 'Listings'}
+        </TabsTrigger>
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
         {isOwner && !isPending ? (
           <TabsTrigger value="liked">Liked Listings</TabsTrigger>
         ) : null}
       </TabsList>
       <TabsContent value="listings">
-        <div>Listings of {userId}</div>
+        <ListingGrid
+          listings={listings?.data.filter(
+            (listing) => listing.seller.id === userId,
+          )}
+          isLoading={listingsLoading}
+          isError={listingsError}
+        />
       </TabsContent>
       <TabsContent value="reviews">
         {reviewsLoading ? (

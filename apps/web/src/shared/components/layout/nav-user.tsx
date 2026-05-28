@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { MoonIcon, MonitorIcon, SunIcon, LogOutIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -11,6 +12,10 @@ import { useAuth } from '@/features/auth/hooks/use-auth';
 import { authClient } from '@/shared/lib/auth-client';
 import { disconnectSocket } from '@/shared/lib/socket-client';
 import { useUserProfile } from '@/features/users/hooks/use-user-profile';
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 import {
   DropdownMenu,
@@ -30,6 +35,8 @@ type Theme = 'light' | 'dark' | 'system';
 
 export function NavUser({ className }: { className?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -44,9 +51,11 @@ export function NavUser({ className }: { className?: string }) {
     disconnectSocket();
     await authClient.signOut();
     refetch();
-    router.push('/sign-in');
+    router.replace('/sign-in');
     router.refresh();
   };
+
+  const currentPath = getCurrentPathWithSearch(pathname, searchParams);
 
   if (isPending) {
     return <Skeleton className="h-8 w-8 rounded-full" />;
@@ -55,7 +64,9 @@ export function NavUser({ className }: { className?: string }) {
   if (!user) {
     return (
       <Button asChild className={className}>
-        <Link href="/sign-in">Sign in</Link>
+        <Link href={createSignInUrl(currentPath)} replace>
+          Sign in
+        </Link>
       </Button>
     );
   }

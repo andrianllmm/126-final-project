@@ -4,6 +4,10 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/shared/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
 
 function formatError(error: string | null) {
   if (!error) return 'An unexpected authentication error occurred.';
@@ -17,6 +21,7 @@ function formatError(error: string | null) {
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const currentPath = getCurrentPathWithSearch('/auth/error', searchParams);
 
   return (
     <div className="w-full max-w-md text-center space-y-6">
@@ -30,7 +35,9 @@ export default function AuthErrorPage() {
 
       <div className="flex gap-2 justify-center">
         <Button asChild variant="default">
-          <Link href="/sign-in">Back to sign in</Link>
+          <Link href={createSignInUrl(currentPath)} replace>
+            Back to sign in
+          </Link>
         </Button>
 
         <Button asChild variant="outline">

@@ -32,6 +32,12 @@ const mapTransaction = (t: any) => ({
 
 const mapCategory = (category: any) => category;
 
+const allowedReadListingStatuses: ListingStatus[] = [
+  ListingStatus.AVAILABLE,
+  ListingStatus.RESERVED,
+  ListingStatus.SOLD,
+];
+
 @Injectable()
 export class ListingsService {
   constructor(
@@ -49,11 +55,7 @@ export class ListingsService {
 
     const where = {
       status: {
-        in: [
-          ListingStatus.AVAILABLE,
-          ListingStatus.RESERVED,
-          ListingStatus.SOLD,
-        ],
+        in: allowedReadListingStatuses,
       },
     };
 
@@ -82,7 +84,7 @@ export class ListingsService {
   async findOne(listingId: string, userId?: string): Promise<Listing> {
     const listing = await this.getListingOrThrow(listingId);
 
-    if (listing.status !== ListingStatus.AVAILABLE) {
+    if (!allowedReadListingStatuses.includes(listing.status)) {
       throw new NotFoundException('Listing not found');
     }
 

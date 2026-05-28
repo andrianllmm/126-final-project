@@ -2,8 +2,10 @@
 
 import { cn } from '@/shared/lib/utils';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { usePathname } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Checkbox } from '@/shared/components/ui/checkbox';
 
 import { authClient } from '@/shared/lib/auth-client';
 
@@ -28,19 +30,30 @@ import Link from 'next/link';
 import { signUpSchema, SignUpInput } from '@repo/api';
 import { GoogleAuthButton } from './google-auth-button';
 
+import {
+  createSignInUrl,
+  getCurrentPathWithSearch,
+} from '@/shared/lib/auth-redirect';
+
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const pathname = usePathname();
+  const currentPath = getCurrentPathWithSearch(pathname);
 
   const {
+    control,
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      acceptedTerms: false,
+    },
   });
 
   async function onSubmit(values: SignUpInput) {
@@ -122,6 +135,54 @@ export function SignupForm({
                 )}
               </Field>
 
+              <Field>
+                <div className="flex items-start gap-2">
+                  <Controller
+                    control={control}
+                    name="acceptedTerms"
+                    render={({ field }) => (
+                      <Checkbox
+                        id="acceptedTerms"
+                        checked={field.value}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked === true)
+                        }
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                        className="mt-0.5"
+                      />
+                    )}
+                  />
+
+                  <label
+                    htmlFor="acceptedTerms"
+                    className="text-xs leading-relaxed text-muted-foreground"
+                  >
+                    I agree to the{' '}
+                    <Link
+                      href="/terms"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      href="/privacy"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
+
+                {errors.acceptedTerms && (
+                  <FieldDescription className="text-destructive">
+                    {errors.acceptedTerms.message}
+                  </FieldDescription>
+                )}
+              </Field>
+
               {errors.root && (
                 <FieldDescription className="text-destructive text-center">
                   {errors.root.message}
@@ -134,7 +195,10 @@ export function SignupForm({
                 </Button>
 
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <Link href="/sign-in">Sign in</Link>
+                  Already have an account?{' '}
+                  <Link href={createSignInUrl(currentPath)} replace>
+                    Sign in
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
