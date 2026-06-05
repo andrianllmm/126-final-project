@@ -35,6 +35,10 @@
       "dependsOn": ["^build", "^db:generate"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
+    "start": {
+      "dependsOn": ["^db:generate"],
+      "cache": false
+    },
     "db:generate": {
       "cache": false
     },
