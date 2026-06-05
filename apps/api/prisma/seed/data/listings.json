@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Mechanical Keyboard",
+    "description": "Barely used 75% mechanical keyboard with hot-swappable switches.",
+    "price": "2500.00",
+    "categorySlug": "electronics",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "images/mechanical-keyboard.jpg"
+  },
+  {
+    "title": "Study Desk",
+    "description": "Wooden study desk, sturdy and minimal scratches.",
+    "price": "3200.00",
+    "categorySlug": "furniture",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "images/study-desk.jpg"
+  },
+  {
+    "title": "Wireless Headphones",
+    "description": "Noise cancelling, good battery health.",
+    "price": "1800.00",
+    "categorySlug": "electronics",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "images/wireless-headphones.jpg"
+  },
+  {
+    "title": "Laptop Backpack",
+    "description": "Water-resistant backpack with laptop compartment.",
+    "price": "900.00",
+    "categorySlug": "accessories",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "images/laptop-backpack.jpg"
+  },
+  {
+    "title": "Arduino Uno Kit",
+    "description": "Complete starter kit for embedded projects.",
+    "price": "1200.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "images/arduino-uno-kit.jpg"
+  },
+  {
+    "title": "Office Chair",
+    "description": "Ergonomic chair with lumbar support.",
+    "price": "4500.00",
+    "categorySlug": "furniture",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "images/office-chair.jpg"
+  },
+  {
+    "title": "Gaming Mouse",
+    "description": "RGB gaming mouse with adjustable DPI.",
+    "price": "950.00",
+    "categorySlug": "electronics",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "images/gaming-mouse.jpg"
+  },
+  {
+    "title": "USB-C Hub",
+    "description": "Multiport adapter with HDMI and USB 3.0.",
+    "price": "1100.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "images/usb-c-hub.jpg"
+  }
+]
