@@ -32,7 +32,7 @@
     "maplibre-gl": "^5.24.0",
     "next": "16.2.0",
     "next-themes": "^0.4.6",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.18",
     "radix-ui": "^1.4.3",
     "react": "^19.1.0",
     "react-day-picker": "^10.0.1",
