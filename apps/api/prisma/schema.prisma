@@ -211,6 +211,8 @@ model Listing {
   condition ListingCondition
   status    ListingStatus    @default(DRAFT)
 
+  embedding Unsupported("vector(384)")?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   soldAt    DateTime?

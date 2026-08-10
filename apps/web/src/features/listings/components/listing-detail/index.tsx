@@ -17,6 +17,7 @@ import { DeleteListingDialog } from '@/features/listings/components/delete-listi
 import { getListingById } from '@/features/listings/api/listings-api';
 import { UserCardCompact } from '@/features/users/components/user-card-compact';
 import { ListingBreadcrumb } from './listing-detail-breadcrumb';
+import { SimilarListings } from './similar-listings';
 import { MessageButton } from '@/features/messaging/components/message-button';
 import { currencyFormatter } from '@/shared/lib/currency-formatter';
 import { ListingStatus } from '@repo/api';
@@ -189,6 +190,8 @@ export function ListingDetail() {
           </div>
         </div>
       </div>
+
+      <SimilarListings listingId={listing.id} />
     </div>
   );
 }

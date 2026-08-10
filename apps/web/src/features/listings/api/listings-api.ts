@@ -1,6 +1,7 @@
 import { apiClient } from '@/shared/lib/api-client';
 import {
   type Listing,
+  type ListingList,
   type ListingPage,
   type ListingPaginationQuery,
   type CreateListingInput,
@@ -18,6 +19,9 @@ export const getListings = (query: ListingPaginationQuery) =>
 
 export const getListing = (id: string) =>
   apiClient.get<Listing>(`/listings/${id}`);
+
+export const getSimilarListings = (id: string) =>
+  apiClient.get<ListingList>(`/listings/${id}/similar`);
 
 export const likeListing = (id: string) =>
   apiClient.post<Listing>(`/listings/${id}/like`, undefined);

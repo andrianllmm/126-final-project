@@ -1,5 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
+import { EmbeddingsService } from '../embeddings/embeddings.service.js';
+import pgvector from 'pgvector';
 
 import {
   CreateListingInput,
@@ -40,9 +42,12 @@ const allowedReadListingStatuses: ListingStatus[] = [
 
 @Injectable()
 export class ListingsService {
+  private readonly logger = new Logger(ListingsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly policy: ListingPolicy,
+    private readonly embeddings: EmbeddingsService,
   ) {}
 
   async findAll(
@@ -108,6 +113,8 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
+    this.updateEmbedding(listing.id, listing.title, listing.description);
+
     return decorateListing(this.prisma, listing);
   }
 
@@ -137,6 +144,10 @@ export class ListingsService {
       },
       include: LISTING_INCLUDE,
     });
+
+    if (input.title !== undefined || input.description !== undefined) {
+      this.updateEmbedding(updated.id, updated.title, updated.description);
+    }
 
     return decorateListing(this.prisma, updated);
   }
@@ -179,6 +190,28 @@ export class ListingsService {
     });
 
     return decorateListing(this.prisma, deleted);
+  }
+
+  private updateEmbedding(
+    listingId: string,
+    title: string,
+    description: string,
+  ): void {
+    this.embeddings
+      .embedText(`${title}\n${description}`)
+      .then((vector) => {
+        const embedding = pgvector.toSql(vector);
+        return this.prisma.$executeRaw`
+          UPDATE "Listing" SET "embedding" = ${embedding}::vector
+          WHERE "id" = ${listingId}
+        `;
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to compute embedding for listing ${listingId}`,
+          err,
+        ),
+      );
   }
 
   private async getListingOrThrow(id: string) {
@@ -260,6 +293,39 @@ export class ListingsService {
     });
 
     return transactions.map(mapTransaction);
+  }
+
+  async findSimilar(
+    listingId: string,
+    userId?: string,
+    limit = 8,
+  ): Promise<Listing[]> {
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT l2.id
+      FROM "Listing" l1
+      JOIN "Listing" l2 ON l2.id != l1.id
+      WHERE l1.id = ${listingId}
+        AND l1."embedding" IS NOT NULL
+        AND l2."embedding" IS NOT NULL
+        AND l2."status" = 'AVAILABLE'
+      ORDER BY l2."embedding" <=> l1."embedding"
+      LIMIT ${limit}
+    `;
+
+    const ids = rows.map((row) => row.id);
+    if (ids.length === 0) return [];
+
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: ids } },
+      include: LISTING_INCLUDE,
+    });
+
+    const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
+    const ordered = ids
+      .map((id) => listingsById.get(id))
+      .filter((listing) => listing !== undefined);
+
+    return decorateListings(this.prisma, ordered, userId);
   }
 
   async listCategories(): Promise<ListingCategoryList> {

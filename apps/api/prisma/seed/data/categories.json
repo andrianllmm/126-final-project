@@ -3,5 +3,7 @@
   { "categoryName": "Books", "slug": "books" },
   { "categoryName": "Furniture", "slug": "furniture" },
   { "categoryName": "Accessories", "slug": "accessories" },
-  { "categoryName": "Clothing", "slug": "clothing" }
+  { "categoryName": "Clothing", "slug": "clothing" },
+  { "categoryName": "Dorm Essentials", "slug": "dorm-essentials" },
+  { "categoryName": "Sports & Outdoors", "slug": "sports-outdoors" }
 ]

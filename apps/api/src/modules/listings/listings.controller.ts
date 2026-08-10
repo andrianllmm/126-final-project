@@ -20,9 +20,11 @@ import { ListingsService } from './listings.service.js';
 import {
   CreateListingDto,
   ListingDto,
+  ListingListDto,
   ListingPageDto,
   ListingPageQueryDto,
   ListingCategoriesListDto,
+  SimilarListingsQueryDto,
   UpdateListingDto,
   UpdateListingStatusDto,
 } from './listings.dto.js';
@@ -47,6 +49,17 @@ export class ListingsController {
   @ZodResponse({ type: ListingCategoriesListDto })
   categories() {
     return this.listingsService.listCategories();
+  }
+
+  @Get(':id/similar')
+  @OptionalAuth()
+  @ZodResponse({ type: ListingListDto })
+  similar(
+    @Param('id') id: string,
+    @Query() query: SimilarListingsQueryDto,
+    @Session() session: UserSession | undefined,
+  ) {
+    return this.listingsService.findSimilar(id, session?.user.id, query.limit);
   }
 
   @Get(':id')
