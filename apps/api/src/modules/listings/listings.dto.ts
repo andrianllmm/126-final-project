@@ -6,6 +6,7 @@ import {
   listingPaginationQuerySchema,
   listingListSchema,
   listingSchema,
+  similarListingsQuerySchema,
   updateListingSchema,
   updateListingStatusSchema,
 } from '@repo/api';
@@ -36,4 +37,8 @@ export class ListingCategoriesListDto extends createZodDto(
 
 export class ListingPageQueryDto extends createZodDto(
   listingPaginationQuerySchema,
+) {}
+
+export class SimilarListingsQueryDto extends createZodDto(
+  similarListingsQuerySchema,
 ) {}

@@ -120,6 +120,10 @@ export const listingPaginationQuerySchema = z.object({
   limit: optionalPositiveIntegerSchema,
 });
 
+export const similarListingsQuerySchema = z.object({
+  limit: optionalPositiveIntegerSchema,
+});
+
 export const listingSearchQuerySchema = z
   .object({
     q: optionalSearchStringSchema,
@@ -200,6 +204,7 @@ export type ListingList = z.infer<typeof listingListSchema>;
 export type ListingPaginationQuery = z.infer<
   typeof listingPaginationQuerySchema
 >;
+export type SimilarListingsQuery = z.infer<typeof similarListingsQuerySchema>;
 export type ListingSearchQuery = z.infer<typeof listingSearchQuerySchema>;
 export type ListingPageMeta = z.infer<typeof listingPageMetaSchema>;
 export type ListingPage = z.infer<typeof listingPageSchema>;

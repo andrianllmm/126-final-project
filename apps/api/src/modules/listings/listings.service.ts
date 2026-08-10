@@ -295,6 +295,39 @@ export class ListingsService {
     return transactions.map(mapTransaction);
   }
 
+  async findSimilar(
+    listingId: string,
+    userId?: string,
+    limit = 8,
+  ): Promise<Listing[]> {
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT l2.id
+      FROM "Listing" l1
+      JOIN "Listing" l2 ON l2.id != l1.id
+      WHERE l1.id = ${listingId}
+        AND l1."embedding" IS NOT NULL
+        AND l2."embedding" IS NOT NULL
+        AND l2."status" = 'AVAILABLE'
+      ORDER BY l2."embedding" <=> l1."embedding"
+      LIMIT ${limit}
+    `;
+
+    const ids = rows.map((row) => row.id);
+    if (ids.length === 0) return [];
+
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: ids } },
+      include: LISTING_INCLUDE,
+    });
+
+    const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
+    const ordered = ids
+      .map((id) => listingsById.get(id))
+      .filter((listing) => listing !== undefined);
+
+    return decorateListings(this.prisma, ordered, userId);
+  }
+
   async listCategories(): Promise<ListingCategoryList> {
     const categories = await this.prisma.listingCategory.findMany({
       orderBy: { categoryName: 'asc' },
