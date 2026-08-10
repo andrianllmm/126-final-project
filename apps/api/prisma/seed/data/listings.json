@@ -6,7 +6,7 @@
     "categorySlug": "electronics",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/mechanical-keyboard/600/450"
+    "imageUrl": "https://live.staticflickr.com/4911/31006275737_dccbdc13f8_b.jpg"
   },
   {
     "title": "Wireless Gaming Mouse",
@@ -15,7 +15,7 @@
     "categorySlug": "electronics",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/gaming-mouse/600/450"
+    "imageUrl": "https://live.staticflickr.com/2261/2778794704_1b306d34f1_b.jpg"
   },
   {
     "title": "USB-C Hub",
@@ -24,7 +24,7 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/usb-c-hub/600/450"
+    "imageUrl": "https://live.staticflickr.com/5307/5691463197_93b1e52caa_b.jpg"
   },
   {
     "title": "27-inch Monitor",
@@ -33,7 +33,7 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/monitor/600/450"
+    "imageUrl": "https://live.staticflickr.com/1/922887_93c2e10872.jpg"
   },
   {
     "title": "Adjustable Laptop Stand",
@@ -42,9 +42,8 @@
     "categorySlug": "accessories",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/laptop-stand/600/450"
+    "imageUrl": "https://live.staticflickr.com/7323/12326701145_3cb27960fc_b.jpg"
   },
-
   {
     "title": "Calculus: Early Transcendentals Textbook",
     "description": "Used calculus textbook for engineering and science majors, minimal highlighting.",
@@ -52,7 +51,7 @@
     "categorySlug": "books",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/calculus-textbook/600/450"
+    "imageUrl": "https://live.staticflickr.com/4135/4768687556_38e9295380_b.jpg"
   },
   {
     "title": "Linear Algebra and Its Applications",
@@ -61,7 +60,7 @@
     "categorySlug": "books",
     "condition": "FAIR",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/linear-algebra/600/450"
+    "imageUrl": "https://live.staticflickr.com/5205/5379016843_c7b67fe3ca_b.jpg"
   },
   {
     "title": "Scientific Calculator",
@@ -70,9 +69,8 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/scientific-calculator/600/450"
+    "imageUrl": "https://live.staticflickr.com/5575/15069040048_e21c317a4b_b.jpg"
   },
-
   {
     "title": "Study Desk",
     "description": "Wooden study desk, sturdy and minimal scratches, fits well in a dorm room.",
@@ -80,7 +78,7 @@
     "categorySlug": "furniture",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/study-desk/600/450"
+    "imageUrl": "https://live.staticflickr.com/4107/5009895195_fb306ffcb4_b.jpg"
   },
   {
     "title": "Ergonomic Office Chair",
@@ -89,7 +87,7 @@
     "categorySlug": "furniture",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/office-chair/600/450"
+    "imageUrl": "https://live.staticflickr.com/2712/4272145651_6b8cd01f7d_b.jpg"
   },
   {
     "title": "Wooden Bookshelf",
@@ -98,7 +96,7 @@
     "categorySlug": "furniture",
     "condition": "FAIR",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/bookshelf/600/450"
+    "imageUrl": "https://live.staticflickr.com/4068/4420309692_ca76f1913a_b.jpg"
   },
   {
     "title": "LED Desk Lamp",
@@ -107,9 +105,8 @@
     "categorySlug": "dorm-essentials",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/desk-lamp/600/450"
+    "imageUrl": "https://live.staticflickr.com/3637/5771792573_6daf7dd020_b.jpg"
   },
-
   {
     "title": "Laptop Backpack",
     "description": "Water-resistant backpack with a padded laptop compartment.",
@@ -117,7 +114,7 @@
     "categorySlug": "accessories",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/laptop-backpack/600/450"
+    "imageUrl": "https://live.staticflickr.com/3764/12592249784_12c252b8f5_b.jpg"
   },
   {
     "title": "Canvas Tote Bag",
@@ -126,7 +123,7 @@
     "categorySlug": "accessories",
     "condition": "NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/tote-bag/600/450"
+    "imageUrl": "https://live.staticflickr.com/4074/4860486736_c4c3459f1d_b.jpg"
   },
   {
     "title": "Travel Duffel Bag",
@@ -135,9 +132,8 @@
     "categorySlug": "accessories",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/duffel-bag/600/450"
+    "imageUrl": "https://live.staticflickr.com/183/427489461_4d8d5b8aba_b.jpg"
   },
-
   {
     "title": "UP Visayas Hoodie",
     "description": "University hoodie, size medium, worn a few times only.",
@@ -145,7 +141,7 @@
     "categorySlug": "clothing",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/up-hoodie/600/450"
+    "imageUrl": "https://live.staticflickr.com/843/43298682322_851183d55c_m.jpg"
   },
   {
     "title": "Graduation Toga Set",
@@ -154,7 +150,7 @@
     "categorySlug": "clothing",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/graduation-toga/600/450"
+    "imageUrl": "https://live.staticflickr.com/8145/7309278836_7aabe8efff_b.jpg"
   },
   {
     "title": "Varsity Jacket",
@@ -163,9 +159,8 @@
     "categorySlug": "clothing",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/varsity-jacket/600/450"
+    "imageUrl": "https://live.staticflickr.com/5593/14981568370_cff353bd4b_b.jpg"
   },
-
   {
     "title": "Yoga Mat",
     "description": "Non-slip yoga mat, lightly used for PE class and home workouts.",
@@ -173,7 +168,7 @@
     "categorySlug": "sports-outdoors",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/yoga-mat/600/450"
+    "imageUrl": "https://live.staticflickr.com/3570/3286289446_51157914b2_b.jpg"
   },
   {
     "title": "Badminton Racket Set",
@@ -182,7 +177,7 @@
     "categorySlug": "sports-outdoors",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/badminton-racket/600/450"
+    "imageUrl": "https://images.rawpixel.com/editor_1024/cHJpdmF0ZS9zdGF0aWMvaW1hZ2Uvd2Vic2l0ZS8yMDIyLTA0L2xyL3B4MTA2MDgyNC1pbWFnZS1rd3Z3ZHY4eS5qcGc.jpg"
   },
   {
     "title": "Basketball",
@@ -191,9 +186,8 @@
     "categorySlug": "sports-outdoors",
     "condition": "FAIR",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/basketball/600/450"
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Basketball_%28Ball%29.jpg"
   },
-
   {
     "title": "Mini Fridge",
     "description": "Compact dorm fridge, quiet operation, perfect for snacks and drinks.",
@@ -201,7 +195,7 @@
     "categorySlug": "dorm-essentials",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/mini-fridge/600/450"
+    "imageUrl": "https://live.staticflickr.com/1194/865973960_c16315bea1.jpg"
   },
   {
     "title": "Electric Kettle",
@@ -210,7 +204,7 @@
     "categorySlug": "dorm-essentials",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/electric-kettle/600/450"
+    "imageUrl": "https://live.staticflickr.com/8432/7853607814_41755dc873_b.jpg"
   },
   {
     "title": "Rice Cooker",
@@ -219,9 +213,8 @@
     "categorySlug": "dorm-essentials",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/rice-cooker/600/450"
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/62/Zojirushi_Rice_Cooker_NP-RG05.jpg"
   },
-
   {
     "title": "Arduino Uno Kit",
     "description": "Complete starter kit for embedded systems and microcontroller projects.",
@@ -229,7 +222,7 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/arduino-uno-kit/600/450"
+    "imageUrl": "https://live.staticflickr.com/7363/9292046985_6c22e4a69b_b.jpg"
   },
   {
     "title": "Raspberry Pi 4 Board",
@@ -238,7 +231,7 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/raspberry-pi/600/450"
+    "imageUrl": "https://live.staticflickr.com/5537/11140909414_e19f363a3d_b.jpg"
   },
   {
     "title": "Breadboard and Jumper Wires Kit",
@@ -247,9 +240,8 @@
     "categorySlug": "electronics",
     "condition": "NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/breadboard-kit/600/450"
+    "imageUrl": "https://live.staticflickr.com/2633/4106533511_9d0b5f6b39_b.jpg"
   },
-
   {
     "title": "Wireless Headphones",
     "description": "Noise cancelling over-ear headphones, good battery health.",
@@ -257,7 +249,7 @@
     "categorySlug": "electronics",
     "condition": "FAIR",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/wireless-headphones/600/450"
+    "imageUrl": "https://live.staticflickr.com/2603/3946989049_721c163f2c.jpg"
   },
   {
     "title": "Bluetooth Speaker",
@@ -266,9 +258,8 @@
     "categorySlug": "electronics",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/bluetooth-speaker/600/450"
+    "imageUrl": "https://live.staticflickr.com/4010/4526603240_3e8ef506d5_b.jpg"
   },
-
   {
     "title": "Anatomy and Physiology Textbook",
     "description": "Nursing textbook covering human anatomy and physiology, some markings inside.",
@@ -276,7 +267,7 @@
     "categorySlug": "books",
     "condition": "FAIR",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/anatomy-textbook/600/450"
+    "imageUrl": "https://live.staticflickr.com/5478/11291131743_8d28f15c7d_b.jpg"
   },
   {
     "title": "Nursing Uniform Set",
@@ -285,9 +276,8 @@
     "categorySlug": "clothing",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "https://picsum.photos/seed/nursing-uniform/600/450"
+    "imageUrl": "https://live.staticflickr.com/7149/6633632021_123365851c.jpg"
   },
-
   {
     "title": "Old Gaming Laptop (For Parts)",
     "description": "Gaming laptop with broken screen, good for parts or repair projects.",
@@ -295,7 +285,7 @@
     "categorySlug": "electronics",
     "condition": "FOR_PARTS",
     "status": "RESERVED",
-    "imageUrl": "https://picsum.photos/seed/broken-laptop/600/450"
+    "imageUrl": "https://live.staticflickr.com/5024/5571838049_4bcb3a295b.jpg"
   },
   {
     "title": "Thesis-Ready Printer",
@@ -304,6 +294,6 @@
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "SOLD",
-    "imageUrl": "https://picsum.photos/seed/printer/600/450"
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Epson-inkjet-printer.jpg"
   }
 ]
