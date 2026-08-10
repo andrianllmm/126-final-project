@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import pgvector from 'pgvector';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../database/prisma.service.js';
+import { EmbeddingsService } from '../embeddings/embeddings.service.js';
 
 import {
   ListingStatus,
@@ -28,7 +30,12 @@ function buildOrderBy(
   }
 }
 
-function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
+function buildWhere(
+  query: ListingSearchQuery,
+  options: { includeTextSearch?: boolean } = {},
+): Prisma.ListingWhereInput {
+  const { includeTextSearch = true } = options;
+
   const where: Prisma.ListingWhereInput[] = [
     {
       status: {
@@ -74,7 +81,7 @@ function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
     });
   }
 
-  if (query.q) {
+  if (includeTextSearch && query.q) {
     where.push({
       OR: [
         {
@@ -124,12 +131,19 @@ function buildWhere(query: ListingSearchQuery): Prisma.ListingWhereInput {
 
 @Injectable()
 export class SearchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly embeddings: EmbeddingsService,
+  ) {}
 
   async search(
     query: ListingSearchQuery,
     userId?: string,
   ): Promise<ListingPage> {
+    if (query.q) {
+      return this.searchSemantic(query, userId);
+    }
+
     const page = query.page ?? 1;
     const limit = query.limit ?? 12;
     const skip = (page - 1) * limit;
@@ -151,6 +165,75 @@ export class SearchService {
 
     return {
       data: await decorateListings(this.prisma, listings, userId),
+      meta: {
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        page,
+        limit,
+      },
+    };
+  }
+
+  private async searchSemantic(
+    query: ListingSearchQuery,
+    userId?: string,
+  ): Promise<ListingPage> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+    const skip = (page - 1) * limit;
+
+    const where = buildWhere(query, { includeTextSearch: false });
+    const candidates = await this.prisma.listing.findMany({
+      where,
+      select: { id: true },
+    });
+    const candidateIds = candidates.map((listing) => listing.id);
+
+    if (candidateIds.length === 0) {
+      return {
+        data: [],
+        meta: { total: 0, totalPages: 1, page, limit },
+      };
+    }
+
+    const queryEmbedding = pgvector.toSql(
+      await this.embeddings.embedText(query.q as string),
+    );
+
+    const [rankedRows, countRows] = await Promise.all([
+      this.prisma.$queryRaw<{ id: string }[]>`
+        SELECT id FROM "Listing"
+        WHERE id = ANY(${candidateIds}) AND "embedding" IS NOT NULL
+        ORDER BY "embedding" <=> ${queryEmbedding}::vector
+        LIMIT ${limit} OFFSET ${skip}
+      `,
+      this.prisma.$queryRaw<{ count: bigint }[]>`
+        SELECT COUNT(*) as count FROM "Listing"
+        WHERE id = ANY(${candidateIds}) AND "embedding" IS NOT NULL
+      `,
+    ]);
+
+    const rankedIds = rankedRows.map((row) => row.id);
+    const total = Number(countRows[0]?.count ?? 0);
+
+    if (rankedIds.length === 0) {
+      return {
+        data: [],
+        meta: { total, totalPages: Math.max(1, Math.ceil(total / limit)), page, limit },
+      };
+    }
+
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: rankedIds } },
+      include: LISTING_INCLUDE,
+    });
+    const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
+    const ordered = rankedIds
+      .map((id) => listingsById.get(id))
+      .filter((listing) => listing !== undefined);
+
+    return {
+      data: await decorateListings(this.prisma, ordered, userId),
       meta: {
         total,
         totalPages: Math.max(1, Math.ceil(total / limit)),
