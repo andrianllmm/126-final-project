@@ -1,12 +1,10 @@
-# Agent Instructions
+# AGENTS.md
 
 ## Project
 
 Iskommerce is a C2C marketplace for UP Visayas students.
 
 Stack: Next.js (web), NestJS (api), PostgreSQL + Prisma, BetterAuth, Tailwind, shadcn/ui, TypeScript, Turborepo.
-
----
 
 ## Repo Structure
 
@@ -18,15 +16,11 @@ packages/
   api/   # shared types + schema
 ```
 
----
-
 ## Core Rules
 
 - Modular monolith (domain-based modules)
 - Keep frontend/backend independent (no cross-imports)
 - Treat `packages/api` as source of truth for shared types/schemas
-
----
 
 ## Domain Features
 
@@ -39,8 +33,6 @@ packages/
 - Reviews
 - Notifications
 
----
-
 ## NestJS Rules
 
 - Feature modules only
@@ -48,8 +40,6 @@ packages/
 - Services = business logic
 - DTO validation required
 - Avoid circular dependencies
-
----
 
 ## Next.js Rules
 
@@ -59,8 +49,6 @@ packages/
 - Do not rely on training data assumptions
 - Always verify in:
   `node_modules/next/dist/docs/`
-
----
 
 ## Code Style
 
