@@ -6,69 +6,304 @@
     "categorySlug": "electronics",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "images/mechanical-keyboard.jpg"
+    "imageUrl": "https://picsum.photos/seed/mechanical-keyboard/600/450"
   },
   {
-    "title": "Study Desk",
-    "description": "Wooden study desk, sturdy and minimal scratches.",
-    "price": "3200.00",
-    "categorySlug": "furniture",
-    "condition": "GOOD",
-    "status": "AVAILABLE",
-    "imageUrl": "images/study-desk.jpg"
-  },
-  {
-    "title": "Wireless Headphones",
-    "description": "Noise cancelling, good battery health.",
-    "price": "1800.00",
-    "categorySlug": "electronics",
-    "condition": "FAIR",
-    "status": "AVAILABLE",
-    "imageUrl": "images/wireless-headphones.jpg"
-  },
-  {
-    "title": "Laptop Backpack",
-    "description": "Water-resistant backpack with laptop compartment.",
-    "price": "900.00",
-    "categorySlug": "accessories",
-    "condition": "LIKE_NEW",
-    "status": "AVAILABLE",
-    "imageUrl": "images/laptop-backpack.jpg"
-  },
-  {
-    "title": "Arduino Uno Kit",
-    "description": "Complete starter kit for embedded projects.",
-    "price": "1200.00",
-    "categorySlug": "electronics",
-    "condition": "GOOD",
-    "status": "AVAILABLE",
-    "imageUrl": "images/arduino-uno-kit.jpg"
-  },
-  {
-    "title": "Office Chair",
-    "description": "Ergonomic chair with lumbar support.",
-    "price": "4500.00",
-    "categorySlug": "furniture",
-    "condition": "GOOD",
-    "status": "AVAILABLE",
-    "imageUrl": "images/office-chair.jpg"
-  },
-  {
-    "title": "Gaming Mouse",
-    "description": "RGB gaming mouse with adjustable DPI.",
+    "title": "Wireless Gaming Mouse",
+    "description": "RGB gaming mouse with adjustable DPI and low input lag.",
     "price": "950.00",
     "categorySlug": "electronics",
     "condition": "LIKE_NEW",
     "status": "AVAILABLE",
-    "imageUrl": "images/gaming-mouse.jpg"
+    "imageUrl": "https://picsum.photos/seed/gaming-mouse/600/450"
   },
   {
     "title": "USB-C Hub",
-    "description": "Multiport adapter with HDMI and USB 3.0.",
+    "description": "Multiport adapter with HDMI and USB 3.0, great for laptops with limited ports.",
     "price": "1100.00",
     "categorySlug": "electronics",
     "condition": "GOOD",
     "status": "AVAILABLE",
-    "imageUrl": "images/usb-c-hub.jpg"
+    "imageUrl": "https://picsum.photos/seed/usb-c-hub/600/450"
+  },
+  {
+    "title": "27-inch Monitor",
+    "description": "1080p IPS monitor, great for coding and dual-monitor setups.",
+    "price": "5200.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/monitor/600/450"
+  },
+  {
+    "title": "Adjustable Laptop Stand",
+    "description": "Aluminum laptop stand, improves posture and airflow for long coding sessions.",
+    "price": "600.00",
+    "categorySlug": "accessories",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/laptop-stand/600/450"
+  },
+
+  {
+    "title": "Calculus: Early Transcendentals Textbook",
+    "description": "Used calculus textbook for engineering and science majors, minimal highlighting.",
+    "price": "850.00",
+    "categorySlug": "books",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/calculus-textbook/600/450"
+  },
+  {
+    "title": "Linear Algebra and Its Applications",
+    "description": "Math textbook covering vectors, matrices, and linear transformations.",
+    "price": "780.00",
+    "categorySlug": "books",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/linear-algebra/600/450"
+  },
+  {
+    "title": "Scientific Calculator",
+    "description": "Casio scientific calculator for calculus, statistics, and engineering courses.",
+    "price": "1050.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/scientific-calculator/600/450"
+  },
+
+  {
+    "title": "Study Desk",
+    "description": "Wooden study desk, sturdy and minimal scratches, fits well in a dorm room.",
+    "price": "3200.00",
+    "categorySlug": "furniture",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/study-desk/600/450"
+  },
+  {
+    "title": "Ergonomic Office Chair",
+    "description": "Ergonomic chair with lumbar support, ideal for long study sessions.",
+    "price": "4500.00",
+    "categorySlug": "furniture",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/office-chair/600/450"
+  },
+  {
+    "title": "Wooden Bookshelf",
+    "description": "3-tier bookshelf, enough space for textbooks and dorm essentials.",
+    "price": "2100.00",
+    "categorySlug": "furniture",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/bookshelf/600/450"
+  },
+  {
+    "title": "LED Desk Lamp",
+    "description": "Adjustable brightness desk lamp with USB charging port, perfect for late-night studying.",
+    "price": "450.00",
+    "categorySlug": "dorm-essentials",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/desk-lamp/600/450"
+  },
+
+  {
+    "title": "Laptop Backpack",
+    "description": "Water-resistant backpack with a padded laptop compartment.",
+    "price": "900.00",
+    "categorySlug": "accessories",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/laptop-backpack/600/450"
+  },
+  {
+    "title": "Canvas Tote Bag",
+    "description": "Durable canvas tote bag, great for carrying books around campus.",
+    "price": "300.00",
+    "categorySlug": "accessories",
+    "condition": "NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/tote-bag/600/450"
+  },
+  {
+    "title": "Travel Duffel Bag",
+    "description": "Spacious duffel bag, ideal for weekend trips home or out-of-town internships.",
+    "price": "700.00",
+    "categorySlug": "accessories",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/duffel-bag/600/450"
+  },
+
+  {
+    "title": "UP Visayas Hoodie",
+    "description": "University hoodie, size medium, worn a few times only.",
+    "price": "550.00",
+    "categorySlug": "clothing",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/up-hoodie/600/450"
+  },
+  {
+    "title": "Graduation Toga Set",
+    "description": "Complete graduation toga and cap set, used only once for the ceremony.",
+    "price": "1200.00",
+    "categorySlug": "clothing",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/graduation-toga/600/450"
+  },
+  {
+    "title": "Varsity Jacket",
+    "description": "College varsity jacket, warm and comfortable for cold classrooms.",
+    "price": "1400.00",
+    "categorySlug": "clothing",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/varsity-jacket/600/450"
+  },
+
+  {
+    "title": "Yoga Mat",
+    "description": "Non-slip yoga mat, lightly used for PE class and home workouts.",
+    "price": "350.00",
+    "categorySlug": "sports-outdoors",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/yoga-mat/600/450"
+  },
+  {
+    "title": "Badminton Racket Set",
+    "description": "Pair of badminton rackets with shuttlecocks, great for intramurals.",
+    "price": "800.00",
+    "categorySlug": "sports-outdoors",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/badminton-racket/600/450"
+  },
+  {
+    "title": "Basketball",
+    "description": "Molten basketball, indoor/outdoor use, good grip and bounce.",
+    "price": "600.00",
+    "categorySlug": "sports-outdoors",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/basketball/600/450"
+  },
+
+  {
+    "title": "Mini Fridge",
+    "description": "Compact dorm fridge, quiet operation, perfect for snacks and drinks.",
+    "price": "3800.00",
+    "categorySlug": "dorm-essentials",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/mini-fridge/600/450"
+  },
+  {
+    "title": "Electric Kettle",
+    "description": "1L electric kettle, fast boiling, ideal for instant noodles and coffee.",
+    "price": "550.00",
+    "categorySlug": "dorm-essentials",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/electric-kettle/600/450"
+  },
+  {
+    "title": "Rice Cooker",
+    "description": "Small rice cooker, perfect for dorm cooking and quick meals.",
+    "price": "900.00",
+    "categorySlug": "dorm-essentials",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/rice-cooker/600/450"
+  },
+
+  {
+    "title": "Arduino Uno Kit",
+    "description": "Complete starter kit for embedded systems and microcontroller projects.",
+    "price": "1200.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/arduino-uno-kit/600/450"
+  },
+  {
+    "title": "Raspberry Pi 4 Board",
+    "description": "Raspberry Pi 4 with case and power supply, used for a thesis project.",
+    "price": "3500.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/raspberry-pi/600/450"
+  },
+  {
+    "title": "Breadboard and Jumper Wires Kit",
+    "description": "Electronics prototyping kit with breadboard, jumper wires, and resistors.",
+    "price": "400.00",
+    "categorySlug": "electronics",
+    "condition": "NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/breadboard-kit/600/450"
+  },
+
+  {
+    "title": "Wireless Headphones",
+    "description": "Noise cancelling over-ear headphones, good battery health.",
+    "price": "1800.00",
+    "categorySlug": "electronics",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/wireless-headphones/600/450"
+  },
+  {
+    "title": "Bluetooth Speaker",
+    "description": "Portable Bluetooth speaker with good bass, great for dorm room music.",
+    "price": "1300.00",
+    "categorySlug": "electronics",
+    "condition": "LIKE_NEW",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/bluetooth-speaker/600/450"
+  },
+
+  {
+    "title": "Anatomy and Physiology Textbook",
+    "description": "Nursing textbook covering human anatomy and physiology, some markings inside.",
+    "price": "950.00",
+    "categorySlug": "books",
+    "condition": "FAIR",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/anatomy-textbook/600/450"
+  },
+  {
+    "title": "Nursing Uniform Set",
+    "description": "White nursing uniform set with cap, used for duty and RLE.",
+    "price": "1100.00",
+    "categorySlug": "clothing",
+    "condition": "GOOD",
+    "status": "AVAILABLE",
+    "imageUrl": "https://picsum.photos/seed/nursing-uniform/600/450"
+  },
+
+  {
+    "title": "Old Gaming Laptop (For Parts)",
+    "description": "Gaming laptop with broken screen, good for parts or repair projects.",
+    "price": "5000.00",
+    "categorySlug": "electronics",
+    "condition": "FOR_PARTS",
+    "status": "RESERVED",
+    "imageUrl": "https://picsum.photos/seed/broken-laptop/600/450"
+  },
+  {
+    "title": "Thesis-Ready Printer",
+    "description": "All-in-one inkjet printer, recently serviced, perfect for thesis printing season.",
+    "price": "2800.00",
+    "categorySlug": "electronics",
+    "condition": "GOOD",
+    "status": "SOLD",
+    "imageUrl": "https://picsum.photos/seed/printer/600/450"
   }
 ]
