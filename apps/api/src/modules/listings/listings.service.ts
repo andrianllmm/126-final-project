@@ -1,5 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
+import { EmbeddingsService } from '../embeddings/embeddings.service.js';
+import pgvector from 'pgvector';
 
 import {
   CreateListingInput,
@@ -40,9 +42,12 @@ const allowedReadListingStatuses: ListingStatus[] = [
 
 @Injectable()
 export class ListingsService {
+  private readonly logger = new Logger(ListingsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly policy: ListingPolicy,
+    private readonly embeddings: EmbeddingsService,
   ) {}
 
   async findAll(
@@ -108,6 +113,8 @@ export class ListingsService {
       include: LISTING_INCLUDE,
     });
 
+    this.updateEmbedding(listing.id, listing.title, listing.description);
+
     return decorateListing(this.prisma, listing);
   }
 
@@ -137,6 +144,10 @@ export class ListingsService {
       },
       include: LISTING_INCLUDE,
     });
+
+    if (input.title !== undefined || input.description !== undefined) {
+      this.updateEmbedding(updated.id, updated.title, updated.description);
+    }
 
     return decorateListing(this.prisma, updated);
   }
@@ -179,6 +190,28 @@ export class ListingsService {
     });
 
     return decorateListing(this.prisma, deleted);
+  }
+
+  private updateEmbedding(
+    listingId: string,
+    title: string,
+    description: string,
+  ): void {
+    this.embeddings
+      .embedText(`${title}\n${description}`)
+      .then((vector) => {
+        const embedding = pgvector.toSql(vector);
+        return this.prisma.$executeRaw`
+          UPDATE "Listing" SET "embedding" = ${embedding}::vector
+          WHERE "id" = ${listingId}
+        `;
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to compute embedding for listing ${listingId}`,
+          err,
+        ),
+      );
   }
 
   private async getListingOrThrow(id: string) {
