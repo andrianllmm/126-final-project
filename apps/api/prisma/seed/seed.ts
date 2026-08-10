@@ -17,6 +17,8 @@ import { UploadsService } from '../../src/modules/uploads/uploads.service.js';
 import { StorageProvider } from '../../src/modules/uploads/storage/storage.interface.js';
 import { LocalStorageProvider } from '../../src/modules/uploads/storage/local.storage.js';
 import { S3StorageProvider } from '../../src/modules/uploads/storage/s3.storage.js';
+import { EmbeddingsService } from '../../src/modules/embeddings/embeddings.service.js';
+import pgvector from 'pgvector';
 
 const adapter = new PrismaPg({
   connectionString: env.databaseUrl as string,
@@ -30,6 +32,17 @@ const storageProvider: StorageProvider =
     : new LocalStorageProvider();
 
 const uploadsService = new UploadsService(prisma, storageProvider);
+const embeddingsService = new EmbeddingsService();
+
+async function embedListing(id: string, title: string, description: string) {
+  const vector = await embeddingsService.embedText(`${title}\n${description}`);
+  const embedding = pgvector.toSql(vector);
+
+  await prisma.$executeRaw`
+    UPDATE "Listing" SET "embedding" = ${embedding}::vector
+    WHERE "id" = ${id}
+  `;
+}
 
 type ListingSeed = {
   title: string;
@@ -274,6 +287,11 @@ async function main() {
       });
     }),
   );
+
+  console.log(`Embedding ${listings.length} listing(s)...`);
+  for (const listing of listings) {
+    await embedListing(listing.id, listing.title, listing.description);
+  }
 
   const uploads = await Promise.all(
     listingsSeed.map((l, i) =>
