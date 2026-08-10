@@ -87,7 +87,7 @@ export function SearchToolbar({
       </div>
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <SortControl query={query} onUpdate={onUpdate} />
+        {!query.q && <SortControl query={query} onUpdate={onUpdate} />}
 
         <SearchFiltersSheet
           categories={categories}
