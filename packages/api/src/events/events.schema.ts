@@ -17,5 +17,8 @@ export const createUserEventSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
+export const searchHistorySchema = z.array(z.string());
+
 export type UserEvent = z.infer<typeof userEventSchema>;
 export type CreateUserEventInput = z.infer<typeof createUserEventSchema>;
+export type SearchHistory = z.infer<typeof searchHistorySchema>;

@@ -24,6 +24,11 @@ function parsePgvectorText(text: string): number[] {
     .map(Number);
 }
 
+function extractQuery(metadata: unknown): string | null {
+  const q = (metadata as Record<string, unknown> | null)?.q;
+  return typeof q === 'string' && q.trim() ? q.trim() : null;
+}
+
 @Injectable()
 export class UserEmbeddingService {
   private readonly logger = new Logger(UserEmbeddingService.name);
@@ -58,35 +63,69 @@ export class UserEmbeddingService {
     }
 
     const events = await this.prisma.userEvent.findMany({
-      where: { userId, listingId: { not: null } },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       take: RECOMPUTE_EVENT_LIMIT,
-      select: { listingId: true, eventType: true, createdAt: true },
+      select: {
+        listingId: true,
+        eventType: true,
+        createdAt: true,
+        metadata: true,
+      },
     });
     if (events.length === 0) return;
 
-    const listingIds = [...new Set(events.map((e) => e.listingId as string))];
+    const listingIds = [
+      ...new Set(
+        events
+          .filter((e) => e.listingId !== null)
+          .map((e) => e.listingId as string),
+      ),
+    ];
 
-    const rows = await this.prisma.$queryRaw<
-      { id: string; embedding: string | null }[]
-    >`
-      SELECT id, embedding::text as embedding FROM "Listing"
-      WHERE id = ANY(${listingIds}) AND embedding IS NOT NULL
-    `;
+    const searchQueries = [
+      ...new Set(
+        events
+          .filter((e) => e.eventType === 'SEARCH')
+          .map((e) => extractQuery(e.metadata))
+          .filter((q): q is string => !!q),
+      ),
+    ];
+
+    const [listingRows, searchVectors] = await Promise.all([
+      listingIds.length > 0
+        ? this.prisma.$queryRaw<{ id: string; embedding: string | null }[]>`
+            SELECT id, embedding::text as embedding FROM "Listing"
+            WHERE id = ANY(${listingIds}) AND embedding IS NOT NULL
+          `
+        : Promise.resolve([]),
+      Promise.all(
+        searchQueries.map(
+          async (q) => [q, await this.embeddings.embedText(q)] as const,
+        ),
+      ),
+    ]);
+
     const vectorsById = new Map(
-      rows
+      listingRows
         .filter((r) => r.embedding !== null)
         .map((r) => [r.id, parsePgvectorText(r.embedding as string)]),
     );
-    if (vectorsById.size === 0) return;
+    const vectorsByQuery = new Map(searchVectors);
+    if (vectorsById.size === 0 && vectorsByQuery.size === 0) return;
 
     const now = Date.now();
-    const dim = vectorsById.values().next().value!.length;
+    const dim = (
+      vectorsById.values().next().value ?? vectorsByQuery.values().next().value
+    )!.length;
     const sum = new Array(dim).fill(0);
     let totalWeight = 0;
 
     for (const event of events) {
-      const vector = vectorsById.get(event.listingId as string);
+      const vector =
+        event.eventType === 'SEARCH'
+          ? vectorsByQuery.get(extractQuery(event.metadata) ?? '')
+          : vectorsById.get(event.listingId as string);
       if (!vector) continue;
 
       const daysAgo =

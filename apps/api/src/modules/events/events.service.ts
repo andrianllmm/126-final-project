@@ -32,4 +32,40 @@ export class EventsService {
       this.logger.error(`Failed to log event ${input.eventType}`, err),
     );
   }
+
+  async getRecentSearchQueries(
+    userId: string,
+    limit = 10,
+  ): Promise<string[]> {
+    const events = await this.prisma.userEvent.findMany({
+      where: { userId, eventType: 'SEARCH' },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: { metadata: true },
+    });
+
+    const seen = new Set<string>();
+    const queries: string[] = [];
+
+    for (const event of events) {
+      const metadata = event.metadata as Record<string, unknown> | null;
+      const q = typeof metadata?.q === 'string' ? metadata.q.trim() : '';
+      if (!q) continue;
+
+      const key = q.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      queries.push(q);
+      if (queries.length >= limit) break;
+    }
+
+    return queries;
+  }
+
+  async clearSearchHistory(userId: string): Promise<void> {
+    await this.prisma.userEvent.deleteMany({
+      where: { userId, eventType: 'SEARCH' },
+    });
+  }
 }
