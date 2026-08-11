@@ -4,9 +4,10 @@ import { MessagingService } from './messaging.service.js';
 import { MessagingController } from './messaging.controller.js';
 import { DatabaseModule } from '../../database/database.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { EventsModule } from '../events/events.module.js';
 
 @Module({
-  imports: [DatabaseModule, NotificationsModule],
+  imports: [DatabaseModule, NotificationsModule, EventsModule],
   controllers: [MessagingController],
   providers: [MessagingGateway, MessagingService],
   exports: [MessagingService],
