@@ -8,8 +8,6 @@
 
 UP Visayas C2C Marketplace
 
----
-
 ## About The Project
 
 Iskommerce is a closed-campus student-to-student e-commerce marketplace for UP Visayas that enables buying and selling of items within a verified university community.
@@ -28,8 +26,6 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 - Ratings and reviews system
 - Notifications for messages and transaction updates
 
----
-
 ## Built With
 
 - Next.js (Frontend)
@@ -39,8 +35,6 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 - Tailwind CSS + shadcn/ui (UI)
 - TypeScript
 - Turborepo (Monorepo)
-
----
 
 ## Getting Started
 
@@ -106,8 +100,6 @@ pnpm db:migrate
 ```sh
 pnpm dev
 ```
-
----
 
 ## Project Structure
 
@@ -175,15 +167,11 @@ packages/
     └── contracts/                       # FE/BE shared request/response types
 ```
 
----
-
 ## Contributing
 
 Contributions are welcome!
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
-
----
 
 <!-- MARKDOWN LINKS -->
 

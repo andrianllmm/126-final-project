@@ -6,8 +6,6 @@ The Events module logs user activity (views, likes, messages, purchases, searche
 
 It is not responsible for the actual ranking logic on the homepage; that lives in the Search module and only reads `User.embedding`.
 
----
-
 ## System Flow
 
 1. A user action happens (like a listing, send a message, complete a purchase, submit a search)
@@ -15,19 +13,17 @@ It is not responsible for the actual ranking logic on the homepage; that lives i
 3. For likes, messages, purchases, and searches, `UserEmbeddingService.triggerRecompute()` is also called, fire-and-forget
 4. `recomputeOne()` rebuilds the user's embedding from their recent events, skipping the rebuild if it already ran within the last hour
 
----
-
 ## Domain Model
 
 ### UserEvent
 
 Defined in `prisma/schema.prisma`.
 
-| Field       | Description                                    |
-| ----------- | ----------------------------------------------- |
-| `userId`    | Nullable, allows anonymous events               |
-| `listingId` | Nullable, absent for search events              |
-| `eventType` | `VIEW`, `CLICK`, `LIKE`, `MESSAGE`, `PURCHASE`, `SEARCH` |
+| Field       | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `userId`    | Nullable, allows anonymous events                                                  |
+| `listingId` | Nullable, absent for search events                                                 |
+| `eventType` | `VIEW`, `CLICK`, `LIKE`, `MESSAGE`, `PURCHASE`, `SEARCH`                           |
 | `metadata`  | Free-form JSON, used to store the query text for `SEARCH` events (`{ q: string }`) |
 
 ### User.embedding
@@ -38,8 +34,6 @@ A 384-dimension pgvector column on `User`, same type as `Listing.embedding`. Rec
 - The text embeddings of the user's recent search queries
 
 Each event is weighted by type and decays with age (30-day half-life), so recent and stronger signals (a purchase) matter more than older or weaker ones (a view).
-
----
 
 ## HTTP API
 
@@ -61,8 +55,6 @@ POST /events
 
 `listingId` and `metadata` are optional. `userId` is taken from the session, not the request body.
 
----
-
 ### Get Search History
 
 ```
@@ -70,8 +62,6 @@ GET /events/search-history?limit=10
 ```
 
 Returns the user's recent unique search queries, most recent first. Requires authentication.
-
----
 
 ### Clear Search History
 
@@ -81,15 +71,11 @@ DELETE /events/search-history
 
 Deletes all of the user's `SEARCH` events. Requires authentication.
 
----
-
 ## Recompute Behavior
 
 `recomputeOne(userId)` is idempotent and safe to call repeatedly. It skips the rebuild if `User.embeddingUpdatedAt` is less than an hour old, so a burst of events from one user only triggers one recompute per hour.
 
 There is no scheduled sweep yet. `recomputeStale()` exists for that purpose but nothing calls it; wiring it to a cron job is a future task.
-
----
 
 ## Homepage Personalization
 
