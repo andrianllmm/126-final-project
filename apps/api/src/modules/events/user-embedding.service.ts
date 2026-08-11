@@ -96,7 +96,7 @@ export class UserEmbeddingService {
             SELECT id, embedding::text as embedding FROM "Listing"
             WHERE id = ANY(${listingIds}) AND embedding IS NOT NULL
           `
-        : Promise.resolve([]),
+        : Promise.resolve([] as { id: string; embedding: string | null }[]),
       Promise.all(
         searchQueries.map(
           async (q) => [q, await this.embeddings.embedText(q)] as const,
