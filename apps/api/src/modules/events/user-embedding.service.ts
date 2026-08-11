@@ -103,7 +103,7 @@ export class UserEmbeddingService {
     const embedding = pgvector.toSql(sum.map((v) => v / totalWeight));
 
     await this.prisma.$executeRaw`
-      UPDATE "User" SET "embedding" = ${embedding}::vector, "embeddingUpdatedAt" = now()
+      UPDATE "user" SET "embedding" = ${embedding}::vector, "embeddingUpdatedAt" = now()
       WHERE "id" = ${userId}
     `;
   }
