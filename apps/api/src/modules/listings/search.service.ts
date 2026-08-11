@@ -144,6 +144,11 @@ export class SearchService {
       return this.searchSemantic(query, userId);
     }
 
+    if (query.sortBy === 'forYou' && userId) {
+      const personalized = await this.searchPersonalized(query, userId);
+      if (personalized) return personalized;
+    }
+
     const page = query.page ?? 1;
     const limit = query.limit ?? 12;
     const skip = (page - 1) * limit;
@@ -165,6 +170,102 @@ export class SearchService {
 
     return {
       data: await decorateListings(this.prisma, listings, userId),
+      meta: {
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        page,
+        limit,
+      },
+    };
+  }
+
+  private async searchPersonalized(
+    query: ListingSearchQuery,
+    userId: string,
+  ): Promise<ListingPage | null> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+
+    const userRows = await this.prisma.$queryRaw<
+      { embedding: string | null }[]
+    >`
+      SELECT embedding::text as embedding FROM "user" WHERE id = ${userId}
+    `;
+    const userEmbeddingText = userRows[0]?.embedding;
+    if (!userEmbeddingText) return null; // cold start: no embedding yet
+
+    const where = buildWhere(query, { includeTextSearch: false });
+    const candidates = await this.prisma.listing.findMany({
+      where,
+      select: { id: true },
+    });
+    const candidateIds = candidates.map((listing) => listing.id);
+
+    if (candidateIds.length === 0) {
+      return { data: [], meta: { total: 0, totalPages: 1, page, limit } };
+    }
+
+    const skip = (page - 1) * limit;
+    const poolSize = skip + limit;
+    const similarityCount = Math.ceil(poolSize * 0.7);
+    const recencyCount = poolSize - similarityCount;
+
+    const similarityRows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "Listing"
+      WHERE id = ANY(${candidateIds}) AND "embedding" IS NOT NULL
+      ORDER BY "embedding" <=> ${userEmbeddingText}::vector
+      LIMIT ${similarityCount}
+    `;
+    const similarityIds = similarityRows.map((row) => row.id);
+    const similarityIdSet = new Set(similarityIds);
+
+    const recencyListings = await this.prisma.listing.findMany({
+      where: {
+        ...where,
+        id: { notIn: [...similarityIdSet] },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: recencyCount,
+      select: { id: true },
+    });
+    const recencyIds = recencyListings.map((listing) => listing.id);
+
+    const interleaved: string[] = [];
+    let si = 0;
+    let ri = 0;
+    while (
+      interleaved.length < poolSize &&
+      (si < similarityIds.length || ri < recencyIds.length)
+    ) {
+      for (let i = 0; i < 2 && si < similarityIds.length; i++) {
+        interleaved.push(similarityIds[si++]!);
+      }
+      if (ri < recencyIds.length) {
+        interleaved.push(recencyIds[ri++]!);
+      }
+    }
+
+    const pageIds = interleaved.slice(skip, skip + limit);
+    const total = await this.prisma.listing.count({ where });
+
+    if (pageIds.length === 0) {
+      return {
+        data: [],
+        meta: { total, totalPages: Math.max(1, Math.ceil(total / limit)), page, limit },
+      };
+    }
+
+    const listings = await this.prisma.listing.findMany({
+      where: { id: { in: pageIds } },
+      include: LISTING_INCLUDE,
+    });
+    const listingsById = new Map(listings.map((listing) => [listing.id, listing]));
+    const ordered = pageIds
+      .map((id) => listingsById.get(id))
+      .filter((listing) => listing !== undefined);
+
+    return {
+      data: await decorateListings(this.prisma, ordered, userId),
       meta: {
         total,
         totalPages: Math.max(1, Math.ceil(total / limit)),

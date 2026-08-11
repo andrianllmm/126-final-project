@@ -9,16 +9,18 @@ import {
   buildListingPaginationQuery,
   setQueryParams,
 } from '@/features/listings/lib/search-query';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { ListingStatus, type ListingSearchQuery } from '@repo/api';
 
 export default function HomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   const paginationQuery = buildListingPaginationQuery(searchParams);
   const listingsQuery: ListingSearchQuery = {
     ...paginationQuery,
-    sortBy: 'createdAt',
+    sortBy: user ? 'forYou' : 'createdAt',
     sortOrder: 'desc',
     status: [ListingStatus.AVAILABLE, ListingStatus.RESERVED],
   };
