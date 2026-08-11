@@ -35,8 +35,6 @@ export class UserEmbeddingService {
 
   constructor(
     private readonly prisma: PrismaService,
-    // Not called directly here (we average existing listing embeddings rather
-    // than re-embedding text), but kept injected for parity/future use.
     private readonly embeddings: EmbeddingsService,
   ) {}
 
@@ -47,7 +45,7 @@ export class UserEmbeddingService {
     );
   }
 
-  // Idempotent — safe to call from event hooks OR a future cron sweep.
+  // Idempotent, safe to call from event hooks or a future cron sweep.
   async recomputeOne(userId: string): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -147,8 +145,7 @@ export class UserEmbeddingService {
     `;
   }
 
-  // Not called by anything yet. Future cron:
-  // `@Cron(...) sweep() { return this.userEmbeddingService.recomputeStale(); }`
+  // Not called by anything yet. Reserved for a future cron sweep.
   async recomputeStale(limit = 50): Promise<number> {
     const cutoff = new Date(Date.now() - RECOMPUTE_STALENESS_MS);
     const staleUsers = await this.prisma.user.findMany({
