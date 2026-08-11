@@ -4,7 +4,7 @@
 
 Iskommerce is a C2C marketplace for UP Visayas students.
 
-Stack: Next.js (web), NestJS (api), PostgreSQL + Prisma, BetterAuth, Tailwind, shadcn/ui, TypeScript, Turborepo.
+Stack: Next.js (web), NestJS (api), PostgreSQL + Prisma + pgvector, BetterAuth, Tailwind, shadcn/ui, TypeScript, Turborepo.
 
 ## Repo Structure
 
