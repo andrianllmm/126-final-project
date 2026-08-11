@@ -6,8 +6,6 @@ The Uploads module is responsible for handling file uploads, storage abstraction
 
 It is a backend infrastructure module and is NOT responsible for file delivery logic, CDN management, or domain-specific media rules.
 
----
-
 ## System Flow
 
 ### Upload Pipeline
@@ -20,8 +18,6 @@ It is a backend infrastructure module and is NOT responsible for file delivery l
 6. StorageProvider persists file (Local or S3)
 7. Prisma stores upload metadata
 
----
-
 ## Domain Model
 
 ### UploadFile (Input Contract)
@@ -32,8 +28,6 @@ Defined in `uploads/types/upload-file.ts`.
 
 This type is framework-agnostic and decouples business logic from Multer.
 
----
-
 ### UploadResult (Storage Output)
 
 Represents the result returned after a successful storage operation.
@@ -41,8 +35,6 @@ Represents the result returned after a successful storage operation.
 Defined in `uploads/types/upload-result.ts`.
 
 Contains storage key, public URL, and optional metadata (size, dimensions).
-
----
 
 ### StorageProvider (Infrastructure Contract)
 
@@ -57,8 +49,6 @@ interface StorageProvider {
 }
 ```
 
----
-
 ## Storage Implementations
 
 ### LocalStorageProvider
@@ -69,8 +59,6 @@ Located in `uploads/storage/local.storage.ts`.
 - Generates URL using server base path
 - Suitable for development
 
----
-
 ### S3StorageProvider
 
 Located in `uploads/storage/s3.storage.ts`.
@@ -79,8 +67,6 @@ Located in `uploads/storage/s3.storage.ts`.
 - Works with Supabase Storage and Cloudflare R2
 - Requires `forcePathStyle: true`
 - Returns CDN/public URL
-
----
 
 ## HTTP API
 
@@ -110,8 +96,6 @@ POST /uploads
 }
 ```
 
----
-
 ### Delete Upload
 
 ```
@@ -126,11 +110,9 @@ DELETE /uploads/:id
 
 **Responses:**
 
-- `200 OK` — success
-- `404 Not Found` — upload does not exist
-- `403 Forbidden` — user does not own upload
-
----
+- `200 OK`: success
+- `404 Not Found`: upload does not exist
+- `403 Forbidden`: user does not own upload
 
 ## Validation Rules
 
@@ -151,8 +133,6 @@ Validation is enforced at multiple layers:
 
 - Defensive re-validation of file constraints
 
----
-
 ## Persistence Model
 
 Uploads are stored in the `upload` table.
@@ -166,8 +146,6 @@ Each record contains:
 - Optional uploader reference
 
 Uploads are referenced by domain models (e.g. `ListingImage`) rather than storing raw URLs directly.
-
----
 
 ## Usage Pattern
 

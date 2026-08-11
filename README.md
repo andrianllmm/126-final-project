@@ -20,7 +20,8 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 
 - UPV email-verified authentication
 - Product listings (create, update, delete)
-- Search and discovery with filtering and ranking
+- Search and discovery with filtering, sorting, and semantic (meaning-based) search
+- Similar-listings suggestions on each listing page
 - Personalized homepage feed based on a user's activity
 - In-app messaging per listing
 - Transaction workflow (request, accept, reject)
@@ -33,7 +34,7 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 
 - Next.js (Frontend)
 - NestJS (Backend)
-- PostgreSQL + Prisma (Database)
+- PostgreSQL + Prisma + pgvector (Database, semantic search)
 - Better Auth (Auth)
 - Tailwind CSS + shadcn/ui (UI)
 - TypeScript
