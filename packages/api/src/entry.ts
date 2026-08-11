@@ -13,3 +13,4 @@ export * from './reviews/reviews.schema.js';
 export * from './messaging/messaging.schema.js';
 export * from './notifications/notifications.schema.js';
 export * from './location/location.schema.js';
+export * from './events/events.schema.js';
