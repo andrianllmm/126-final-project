@@ -1,6 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
 import { EmbeddingsService } from '../embeddings/embeddings.service.js';
+import { EventsService } from '../events/events.service.js';
+import { UserEmbeddingService } from '../events/user-embedding.service.js';
 import pgvector from 'pgvector';
 
 import {
@@ -48,6 +50,8 @@ export class ListingsService {
     private readonly prisma: PrismaService,
     private readonly policy: ListingPolicy,
     private readonly embeddings: EmbeddingsService,
+    private readonly eventsService: EventsService,
+    private readonly userEmbeddingService: UserEmbeddingService,
   ) {}
 
   async findAll(
@@ -241,6 +245,13 @@ export class ListingsService {
       },
       update: {},
     });
+
+    this.eventsService.logEventAsync({
+      userId,
+      listingId,
+      eventType: 'LIKE',
+    });
+    this.userEmbeddingService.triggerRecompute(userId);
 
     return decorateListing(this.prisma, listing, userId);
   }
