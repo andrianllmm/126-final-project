@@ -11,6 +11,8 @@ import {
   TransactionQueryDto,
 } from './transactions.dto.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { EventsService } from '../events/events.service.js';
+import { UserEmbeddingService } from '../events/user-embedding.service.js';
 import { ListingStatus, NotificationType, TransactionStatus } from '@repo/api';
 import { PrismaTx } from '../../common/prisma-tx.js';
 import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
@@ -20,6 +22,8 @@ export class TransactionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly eventsService: EventsService,
+    private readonly userEmbeddingService: UserEmbeddingService,
   ) {}
 
   async createTransaction(buyerId: string, createDto: CreateTransactionDto) {
@@ -210,7 +214,7 @@ export class TransactionsService {
 
     this.validateStateTransition(transaction.status, 'COMPLETED');
 
-    return this.prisma.$transaction(async (tx) => {
+    const updatedTransaction = await this.prisma.$transaction(async (tx) => {
       const updatedTransaction = await tx.transaction.update({
         where: { transactionId },
         data: {
@@ -287,6 +291,15 @@ export class TransactionsService {
 
       return updatedTransaction;
     });
+
+    this.eventsService.logEventAsync({
+      userId: updatedTransaction.buyerId,
+      listingId: updatedTransaction.listingId,
+      eventType: 'PURCHASE',
+    });
+    this.userEmbeddingService.triggerRecompute(updatedTransaction.buyerId);
+
+    return updatedTransaction;
   }
 
   async cancelTransaction(transactionId: string, userId: string) {

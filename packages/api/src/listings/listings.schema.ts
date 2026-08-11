@@ -14,6 +14,7 @@ export const listingSearchSortBySchema = z.enum([
   'title',
   'category',
   'condition',
+  'forYou',
 ]);
 
 export const listingSearchSortOrderSchema = z.enum(['asc', 'desc']);

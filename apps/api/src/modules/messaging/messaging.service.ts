@@ -7,6 +7,8 @@ import { PrismaService } from '../../database/prisma.service.js';
 import { ListingStatus, NotificationType } from '@repo/api';
 import { NotificationsGateway } from '../notifications/notifications.gateway.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { EventsService } from '../events/events.service.js';
+import { UserEmbeddingService } from '../events/user-embedding.service.js';
 import { truncateText } from '../../common/truncate-text.js';
 import type { Notification as NotificationRecord } from '../../generated/prisma/client.js';
 
@@ -63,6 +65,8 @@ export class MessagingService {
     private prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
     private readonly notificationsGateway: NotificationsGateway,
+    private readonly eventsService: EventsService,
+    private readonly userEmbeddingService: UserEmbeddingService,
   ) {}
 
   async getOrCreateConversation(userId: string, listingId: string) {
@@ -167,6 +171,7 @@ export class MessagingService {
         id: true,
         buyerId: true,
         sellerId: true,
+        listingId: true,
       },
     });
 
@@ -213,6 +218,13 @@ export class MessagingService {
     );
 
     this.notificationsService.emitCreated(notification as NotificationRecord);
+
+    this.eventsService.logEventAsync({
+      userId,
+      listingId: conversation.listingId,
+      eventType: 'MESSAGE',
+    });
+    this.userEmbeddingService.triggerRecompute(userId);
 
     return message;
   }

@@ -56,6 +56,10 @@ model User {
   bio               String?
   pushSubscriptions PushSubscription[]
 
+  embedding          Unsupported("vector(384)")?
+  embeddingUpdatedAt DateTime?
+  events             UserEvent[]
+
   @@map("user")
 }
 
@@ -222,6 +226,7 @@ model Listing {
   conversations Conversation[]
   transactions  Transaction[]
   reviews       Review[]
+  events        UserEvent[]
 
   @@index([sellerId])
   @@index([status])
@@ -256,6 +261,34 @@ model LikedListing {
   createdAt DateTime @default(now())
 
   @@unique([userId, listingId])
+}
+
+enum UserEventType {
+  VIEW
+  CLICK
+  LIKE
+  MESSAGE
+  PURCHASE
+  SEARCH
+}
+
+// TODO: add retention/archival job for UserEvent rows (future task)
+model UserEvent {
+  id String @id @default(cuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  eventType UserEventType
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([listingId, eventType])
 }
 
 model Conversation {

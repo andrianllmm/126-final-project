@@ -8,9 +8,10 @@ import { ListingPolicy } from './listing.policy.js';
 import { SearchModule } from './search.module.js';
 import { UploadsModule } from '../uploads/uploads.module.js';
 import { EmbeddingsModule } from '../embeddings/embeddings.module.js';
+import { EventsModule } from '../events/events.module.js';
 
 @Module({
-  imports: [UploadsModule, SearchModule, EmbeddingsModule],
+  imports: [UploadsModule, SearchModule, EmbeddingsModule, EventsModule],
   controllers: [ListingsController, ListingImagesController],
   providers: [ListingsService, ListingImagesService, ListingPolicy],
 })

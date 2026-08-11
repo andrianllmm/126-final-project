@@ -21,6 +21,7 @@ It replaces fragmented Facebook-based buy-and-sell workflows with a structured p
 - UPV email-verified authentication
 - Product listings (create, update, delete)
 - Search and discovery with filtering and ranking
+- Personalized homepage feed based on a user's activity
 - In-app messaging per listing
 - Transaction workflow (request, accept, reject)
 - Ratings and reviews system

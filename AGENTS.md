@@ -28,6 +28,7 @@ packages/
 - Users
 - Listings
 - Search
+- Events (user activity logging, recommendations)
 - Messaging
 - Transactions
 - Reviews

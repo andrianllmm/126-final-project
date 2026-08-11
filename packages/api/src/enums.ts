@@ -57,3 +57,15 @@ export const NotificationTypeSchema = z.enum([
 
 export type NotificationType = z.infer<typeof NotificationTypeSchema>;
 export const NotificationType = NotificationTypeSchema.enum;
+
+export const UserEventTypeSchema = z.enum([
+  'VIEW',
+  'CLICK',
+  'LIKE',
+  'MESSAGE',
+  'PURCHASE',
+  'SEARCH',
+]);
+
+export type UserEventType = z.infer<typeof UserEventTypeSchema>;
+export const UserEventType = UserEventTypeSchema.enum;
