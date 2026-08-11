@@ -208,7 +208,6 @@ export class SearchService {
     const skip = (page - 1) * limit;
     const poolSize = skip + limit;
     const similarityCount = Math.ceil(poolSize * 0.7);
-    const recencyCount = poolSize - similarityCount;
 
     const similarityRows = await this.prisma.$queryRaw<{ id: string }[]>`
       SELECT id FROM "Listing"
@@ -218,6 +217,11 @@ export class SearchService {
     `;
     const similarityIds = similarityRows.map((row) => row.id);
     const similarityIdSet = new Set(similarityIds);
+
+    // Backfill with recency picks if the similarity pool came up short
+    // (e.g. few candidates have an embedding yet), so the page never
+    // comes up short of poolSize when enough candidates exist overall.
+    const recencyCount = poolSize - similarityIds.length;
 
     const recencyListings = await this.prisma.listing.findMany({
       where: {
